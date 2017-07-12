@@ -37,11 +37,13 @@ import io.sgr.oauth.core.v20.OAuth20;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OAuthCredential implements Serializable {
-	
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6434693647236278615L;
+
+	public static final String DEFAULT_TOKEN_TYPE = "Bearer";
 
 	public static long DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC = TimeUnit.HOURS.toSeconds(1);
 
@@ -60,7 +62,7 @@ public class OAuthCredential implements Serializable {
 	public OAuthCredential(String accessToken, String tokenType) {
 		this.accessToken = accessToken;
 		if (this.accessToken != null && this.accessToken.trim().length() > 0) {
-			this.tokenType = tokenType == null || tokenType.trim().length() <= 0 ? "Bearer" : tokenType;
+			this.tokenType = tokenType == null || tokenType.trim().length() <= 0 ? DEFAULT_TOKEN_TYPE : tokenType;
 		} else {
 			this.tokenType = null;
 		}
@@ -85,7 +87,7 @@ public class OAuthCredential implements Serializable {
 			) {
 		this.accessToken = accessToken;
 		if (this.accessToken != null && this.accessToken.trim().length() > 0) {
-			this.tokenType = tokenType == null || tokenType.trim().length() <= 0 ? "Bearer" : tokenType;
+			this.tokenType = tokenType == null || tokenType.trim().length() <= 0 ? DEFAULT_TOKEN_TYPE : tokenType;
 		} else {
 			this.tokenType = null;
 		}
