@@ -91,7 +91,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.isuper.oauth.http.OAuthHttpClient#getAuthorizeURL(org.isuper.oauth.v20.ResponseType, java.lang.String, java.lang.String, java.lang.String, java.util.Map)
+	 * @see io.sgr.oauth.http.OAuthHttpClient#getAuthorizeURL(io.sgr.oauth.v20.ResponseType, java.lang.String, java.lang.String, java.lang.String, java.util.Map)
 	 */
 	@Override
 	public String getAuthorizeURL(ResponseType responseType, String redirectURL, String state, String scope, Map<String, String> props) throws OAuthException {
@@ -124,7 +124,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.isuper.oauth.http.OAuthHttpClient#retrieveAccessToken(org.isuper.oauth.v20.ParameterStyle, java.lang.String, org.isuper.oauth.v20.GrantType, java.lang.String)
+	 * @see io.sgr.oauth.http.OAuthHttpClient#retrieveAccessToken(io.sgr.oauth.v20.ParameterStyle, java.lang.String, io.sgr.oauth.v20.GrantType, java.lang.String)
 	 */
 	@Override
 	public OAuthCredential retrieveAccessToken(ParameterStyle style, String code, GrantType grantType, String redirectURL) throws MissingAuthorizationCodeException, OAuthException {
@@ -198,7 +198,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.isuper.oauth.client.OAuthHttpClient#refreshToken(org.isuper.oauth.v20.ParameterStyle, java.lang.String, org.isuper.oauth.v20.GrantType)
+	 * @see io.sgr.oauth.client.OAuthHttpClient#refreshToken(io.sgr.oauth.v20.ParameterStyle, java.lang.String, io.sgr.oauth.v20.GrantType)
 	 */
 	@Override
 	public OAuthCredential refreshToken(ParameterStyle style, String refreshToken, GrantType grantType) throws MissingRefreshTokenException, RefreshTokenRevokedException, OAuthException {
@@ -274,7 +274,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.isuper.oauth.client.core.OAuthHttpClient#revokeToken(java.lang.String)
+	 * @see io.sgr.oauth.client.core.OAuthHttpClient#revokeToken(java.lang.String)
 	 */
 	@Override
 	public void revokeToken(String token) throws OAuthException {
@@ -326,7 +326,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.isuper.oauth.http.OAuthHttpClient#getJSONResources(java.lang.Class, org.isuper.oauth.OAuthCredential, java.lang.String, java.lang.String[])
+	 * @see io.sgr.oauth.http.OAuthHttpClient#getJSONResources(java.lang.Class, io.sgr.oauth.OAuthCredential, java.lang.String, java.lang.String[])
 	 */
 	@Override
 	public <T> T getResource(Class<T> resultClass, OAuthCredential credential, String endpoint, String... params) throws MissingAccessTokenException, AccessTokenExpiredException, InvalidAccessTokenException, OAuthException {
@@ -339,7 +339,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.isuper.oauth.http.OAuthHttpClient#getResources(java.lang.Class, org.isuper.oauth.OAuthCredential, java.lang.String, java.lang.String[])
+	 * @see io.sgr.oauth.http.OAuthHttpClient#getResources(java.lang.Class, io.sgr.oauth.OAuthCredential, java.lang.String, java.lang.String[])
 	 */
 	@Override
 	public <T> List<T> getResources(Class<T> resultClass, String treeKey, OAuthCredential credential, String endpoint, String... params) throws MissingAccessTokenException, AccessTokenExpiredException, InvalidAccessTokenException, OAuthException {
@@ -360,7 +360,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.isuper.oauth.http.OAuthHttpClient#getRawResource(org.isuper.oauth.OAuthCredential, java.lang.String, java.lang.String[])
+	 * @see io.sgr.oauth.http.OAuthHttpClient#getRawResource(io.sgr.oauth.OAuthCredential, java.lang.String, java.lang.String[])
 	 */
 	@Override
 	public JsonNode getRawResource(OAuthCredential credential, String endpoint, String... params) throws MissingAccessTokenException, AccessTokenExpiredException, InvalidAccessTokenException, OAuthException {
@@ -432,7 +432,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.isuper.oauth.client.OAuthHttpClient#getOAuthClientConfig()
+	 * @see io.sgr.oauth.client.OAuthHttpClient#getOAuthClientConfig()
 	 */
 	@Override
 	public OAuthClientConfig getOAuthClientConfig() {

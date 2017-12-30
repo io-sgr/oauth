@@ -14,26 +14,28 @@
  * limitations under the License.
  *
  */
-package io.sgr.oauth.server.core.utils;
 
-import io.sgr.oauth.core.OAuthCredential;
-import io.sgr.oauth.core.utils.Preconditions;
+package io.sgr.oauth.server.core.models;
 
-/**
- * @author SgrAlpha
- *
- */
-public class OAuthServerUtils {
-	
-	public static OAuthCredential parseAccessTokenFromAuthorization(String authStr) {
-		if (Preconditions.isEmptyString(authStr)) {
-			return null;
-		}
-		String[] a = authStr.split(" ");
-		if (a.length != 2) {
-			return null;
-		}
-		return new OAuthCredential(a[1], a[0]);
+import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;
+
+public class ScopeDefinition {
+
+	private final String name;
+	private final String description;
+
+	public ScopeDefinition(final String name, final String description) {
+		notEmptyString(name, "Scope name needs to be specified");
+		this.name = name;
+		notEmptyString(name, "Scope description needs to be specified");
+		this.description = description;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
 }

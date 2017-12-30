@@ -56,7 +56,7 @@ public interface OAuthHttpClient extends Closeable {
 	 * @throws OAuthException
 	 * 				If anything goes wrong
 	 */
-	public String getAuthorizeURL(ResponseType responseType, String redirectURL, String state, String scope, Map<String, String> props) throws OAuthException;
+	String getAuthorizeURL(ResponseType responseType, String redirectURL, String state, String scope, Map<String, String> props) throws OAuthException;
 	
 	/**
 	 * @param style
@@ -74,7 +74,7 @@ public interface OAuthHttpClient extends Closeable {
 	 * @throws OAuthException
 	 * 				If anything goes wrong
 	 */
-	public OAuthCredential retrieveAccessToken(ParameterStyle style, String code, GrantType grantType, String redirectURL) throws MissingAuthorizationCodeException, OAuthException;
+	OAuthCredential retrieveAccessToken(ParameterStyle style, String code, GrantType grantType, String redirectURL) throws OAuthException;
 	
 	/**
 	 * @param style
@@ -92,7 +92,7 @@ public interface OAuthHttpClient extends Closeable {
 	 * @throws OAuthException
 	 * 				If anything goes wrong
 	 */
-	public OAuthCredential refreshToken(ParameterStyle style, String refreshToken, GrantType grantType) throws MissingRefreshTokenException, RefreshTokenRevokedException, OAuthException;
+	OAuthCredential refreshToken(ParameterStyle style, String refreshToken, GrantType grantType) throws OAuthException;
 	
 	/**
 	 * @param token
@@ -100,7 +100,7 @@ public interface OAuthHttpClient extends Closeable {
 	 * @throws OAuthException
 	 * 				If anything goes wrong
 	 */
-	public void revokeToken(String token) throws OAuthException;
+	void revokeToken(String token) throws OAuthException;
 	
 	/**
 	 * @param credential
@@ -120,7 +120,7 @@ public interface OAuthHttpClient extends Closeable {
 	 * @throws OAuthException
 	 * 				If anything goes wrong
 	 */
-	public JsonNode getRawResource(OAuthCredential credential, String endpoint, String... params) throws MissingAccessTokenException, AccessTokenExpiredException, InvalidAccessTokenException, OAuthException;
+	JsonNode getRawResource(OAuthCredential credential, String endpoint, String... params) throws MissingAccessTokenException, AccessTokenExpiredException, InvalidAccessTokenException, OAuthException;
 
 	/**
 	 * @param resultClass
@@ -144,7 +144,7 @@ public interface OAuthHttpClient extends Closeable {
 	 * @throws OAuthException
 	 * 				If anything goes wrong
 	 */
-	public <T> T getResource(Class<T> resultClass, OAuthCredential credential, String endpoint, String... params) throws MissingAccessTokenException, AccessTokenExpiredException, InvalidAccessTokenException, OAuthException;
+	<T> T getResource(Class<T> resultClass, OAuthCredential credential, String endpoint, String... params) throws OAuthException;
 	
 	/**
 	 * @param resultClass
@@ -170,12 +170,12 @@ public interface OAuthHttpClient extends Closeable {
 	 * @throws OAuthException
 	 * 				If anything goes wrong
 	 */
-	public <T> List<T> getResources(Class<T> resultClass, String treeKey, OAuthCredential credential, String endpoint, String... params) throws MissingAccessTokenException, AccessTokenExpiredException, InvalidAccessTokenException, OAuthException;
+	<T> List<T> getResources(Class<T> resultClass, String treeKey, OAuthCredential credential, String endpoint, String... params) throws OAuthException;
 	
 	/**
 	 * @return
 	 * 				OAuth client configuration
 	 */
-	public OAuthClientConfig getOAuthClientConfig();
+	OAuthClientConfig getOAuthClientConfig();
 
 }

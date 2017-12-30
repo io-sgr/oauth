@@ -14,24 +14,22 @@
  * limitations under the License.
  *
  */
-package io.sgr.oauth.core;
 
-import java.io.IOException;
+package io.sgr.oauth.core.utils;
 
-/**
- * @author SgrAlpha
- *
- */
-public interface Transformer<S, T> {
-	
-	/**
-	 * @param source
-	 * 			The source object to transform
-	 * @return
-	 * 			The target object after transformation
-	 * @throws IOException
-	 * 			If anything goes wrong during the transformation process
-	 */
-	T transform(S source) throws IOException;
+import static io.sgr.oauth.core.utils.JsonUtil.getDefaultDateFormat;
+import static io.sgr.oauth.core.utils.JsonUtil.getJsonFactory;
+import static io.sgr.oauth.core.utils.JsonUtil.getObjectMapper;
+import static org.junit.Assert.assertNotNull;
 
+import org.junit.Test;
+
+public class JsonUtilTest {
+
+	@Test
+	public void testGetter() {
+		assertNotNull(getObjectMapper());
+		assertNotNull(getJsonFactory());
+		assertNotNull(getDefaultDateFormat());
+	}
 }

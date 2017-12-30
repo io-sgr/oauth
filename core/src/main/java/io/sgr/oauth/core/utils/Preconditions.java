@@ -61,7 +61,7 @@ public final class Preconditions {
 	 * 			Whether or not the given string is an empty string
 	 */
 	public static boolean isEmptyString(String string) {
-		return string == null || string.isEmpty();
+		return string == null || string.trim().isEmpty();
 	}
 
 	private static void matchRequirement(boolean requirements, String errorMsg) {
