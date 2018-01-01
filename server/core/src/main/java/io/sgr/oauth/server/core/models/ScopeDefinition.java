@@ -19,7 +19,9 @@ package io.sgr.oauth.server.core.models;
 
 import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;
 
-public class ScopeDefinition {
+import java.io.Serializable;
+
+public class ScopeDefinition implements Serializable {
 
 	private final String name;
 	private final String description;

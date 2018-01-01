@@ -1,0 +1,118 @@
+/*
+ * Copyright 2018 SgrAlpha
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+package io.sgr.oauth.server.core.models;
+
+import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;
+
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+public class OAuthClientInfo implements Serializable {
+
+	private final String id;
+	private String secret;
+	private String name;
+	private String description;
+	private String iconUrl;
+	private String privacyUrl;
+	private final String ownerUid;
+	private final long createdTimeMs;
+	private List<String> callbacks;
+
+	public OAuthClientInfo(final String id, final String secret, final String name, final String description, final String iconUrl, final String privacyUrl, final String ownerUid, final long createdTimeMs) {
+		this(id, secret, name, description, iconUrl, privacyUrl, ownerUid, createdTimeMs, null);
+	}
+
+	public OAuthClientInfo(final String id, final String secret, final String name, final String description, final String iconUrl, final String privacyUrl, final String ownerUid, final long createdTimeMs, final List<String> callbacks) {
+		notEmptyString(id, "Client ID needs to be specified");
+		this.id = id;
+		setSecret(secret);
+		setName(name);
+		setDescription(description);
+		setIconUrl(iconUrl);
+		setPrivacyUrl(privacyUrl);
+		notEmptyString(ownerUid, "Owner UID needs to be specified");
+		this.ownerUid = ownerUid;
+		this.createdTimeMs = createdTimeMs;
+		setCallbacks(callbacks);
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public String getSecret() {
+		return secret;
+	}
+
+	public void setSecret(final String secret) {
+		notEmptyString(secret, "Client secret needs to be specified");
+		this.secret = secret;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(final String name) {
+		notEmptyString(name, "Client name needs to be specified");
+		this.name = name;
+	}
+
+	public Optional<String> getDescription() {
+		return Optional.ofNullable(description);
+	}
+
+	public void setDescription(final String description) {
+		this.description = Optional.ofNullable(description).orElse(null);
+	}
+
+	public Optional<String> getIconUrl() {
+		return Optional.ofNullable(iconUrl);
+	}
+
+	public void setIconUrl(final String iconUrl) {
+		this.iconUrl = Optional.ofNullable(iconUrl).orElse(null);
+	}
+
+	public Optional<String> getPrivacyUrl() {
+		return Optional.ofNullable(privacyUrl);
+	}
+
+	public void setPrivacyUrl(final String privacyUrl) {
+		this.privacyUrl = Optional.ofNullable(privacyUrl).orElse(null);
+	}
+
+	public String getOwnerUid() {
+		return ownerUid;
+	}
+
+	public long getCreatedTimeMs() {
+		return createdTimeMs;
+	}
+
+	public List<String> getCallbacks() {
+		return callbacks;
+	}
+
+	public void setCallbacks(final List<String> callbacks) {
+		this.callbacks = Optional.ofNullable(callbacks).orElse(Collections.emptyList());
+	}
+}

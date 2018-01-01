@@ -17,57 +17,70 @@
 
 package io.sgr.oauth.server.core.utils;
 
+import static io.sgr.oauth.server.core.utils.OAuthServerUtil.isRedirectUriRegistered;
+import static io.sgr.oauth.server.core.utils.OAuthServerUtil.parseAccessTokenFromAuthorization;
+import static io.sgr.oauth.server.core.utils.OAuthServerUtil.toBaseEndpoint;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 public class OAuthServerUtilTest {
 
 	@Test
-	public void testGetBaseEndpointFromRedirectUri() throws UnsupportedEncodingException {
+	public void testGetBaseEndpointFromRedirectUri() {
 		final String uri = "https://localhost:443/callback?extra_params=aaa&another=";
-		final String encoded = URLEncoder.encode(uri, "UTF-8");
 		try {
-			OAuthServerUtil.toBaseEndpoint(null);
+			toBaseEndpoint(null);
 			fail();
 		} catch (IllegalArgumentException e) {
 			// Ignored
 		}
 		try {
-			OAuthServerUtil.toBaseEndpoint("");
+			toBaseEndpoint("");
 			fail();
 		} catch (IllegalArgumentException e) {
 			// Ignored
 		}
-		final String baseEndpoint = OAuthServerUtil.toBaseEndpoint(encoded);
+		final String baseEndpoint = toBaseEndpoint(uri);
 		assertEquals("https://localhost:443/callback", baseEndpoint);
 	}
 
 	@Test
 	public void testValidateRedirectUri() {
 		try {
-			OAuthServerUtil.isRedirectUriRegistered(null, null);
+			isRedirectUriRegistered(null, Collections.<String>emptyList());
 			fail();
 		} catch (IllegalArgumentException e) {
 			// Ignored
 		}
 		try {
-			OAuthServerUtil.isRedirectUriRegistered("aaa", null);
+			isRedirectUriRegistered("\n", Collections.singletonList("http://localhost/callback"));
 			fail();
 		} catch (IllegalArgumentException e) {
 			// Ignored
 		}
-		try {
-			OAuthServerUtil.isRedirectUriRegistered(null, Collections.singletonList("http://localhost/callback"));
-			fail();
-		} catch (IllegalArgumentException e) {
-			// Ignored
-		}
+		assertFalse(isRedirectUriRegistered("aaa", (String) null));
+		assertFalse(isRedirectUriRegistered("aaa", (String[]) null));
+		assertFalse(isRedirectUriRegistered("aaa", (List<String>) null));
+		assertFalse(isRedirectUriRegistered("aaa", (Set<String>) null));
+		assertTrue(isRedirectUriRegistered("http://localhost/callback", Collections.singletonList("http://localhost/callback")));
+	}
+
+	@Test
+	public void testParseOAuthCredentialFromAuthHeader() {
+		assertNull(parseAccessTokenFromAuthorization(null));
+		assertNull(parseAccessTokenFromAuthorization("\n"));
+		assertNull(parseAccessTokenFromAuthorization("abc"));
+		assertNotNull(parseAccessTokenFromAuthorization("Bearer asadas"));
 	}
 
 }

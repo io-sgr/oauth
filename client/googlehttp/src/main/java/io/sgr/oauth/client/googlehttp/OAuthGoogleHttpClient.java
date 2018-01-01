@@ -16,15 +16,8 @@
  */
 package io.sgr.oauth.client.googlehttp;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.text.DateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static io.sgr.oauth.core.utils.Preconditions.isEmptyString;
+import static io.sgr.oauth.core.utils.Preconditions.notNull;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.api.client.http.GenericUrl;
@@ -33,7 +26,6 @@ import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.UrlEncodedContent;
-
 import io.sgr.oauth.client.core.OAuthClientConfig;
 import io.sgr.oauth.client.core.OAuthHttpClient;
 import io.sgr.oauth.client.core.exceptions.AccessTokenExpiredException;
@@ -48,11 +40,19 @@ import io.sgr.oauth.core.exceptions.OAuthException;
 import io.sgr.oauth.core.exceptions.RecoverableOAuthException;
 import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
 import io.sgr.oauth.core.utils.JsonUtil;
-import io.sgr.oauth.core.utils.Preconditions;
 import io.sgr.oauth.core.v20.GrantType;
 import io.sgr.oauth.core.v20.OAuth20;
 import io.sgr.oauth.core.v20.ParameterStyle;
 import io.sgr.oauth.core.v20.ResponseType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.text.DateFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author SgrAlpha
@@ -81,7 +81,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 	 * 				OAuth HTTP client
 	 */
 	public static OAuthHttpClient newInstance(final OAuthClientConfig clientConfig, final HttpTransport transport, final DateFormat dateFormat) {
-		Preconditions.notNull(clientConfig, "OAuth client configuration should be provided.");
+		notNull(clientConfig, "OAuth client configuration should be provided.");
 		JsonUtil.getObjectMapper().setDateFormat(dateFormat == null ? JsonUtil.getDefaultDateFormat() : dateFormat);
 		try {
 			return new OAuthGoogleHttpClient(clientConfig, transport);
@@ -95,25 +95,26 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 	 */
 	@Override
 	public String getAuthorizeURL(ResponseType responseType, String redirectURL, String state, String scope, Map<String, String> props) throws OAuthException {
-		if (Preconditions.isEmptyString(redirectURL)) {
+		if (isEmptyString(redirectURL)) {
 			throw new UnrecoverableOAuthException(new OAuthError("no_redirect_uri", "Can not get access token without redirect URI"));
 		}
-		ResponseType oauthRespType = responseType == null ? ResponseType.CODE : responseType;
+		final ResponseType oauthRespType = responseType == null ? ResponseType.CODE : responseType;
+		final String oauthRespTypeStr = oauthRespType == ResponseType.CODE_AND_TOKEN ? ResponseType.CODE.name() + " " + ResponseType.TOKEN.name() : oauthRespType.name();
 		try {
-			GenericUrl url = new GenericUrl(this.clientConfig.authUri)
-					.set(OAuth20.OAUTH_RESPONSE_TYPE, oauthRespType.name().toLowerCase())
+			final GenericUrl url = new GenericUrl(this.clientConfig.authUri)
+					.set(OAuth20.OAUTH_RESPONSE_TYPE, oauthRespTypeStr.toLowerCase())
 					.set(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId)
 					.set(OAuth20.OAUTH_REDIRECT_URI, redirectURL);
-			if (!Preconditions.isEmptyString(state)) {
+			if (!isEmptyString(state)) {
 				url.set(OAuth20.OAUTH_STATE, state);
 			}
-			if (!Preconditions.isEmptyString(scope)) {
+			if (!isEmptyString(scope)) {
 				url.set(OAuth20.OAUTH_SCOPE, scope);
 			}
 			if (props != null && !props.isEmpty()) {
 				for (Map.Entry<String, String> entry : props.entrySet()) {
-					String key = entry.getKey();
-					String value = entry.getValue();
+					final String key = entry.getKey();
+					final String value = entry.getValue();
 					url.set(key, value == null ? "" : value);
 				}
 			}
@@ -128,15 +129,15 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 	 */
 	@Override
 	public OAuthCredential retrieveAccessToken(ParameterStyle style, String code, GrantType grantType, String redirectURL) throws MissingAuthorizationCodeException, OAuthException {
-		if (Preconditions.isEmptyString(code)) {
+		if (isEmptyString(code)) {
 			throw new MissingAuthorizationCodeException();
 		}
-		GrantType oauthGrantType = grantType == null ? GrantType.AUTHORIZATION_CODE : grantType;
-		HttpRequest request;
+		final GrantType oauthGrantType = grantType == null ? GrantType.AUTHORIZATION_CODE : grantType;
+		final HttpRequest request;
 		try {
 			switch (style) {
 			case QUERY_STRING:
-				GenericUrl url = new GenericUrl(this.clientConfig.tokenUri)
+				final GenericUrl url = new GenericUrl(this.clientConfig.tokenUri)
 						.set(OAuth20.OAUTH_CODE, code)
 						.set(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId)
 						.set(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret)
@@ -145,7 +146,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 				request = this.reqFac.buildGetRequest(url);
 				break;
 			default:
-				Map<String, String> paramsMap = new HashMap<>();
+				final Map<String, String> paramsMap = new HashMap<>();
 				paramsMap.put(OAuth20.OAUTH_CODE, code);
 				paramsMap.put(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId);
 				paramsMap.put(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret);
@@ -160,8 +161,8 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 			throw new UnrecoverableOAuthException(new OAuthError("failed_to_build_request", "Failed to build request"));
 		}
 		try {
-			HttpResponse resp = request.execute();
-			String content = resp.parseAsString();
+			final HttpResponse resp = request.execute();
+			final String content = resp.parseAsString();
 			LOGGER.trace("Code: " + resp.getStatusCode());
 			LOGGER.trace("Type: " + resp.getContentType());
 			LOGGER.trace("Content: " + content);
@@ -202,15 +203,15 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 	 */
 	@Override
 	public OAuthCredential refreshToken(ParameterStyle style, String refreshToken, GrantType grantType) throws MissingRefreshTokenException, RefreshTokenRevokedException, OAuthException {
-		if (Preconditions.isEmptyString(refreshToken)) {
+		if (isEmptyString(refreshToken)) {
 			throw new MissingRefreshTokenException();
 		}
-		GrantType oauthGrantType = grantType == null ? GrantType.REFRESH_TOKEN : grantType;
-		HttpRequest request;
+		final GrantType oauthGrantType = grantType == null ? GrantType.REFRESH_TOKEN : grantType;
+		final HttpRequest request;
 		try {
 			switch (style) {
 			case QUERY_STRING:
-				GenericUrl url = new GenericUrl(this.clientConfig.tokenUri)
+				final GenericUrl url = new GenericUrl(this.clientConfig.tokenUri)
 										.set(OAuth20.OAUTH_REFRESH_TOKEN, refreshToken)
 										.set(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId)
 										.set(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret)
@@ -218,7 +219,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 				request = this.reqFac.buildGetRequest(url);
 				break;
 			default:
-				Map<String, String> paramsMap = new HashMap<>();
+				final Map<String, String> paramsMap = new HashMap<>();
 				paramsMap.put(OAuth20.OAUTH_REFRESH_TOKEN, refreshToken);
 				paramsMap.put(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId);
 				paramsMap.put(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret);
@@ -232,8 +233,8 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 			throw new UnrecoverableOAuthException(new OAuthError("failed_to_build_request", "Failed to build request"));
 		}
 		try {
-			HttpResponse resp = request.execute();
-			String content = resp.parseAsString();
+			final HttpResponse resp = request.execute();
+			final String content = resp.parseAsString();
 			LOGGER.trace("Code: " + resp.getStatusCode());
 			LOGGER.trace("Type: " + resp.getContentType());
 			LOGGER.trace("Content: " + content);
@@ -242,7 +243,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 				resp.disconnect();
 				try {
 					OAuthCredential credential = JsonUtil.getObjectMapper().readValue(content, OAuthCredential.class);
-					if (Preconditions.isEmptyString(credential.getRefreshToken())) {
+					if (isEmptyString(credential.getRefreshToken())) {
 						credential.setRefreshToken(refreshToken);
 					}
 					return credential;
@@ -278,14 +279,12 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 	 */
 	@Override
 	public void revokeToken(String token) throws OAuthException {
-		if (Preconditions.isEmptyString(token)) {
+		if (isEmptyString(token)) {
 			throw new UnrecoverableOAuthException(new OAuthError("blank_tokne", "Need to specify a token to revoke"));
 		}
-		HttpRequest request;
+		final HttpRequest request;
 		try {
-			Map<String, String> paramsMap = new HashMap<>();
-			paramsMap.put(OAuth20.OAUTH_TOKEN, token);
-			GenericUrl url = new GenericUrl(this.clientConfig.revokeUri).set(OAuth20.OAUTH_TOKEN, token);
+			final GenericUrl url = new GenericUrl(this.clientConfig.revokeUri).set(OAuth20.OAUTH_TOKEN, token);
 			request = this.reqFac.buildGetRequest(url);
 		} catch (MalformedURLException e) {
 			throw new UnrecoverableOAuthException(new OAuthError("invalid_revoke_uri", String.format("Invalid revoke URI: %s", this.clientConfig.revokeUri)));
@@ -293,8 +292,8 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 			throw new UnrecoverableOAuthException(new OAuthError("failed_to_build_request", "Failed to build request"));
 		}
 		try {
-			HttpResponse resp = request.execute();
-			String content = resp.parseAsString();
+			final HttpResponse resp = request.execute();
+			final String content = resp.parseAsString();
 			LOGGER.trace("Code: " + resp.getStatusCode());
 			LOGGER.trace("Type: " + resp.getContentType());
 			LOGGER.trace("Content: " + content);
@@ -330,7 +329,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 	 */
 	@Override
 	public <T> T getResource(Class<T> resultClass, OAuthCredential credential, String endpoint, String... params) throws MissingAccessTokenException, AccessTokenExpiredException, InvalidAccessTokenException, OAuthException {
-		JsonNode node = getRawResource(credential, endpoint, params);
+		final JsonNode node = getRawResource(credential, endpoint, params);
 		try {
 			return JsonUtil.getObjectMapper().treeToValue(node, resultClass);
 		} catch (IOException e) {
@@ -344,7 +343,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 	@Override
 	public <T> List<T> getResources(Class<T> resultClass, String treeKey, OAuthCredential credential, String endpoint, String... params) throws MissingAccessTokenException, AccessTokenExpiredException, InvalidAccessTokenException, OAuthException {
 		JsonNode node = getRawResource(credential, endpoint, params);
-		if (Preconditions.isEmptyString(treeKey)) {
+		if (isEmptyString(treeKey)) {
 			try {
 				return JsonUtil.getObjectMapper().readValue(node.traverse(), JsonUtil.getObjectMapper().getTypeFactory().constructCollectionType(List.class, resultClass));
 			} catch (IOException e) {
@@ -364,20 +363,20 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 	 */
 	@Override
 	public JsonNode getRawResource(OAuthCredential credential, String endpoint, String... params) throws MissingAccessTokenException, AccessTokenExpiredException, InvalidAccessTokenException, OAuthException {
-		if (credential == null || Preconditions.isEmptyString(credential.getAccessToken())) {
+		if (credential == null || isEmptyString(credential.getAccessToken())) {
 			throw new MissingAccessTokenException();
 		}
 		if (System.currentTimeMillis() > credential.getAccessTokenExpiration() * 1000) {
 			throw new AccessTokenExpiredException();
 		}
-		HttpRequest req;
+		final HttpRequest req;
 		try {
-			GenericUrl url = new GenericUrl(endpoint).set(OAuth20.OAUTH_ACCESS_TOKEN, credential.getAccessToken());
+			final GenericUrl url = new GenericUrl(endpoint).set(OAuth20.OAUTH_ACCESS_TOKEN, credential.getAccessToken());
 			if (params != null && params.length > 0) {
 				String key, value;
 				for (int p = 0; p + 1 < params.length; p += 2) {
 					key = params[p];
-					if (Preconditions.isEmptyString(key)) {
+					if (isEmptyString(key)) {
 						continue;
 					}
 					value = params[p + 1];
@@ -391,8 +390,8 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 			throw new UnrecoverableOAuthException(new OAuthError("failed_to_build_request", "Failed to build request"));
 		}
 		try {
-			HttpResponse resp = req.execute();
-			String content = resp.parseAsString();
+			final HttpResponse resp = req.execute();
+			final String content = resp.parseAsString();
 			LOGGER.trace("Code: " + resp.getStatusCode());
 			LOGGER.trace("Type: " + resp.getContentType());
 			LOGGER.trace("Content: " + content);

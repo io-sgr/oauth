@@ -16,6 +16,9 @@
  */
 package io.sgr.oauth.client.apachehttp;
 
+import static io.sgr.oauth.core.utils.Preconditions.isEmptyString;
+import static io.sgr.oauth.core.utils.Preconditions.notNull;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import io.sgr.oauth.client.core.OAuthClientConfig;
 import io.sgr.oauth.client.core.OAuthHttpClient;
@@ -70,9 +73,6 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import static io.sgr.oauth.core.utils.Preconditions.isEmptyString;
-import static io.sgr.oauth.core.utils.Preconditions.notNull;
-
 /**
  * @author SgrAlpha
  *
@@ -86,7 +86,7 @@ public class OAuthApacheHttpClient implements OAuthHttpClient {
 	
 	private OAuthApacheHttpClient(final OAuthClientConfig clientConfig) {
 		this.clientConfig = clientConfig;
-		RequestConfig reqConf = RequestConfig.custom()
+		final RequestConfig reqConf = RequestConfig.custom()
 				.setCookieSpec(CookieSpecs.DEFAULT)
 				.setExpectContinueEnabled(true)
 				.setTargetPreferredAuthSchemes(Arrays.asList(AuthSchemes.NTLM, AuthSchemes.DIGEST))
@@ -125,9 +125,10 @@ public class OAuthApacheHttpClient implements OAuthHttpClient {
 			throw new UnrecoverableOAuthException(new OAuthError("no_redirect_uri", "Can not get access token without redirect URI"));
 		}
 		final ResponseType oauthRespType = responseType == null ? ResponseType.CODE : responseType;
+		final String oauthRespTypeStr = oauthRespType == ResponseType.CODE_AND_TOKEN ? ResponseType.CODE.name() + " " + ResponseType.TOKEN.name() : oauthRespType.name();
 		try {
 			final URIBuilder builder = new URIBuilder(this.clientConfig.authUri);
-			builder.addParameter(OAuth20.OAUTH_RESPONSE_TYPE, oauthRespType.name().toLowerCase());
+			builder.addParameter(OAuth20.OAUTH_RESPONSE_TYPE, oauthRespTypeStr.toLowerCase());
 			builder.addParameter(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId);
 			builder.addParameter(OAuth20.OAUTH_REDIRECT_URI, redirectURL);
 			if (!isEmptyString(state)) {
@@ -153,7 +154,7 @@ public class OAuthApacheHttpClient implements OAuthHttpClient {
 			throw new MissingAuthorizationCodeException();
 		}
 		final GrantType oauthGrantType = grantType == null ? GrantType.AUTHORIZATION_CODE : grantType;
-		HttpRequestBase request;
+		final HttpRequestBase request;
 		try {
 			switch (style) {
 			case QUERY_STRING:
@@ -216,7 +217,7 @@ public class OAuthApacheHttpClient implements OAuthHttpClient {
 			throw new MissingRefreshTokenException();
 		}
 		final GrantType oauthGrantType = grantType == null ? GrantType.REFRESH_TOKEN : grantType;
-		HttpRequestBase request;
+		final HttpRequestBase request;
 		try {
 			switch (style) {
 			case QUERY_STRING:
@@ -282,7 +283,7 @@ public class OAuthApacheHttpClient implements OAuthHttpClient {
 		if (isEmptyString(token)) {
 			throw new UnrecoverableOAuthException(new OAuthError("blank_tokne", "Need to specify a token to revoke"));
 		}
-		HttpRequestBase request;
+		final HttpRequestBase request;
 		try {
 			final URIBuilder builder = new URIBuilder(this.clientConfig.revokeUri);
 			builder.addParameter(OAuth20.OAUTH_TOKEN, token);
@@ -347,7 +348,7 @@ public class OAuthApacheHttpClient implements OAuthHttpClient {
 		if (System.currentTimeMillis() > credential.getAccessTokenExpiration() * 1000) {
 			throw new AccessTokenExpiredException();
 		}
-		HttpRequestBase request;
+		final HttpRequestBase request;
 		try {
 			final URIBuilder builder = new URIBuilder(endpoint);
 			if (params != null && params.length > 0) {

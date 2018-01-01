@@ -21,14 +21,22 @@ import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notNull;
 
 import io.sgr.oauth.core.OAuthCredential;
+import io.sgr.oauth.core.v20.OAuth20;
+import io.sgr.oauth.core.v20.ResponseType;
+import io.sgr.oauth.server.core.exceptions.BadOAuthRequestException;
+import io.sgr.oauth.server.core.models.AuthorizationCodeRequest;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
-import java.util.Collection;
+import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author SgrAlpha
@@ -36,23 +44,67 @@ import java.util.Set;
  */
 public class OAuthServerUtil {
 
-	public static boolean isRedirectUriRegistered(final String redirectUri, final Collection<String> callbacks) {
+	public static AuthorizationCodeRequest parseAuthorizationCodeRequest(final HttpServletRequest req)
+			throws BadOAuthRequestException {
+		notNull(req, "Missing HTTP servlet request");
+		final String responseTypeS = req.getParameter(OAuth20.OAUTH_RESPONSE_TYPE);
+		final ResponseType responseType;
+		if (isEmptyString(responseTypeS)) {
+			responseType = ResponseType.CODE;
+		} else {
+			try {
+				responseType = ResponseType.valueOf(responseTypeS.toUpperCase());
+			} catch (Exception e) {
+				throw new BadOAuthRequestException(MessageFormat.format("Invalid response type '{}'.", responseTypeS));
+			}
+		}
+		final String clientId = req.getParameter(OAuth20.OAUTH_CLIENT_ID);
+		if (isEmptyString(clientId)) {
+			throw new BadOAuthRequestException("Missing OAuth client ID.");
+		}
+		String redirectUri = req.getParameter(OAuth20.OAUTH_REDIRECT_URI);
+		if (isEmptyString(redirectUri)) {
+			throw new BadOAuthRequestException("Missing OAuth client redirect URI.");
+		}
+		try {
+			redirectUri = URLDecoder.decode(redirectUri, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+		String scopes = req.getParameter(OAuth20.OAUTH_SCOPE);
+		if (isEmptyString(scopes)) {
+			throw new BadOAuthRequestException("Missing OAuth client request scopes.");
+		}
+		try {
+			scopes = URLDecoder.decode(scopes, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+		scopes = scopes.replaceAll(" ", "");
+		final String state = req.getParameter(OAuth20.OAUTH_STATE);
+		return new AuthorizationCodeRequest(responseType, clientId, redirectUri, scopes, state);
+	}
+
+	public static boolean isRedirectUriRegistered(final String redirectUri, final String... callbacks) {
 		notEmptyString(redirectUri, "Redirect URI needs to be specified");
-		notNull(callbacks, "Registered callbacks needs to be specified");
-		return isRedirectUriRegistered(redirectUri, new HashSet<>(callbacks));
+		return callbacks != null && callbacks.length == 0 && isRedirectUriRegistered(redirectUri, new HashSet<>(Arrays.asList(callbacks)));
+	}
+
+	public static boolean isRedirectUriRegistered(final String redirectUri, final List<String> callbacks) {
+		notEmptyString(redirectUri, "Redirect URI needs to be specified");
+		return callbacks != null && !callbacks.isEmpty() && isRedirectUriRegistered(redirectUri, new HashSet<>(callbacks));
 	}
 
 	public static boolean isRedirectUriRegistered(final String redirectUri, final Set<String> callbacks) {
-		notNull(callbacks, "Registered callbacks needs to be specified");
-		return callbacks.contains(toBaseEndpoint(redirectUri));
+		return callbacks != null && !callbacks.isEmpty() && callbacks.contains(toBaseEndpoint(redirectUri));
 	}
 
 	public static String toBaseEndpoint(final String redirectUri) {
 		notEmptyString(redirectUri, "Redirect URI needs to be specified");
 		try {
-			final URI uri = URI.create(URLDecoder.decode(redirectUri, "UTF-8"));
+			final URI uri = URI.create(redirectUri);
 			return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null).toString();
-		} catch (URISyntaxException | UnsupportedEncodingException e) {
+		} catch (URISyntaxException e) {
 			throw new IllegalArgumentException(e);
 		}
 	}

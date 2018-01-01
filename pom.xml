@@ -64,6 +64,7 @@
     <modules>
         <module>core</module>
         <module>server/core</module>
+        <module>server/web</module>
         <module>client/core</module>
         <module>client/googlehttp</module>
         <module>client/apachehttp</module>
