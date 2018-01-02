@@ -29,13 +29,13 @@ import io.sgr.oauth.client.core.exceptions.MissingAuthorizationCodeException;
 import io.sgr.oauth.client.core.exceptions.MissingRefreshTokenException;
 import io.sgr.oauth.client.core.exceptions.RefreshTokenRevokedException;
 import io.sgr.oauth.core.OAuthCredential;
-import io.sgr.oauth.core.exceptions.OAuthError;
 import io.sgr.oauth.core.exceptions.OAuthException;
 import io.sgr.oauth.core.exceptions.RecoverableOAuthException;
 import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
 import io.sgr.oauth.core.utils.JsonUtil;
 import io.sgr.oauth.core.v20.GrantType;
 import io.sgr.oauth.core.v20.OAuth20;
+import io.sgr.oauth.core.v20.OAuthError;
 import io.sgr.oauth.core.v20.ParameterStyle;
 import io.sgr.oauth.core.v20.ResponseType;
 import org.apache.http.HttpEntity;
@@ -155,35 +155,37 @@ public class OAuthApacheHttpClient implements OAuthHttpClient {
 		}
 		final GrantType oauthGrantType = grantType == null ? GrantType.AUTHORIZATION_CODE : grantType;
 		final HttpRequestBase request;
-		try {
-			switch (style) {
+		switch (style) {
 			case QUERY_STRING:
-				final URIBuilder builder = new URIBuilder(this.clientConfig.authUri);
-				builder.addParameter(OAuth20.OAUTH_CODE, code);
-				builder.addParameter(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId);
-				builder.addParameter(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret);
-				builder.addParameter(OAuth20.OAUTH_REDIRECT_URI, redirectURL);
-				builder.addParameter(OAuth20.OAUTH_GRANT_TYPE, oauthGrantType.name().toLowerCase());
-				request = new HttpGet(builder.build());
+				try {
+					final URIBuilder builder = new URIBuilder(this.clientConfig.authUri);
+					builder.addParameter(OAuth20.OAUTH_CODE, code);
+					builder.addParameter(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId);
+					builder.addParameter(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret);
+					builder.addParameter(OAuth20.OAUTH_REDIRECT_URI, redirectURL);
+					builder.addParameter(OAuth20.OAUTH_GRANT_TYPE, oauthGrantType.name().toLowerCase());
+					request = new HttpGet(builder.build());
+				} catch (URISyntaxException e) {
+					throw new UnrecoverableOAuthException(new OAuthError("invalid_token_uri", String.format("Invalid token URI: %s", this.clientConfig.tokenUri)));
+				}
 				break;
 			default:
-				final HttpPost post = new HttpPost(this.clientConfig.tokenUri);
-				final List<NameValuePair> nameValuePairs = new ArrayList<>(5);
-				nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_CODE, code));
-				nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId));
-				nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret));
-				nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_REDIRECT_URI, redirectURL));
-				nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_GRANT_TYPE, oauthGrantType.name().toLowerCase()));
-				post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-				request = post;
+				try {
+					final HttpPost post = new HttpPost(this.clientConfig.tokenUri);
+					final List<NameValuePair> nameValuePairs = new ArrayList<>(5);
+					nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_CODE, code));
+					nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId));
+					nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret));
+					nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_REDIRECT_URI, redirectURL));
+					nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_GRANT_TYPE, oauthGrantType.name().toLowerCase()));
+					post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+					request = post;
+				} catch (UnsupportedEncodingException e) {
+					throw new UnrecoverableOAuthException(new OAuthError(e.getMessage(), e.getMessage()));
+				}
 				break;
-			}
-			LOGGER.trace(request.getRequestLine().toString());
-		} catch (URISyntaxException e) {
-			throw new UnrecoverableOAuthException(new OAuthError("invalid_token_uri", String.format("Invalid token URI: %s", this.clientConfig.tokenUri)));
-		} catch (UnsupportedEncodingException e) {
-			throw new UnrecoverableOAuthException(new OAuthError(e.getMessage(), e.getMessage()));
 		}
+		LOGGER.trace(request.getRequestLine().toString());
 		try {
 			final Future<HttpResponse> future = this.httpclient.execute(request, null);
 			final HttpResponse resp = future.get();

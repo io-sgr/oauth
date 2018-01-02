@@ -17,7 +17,7 @@
 
 package io.sgr.oauth.server.core.exceptions;
 
-import io.sgr.oauth.core.exceptions.OAuthError;
+import io.sgr.oauth.core.v20.OAuthError;
 import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
 
 public class BadOAuthRequestException extends UnrecoverableOAuthException {
@@ -26,7 +26,13 @@ public class BadOAuthRequestException extends UnrecoverableOAuthException {
 	 * @param message The error message
 	 */
 	public BadOAuthRequestException(final String message) {
-		super(new OAuthError("bad_oauth_request", message));
+		this(new OAuthError("bad_oauth_request", message, null));
 	}
 
+	/**
+	 * @param error The error
+	 */
+	public BadOAuthRequestException(final OAuthError error) {
+		super(error);
+	}
 }

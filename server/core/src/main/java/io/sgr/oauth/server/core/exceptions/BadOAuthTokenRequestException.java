@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 SgrAlpha
+ * Copyright 2018 SgrAlpha
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,21 @@
  * limitations under the License.
  *
  */
-package io.sgr.oauth.client.core.exceptions;
 
-import static io.sgr.oauth.core.v20.AuthTokenErrorResponseType.INVALID_GRANT;
+package io.sgr.oauth.server.core.exceptions;
 
 import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
+import io.sgr.oauth.core.v20.AuthTokenErrorResponseType;
 import io.sgr.oauth.core.v20.OAuthError;
 
-/**
- * @author SgrAlpha
- *
- */
-public class MissingAuthorizationCodeException extends UnrecoverableOAuthException {
-
-	public MissingAuthorizationCodeException() {
-		super(new OAuthError(INVALID_GRANT.name().toLowerCase(), "The authorization code should be specified."));
-	}
+public class BadOAuthTokenRequestException extends UnrecoverableOAuthException {
 
 	/**
-	 * 
+	 * @param errorType The error type
+	 * @param errorDescription The error description
 	 */
-	private static final long serialVersionUID = 8000416928311828458L;
-	
+	public BadOAuthTokenRequestException(final AuthTokenErrorResponseType errorType, final String errorDescription) {
+		super(new OAuthError(errorType.name().toLowerCase(), errorDescription));
+	}
+
 }

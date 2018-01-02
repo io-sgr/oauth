@@ -35,7 +35,7 @@ import io.sgr.oauth.client.core.exceptions.MissingAuthorizationCodeException;
 import io.sgr.oauth.client.core.exceptions.MissingRefreshTokenException;
 import io.sgr.oauth.client.core.exceptions.RefreshTokenRevokedException;
 import io.sgr.oauth.core.OAuthCredential;
-import io.sgr.oauth.core.exceptions.OAuthError;
+import io.sgr.oauth.core.v20.OAuthError;
 import io.sgr.oauth.core.exceptions.OAuthException;
 import io.sgr.oauth.core.exceptions.RecoverableOAuthException;
 import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
@@ -227,7 +227,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 				request = this.reqFac.buildPostRequest(new GenericUrl(this.clientConfig.tokenUri), new UrlEncodedContent(paramsMap));
 				break;
 			}
-		} catch (MalformedURLException e) {
+		} catch (IllegalArgumentException | MalformedURLException e) {
 			throw new UnrecoverableOAuthException(new OAuthError("invalid_token_uri", String.format("Invalid token URI: %s", this.clientConfig.tokenUri)));
 		} catch (IOException e) {
 			throw new UnrecoverableOAuthException(new OAuthError("failed_to_build_request", "Failed to build request"));

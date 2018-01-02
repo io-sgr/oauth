@@ -31,6 +31,8 @@ public class OAuth20 {
 	public static final String OAUTH_RESPONSE_TYPE = "response_type";
 	public static final String OAUTH_REDIRECT_URI = "redirect_uri";
 	public static final String OAUTH_CODE = "code";
+	public static final String OAUTH_USERNAME = "username";
+	public static final String OAUTH_PASSWORD = "password";
 	public static final String OAUTH_STATE = "state";
 	public static final String OAUTH_SCOPE = "scope";
 	public static final String OAUTH_GRANT_TYPE = "grant_type";

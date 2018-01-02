@@ -16,7 +16,7 @@
  */
 package io.sgr.oauth.client.core.exceptions;
 
-import io.sgr.oauth.core.exceptions.OAuthError;
+import io.sgr.oauth.core.v20.OAuthError;
 import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
 
 /**

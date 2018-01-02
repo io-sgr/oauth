@@ -16,6 +16,8 @@
  */
 package io.sgr.oauth.core.exceptions;
 
+import io.sgr.oauth.core.v20.OAuthError;
+
 /**
  * @author SgrAlpha
  *

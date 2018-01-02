@@ -16,7 +16,9 @@
  */
 package io.sgr.oauth.client.core.exceptions;
 
-import io.sgr.oauth.core.exceptions.OAuthError;
+import static io.sgr.oauth.core.v20.AuthTokenErrorResponseType.INVALID_GRANT;
+
+import io.sgr.oauth.core.v20.OAuthError;
 import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
 
 /**
@@ -26,7 +28,7 @@ import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
 public class MissingRefreshTokenException extends UnrecoverableOAuthException {
 
 	public MissingRefreshTokenException() {
-		super(new OAuthError("missing_refresh_token", "The refresh token should be specified."));
+		super(new OAuthError(INVALID_GRANT.name().toLowerCase(), "The refresh token should be specified."));
 	}
 
 	/**

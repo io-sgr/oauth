@@ -25,7 +25,7 @@ import static io.sgr.oauth.server.utils.OAuthV2WebConstants.SESSION_ATTRS_KEY_CL
 import static io.sgr.oauth.server.utils.OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN;
 import static io.sgr.oauth.server.utils.OAuthV2WebConstants.SESSION_ATTRS_KEY_SCOPES;
 
-import io.sgr.oauth.core.exceptions.OAuthError;
+import io.sgr.oauth.core.v20.OAuthError;
 import io.sgr.oauth.core.v20.OAuth20;
 import io.sgr.oauth.core.v20.ResponseType;
 import io.sgr.oauth.server.core.OAuthV2Service;
