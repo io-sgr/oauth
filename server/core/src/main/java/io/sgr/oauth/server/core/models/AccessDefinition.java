@@ -21,24 +21,27 @@ import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notNull;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Collection;
 
 public class AccessDefinition implements Serializable {
 
 	private final String clientId;
 	private final String userId;
-	private final List<String> scopes;
+	private final Collection<String> scopes;
+	private final String redirectUri;
 
-	public AccessDefinition(final String clientId, final String userId, final List<String> scopes) {
+	public AccessDefinition(final String clientId, final String userId, final Collection<String> scopes, final String redirectUri) {
 		notEmptyString(clientId, "Client ID needs to be specified");
 		this.clientId = clientId;
-		notEmptyString(clientId, "Client ID needs to be specified");
+		notEmptyString(userId, "User ID needs to be specified");
 		this.userId = userId;
 		notNull(scopes, "Scopes needs to be specified");
 		if (scopes.isEmpty()) {
 			throw new IllegalArgumentException("Scopes needs to be specified");
 		}
 		this.scopes = scopes;
+		notEmptyString(redirectUri, "Redirect URI needs to be specified");
+		this.redirectUri = redirectUri;
 	}
 
 	public String getClientId() {
@@ -49,7 +52,11 @@ public class AccessDefinition implements Serializable {
 		return userId;
 	}
 
-	public List<String> getScopes() {
+	public Collection<String> getScopes() {
 		return scopes;
+	}
+
+	public String getRedirectUri() {
+		return redirectUri;
 	}
 }

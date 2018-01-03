@@ -15,7 +15,7 @@
  *
  */
 
-package io.sgr.oauth.server.utils;
+package io.sgr.oauth.server.web.utils;
 
 public class OAuthV2WebConstants {
 

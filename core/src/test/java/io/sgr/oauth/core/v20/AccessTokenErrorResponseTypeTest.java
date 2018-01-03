@@ -17,12 +17,12 @@
 
 package io.sgr.oauth.core.v20;
 
-import static io.sgr.oauth.core.v20.AuthTokenErrorResponseType.INVALID_CLIENT;
-import static io.sgr.oauth.core.v20.AuthTokenErrorResponseType.INVALID_GRANT;
-import static io.sgr.oauth.core.v20.AuthTokenErrorResponseType.INVALID_REQUEST;
-import static io.sgr.oauth.core.v20.AuthTokenErrorResponseType.INVALID_SCOPE;
-import static io.sgr.oauth.core.v20.AuthTokenErrorResponseType.UNAUTHORIZED_CLIENT;
-import static io.sgr.oauth.core.v20.AuthTokenErrorResponseType.UNSUPPORTED_GRANT_TYPE;
+import static io.sgr.oauth.core.v20.AccessTokenErrorResponseType.INVALID_CLIENT;
+import static io.sgr.oauth.core.v20.AccessTokenErrorResponseType.INVALID_GRANT;
+import static io.sgr.oauth.core.v20.AccessTokenErrorResponseType.INVALID_REQUEST;
+import static io.sgr.oauth.core.v20.AccessTokenErrorResponseType.INVALID_SCOPE;
+import static io.sgr.oauth.core.v20.AccessTokenErrorResponseType.UNAUTHORIZED_CLIENT;
+import static io.sgr.oauth.core.v20.AccessTokenErrorResponseType.UNSUPPORTED_GRANT_TYPE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -34,11 +34,11 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.List;
 
-public class AuthTokenErrorResponseTypeTest {
+public class AccessTokenErrorResponseTypeTest {
 
 	@Test
 	public void testToJson() throws JsonProcessingException {
-		final String json = JsonUtil.getObjectMapper().writeValueAsString(AuthTokenErrorResponseType.values());
+		final String json = JsonUtil.getObjectMapper().writeValueAsString(AccessTokenErrorResponseType.values());
 		System.out.println(json);
 		assertEquals("[\"invalid_request\",\"invalid_client\",\"invalid_grant\",\"invalid_scope\",\"unauthorized_client\",\"unsupported_grant_type\"]", json);
 	}
@@ -46,8 +46,8 @@ public class AuthTokenErrorResponseTypeTest {
 	@Test
 	public void testFromJson() throws IOException {
 		final String json = "[\"invalid_request\",\"invalid_client\",\"invalid_grant\",\"invalid_scope\",\"unauthorized_client\",\"unsupported_grant_type\"]";
-		final CollectionType type = JsonUtil.getObjectMapper().getTypeFactory().constructCollectionType(List.class, AuthTokenErrorResponseType.class);
-		final List<AuthTokenErrorResponseType> types = JsonUtil.getObjectMapper().readValue(json, type);
+		final CollectionType type = JsonUtil.getObjectMapper().getTypeFactory().constructCollectionType(List.class, AccessTokenErrorResponseType.class);
+		final List<AccessTokenErrorResponseType> types = JsonUtil.getObjectMapper().readValue(json, type);
 		assertNotNull(types);
 		assertEquals(6, types.size());
 		assertEquals(INVALID_REQUEST, types.get(0));

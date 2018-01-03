@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 SgrAlpha
+ * Copyright 2018 SgrAlpha
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,20 @@
  * limitations under the License.
  *
  */
-package io.sgr.oauth.client.core.exceptions;
 
-import static io.sgr.oauth.core.v20.AccessTokenErrorResponseType.INVALID_GRANT;
+package io.sgr.oauth.server.core.exceptions;
 
-import io.sgr.oauth.core.v20.OAuthError;
 import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
+import io.sgr.oauth.core.v20.AccessTokenErrorResponseType;
+import io.sgr.oauth.core.v20.OAuthError;
 
-/**
- * @author SgrAlpha
- *
- */
-public class RefreshTokenRevokedException extends UnrecoverableOAuthException {
-
-	public RefreshTokenRevokedException() {
-		super(new OAuthError(INVALID_GRANT.name().toLowerCase(), "The refresh token already been revoked."));
-	}
+public class InvalidGrantException extends UnrecoverableOAuthException {
 
 	/**
-	 * 
+	 * @param errorDescription The error description
 	 */
-	private static final long serialVersionUID = -7630620067962365131L;
-	
+	public InvalidGrantException(final String errorDescription) {
+		super(new OAuthError(AccessTokenErrorResponseType.INVALID_GRANT.name().toLowerCase(), errorDescription));
+	}
+
 }

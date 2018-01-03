@@ -17,10 +17,12 @@
 
 package io.sgr.oauth.server.core;
 
+import io.sgr.oauth.core.OAuthCredential;
 import io.sgr.oauth.server.core.models.AccessDefinition;
 import io.sgr.oauth.server.core.models.OAuthClientInfo;
 import io.sgr.oauth.server.core.models.ScopeDefinition;
 
+import java.util.Collection;
 import java.util.Optional;
 
 public interface OAuthV2Service {
@@ -47,4 +49,13 @@ public interface OAuthV2Service {
 
 	AccessDefinition getOAuthAccessDefinitionByAuthCode(final String authCode);
 
+	void revokeAuthorizationCode(final String authCode);
+
+	Collection<String> getGrantedScopes(final String clientId, final String userId);
+
+	OAuthCredential generateAccessToken(final String clientId, final String userId, final Collection<String> scopes);
+
+	String getUserIdByUsernameAndPassword(final String username, final String password);
+
+	OAuthCredential refreshAccessToken(final String clientId, final String refreshToken);
 }

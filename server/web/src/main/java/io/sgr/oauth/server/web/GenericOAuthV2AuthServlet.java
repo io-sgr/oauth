@@ -18,12 +18,12 @@
 package io.sgr.oauth.server.web;
 
 import static io.sgr.oauth.core.utils.Preconditions.isEmptyString;
-import static io.sgr.oauth.server.utils.OAuthV2WebConstants.REQ_PARAMS_KEY_APPROVED;
-import static io.sgr.oauth.server.utils.OAuthV2WebConstants.REQ_PARAMS_KEY_CSRF_TOKEN;
-import static io.sgr.oauth.server.utils.OAuthV2WebConstants.SESSION_ATTRS_KEY_AUTH_CODE_REQ;
-import static io.sgr.oauth.server.utils.OAuthV2WebConstants.SESSION_ATTRS_KEY_CLIENT_INFO;
-import static io.sgr.oauth.server.utils.OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN;
-import static io.sgr.oauth.server.utils.OAuthV2WebConstants.SESSION_ATTRS_KEY_SCOPES;
+import static io.sgr.oauth.server.web.utils.OAuthV2WebConstants.REQ_PARAMS_KEY_APPROVED;
+import static io.sgr.oauth.server.web.utils.OAuthV2WebConstants.REQ_PARAMS_KEY_CSRF_TOKEN;
+import static io.sgr.oauth.server.web.utils.OAuthV2WebConstants.SESSION_ATTRS_KEY_AUTH_CODE_REQ;
+import static io.sgr.oauth.server.web.utils.OAuthV2WebConstants.SESSION_ATTRS_KEY_CLIENT_INFO;
+import static io.sgr.oauth.server.web.utils.OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN;
+import static io.sgr.oauth.server.web.utils.OAuthV2WebConstants.SESSION_ATTRS_KEY_SCOPES;
 
 import io.sgr.oauth.core.v20.OAuthError;
 import io.sgr.oauth.core.v20.OAuth20;
@@ -173,7 +173,7 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 			switch (responseType) {
 				case CODE:
 					final String code = UUID.randomUUID().toString().replaceAll("-", "");
-					getOAuthV2Service().createOAuthAccessDefinition(code, new AccessDefinition(clientInfo.getId(), currentUserId, checkedScopes));
+					getOAuthV2Service().createOAuthAccessDefinition(code, new AccessDefinition(clientInfo.getId(), currentUserId, checkedScopes, redirectUri));
 					uri = uriBuilder.queryParam(OAuth20.OAUTH_CODE, code).build();
 					break;
 				default:
@@ -192,9 +192,9 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 		resp.sendError(HttpServletResponse.SC_MOVED_TEMPORARILY);
 	}
 
-	protected abstract String getCurrentUserId(final HttpServletRequest req, final HttpServletResponse resp);
+	protected abstract String getCurrentUserId(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
 
-	protected abstract void onUserNotSignedIn(final HttpServletRequest req, final HttpServletResponse resp) throws IOException;
+	protected abstract void onUserNotSignedIn(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
 
 	protected abstract void onBadOAuthRequest(final HttpServletRequest req, final HttpServletResponse resp, final OAuthError error) throws ServletException, IOException;
 

@@ -16,7 +16,7 @@
  */
 package io.sgr.oauth.client.core.exceptions;
 
-import static io.sgr.oauth.core.v20.AuthTokenErrorResponseType.INVALID_GRANT;
+import static io.sgr.oauth.core.v20.AccessTokenErrorResponseType.INVALID_GRANT;
 
 import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
 import io.sgr.oauth.core.v20.OAuthError;

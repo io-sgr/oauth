@@ -19,17 +19,12 @@ package io.sgr.oauth.server.core.utils;
 import static io.sgr.oauth.core.utils.Preconditions.isEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notNull;
-import static io.sgr.oauth.core.v20.AuthTokenErrorResponseType.INVALID_REQUEST;
-import static io.sgr.oauth.core.v20.AuthTokenErrorResponseType.UNSUPPORTED_GRANT_TYPE;
 
 import io.sgr.oauth.core.OAuthCredential;
-import io.sgr.oauth.core.v20.GrantType;
 import io.sgr.oauth.core.v20.OAuth20;
 import io.sgr.oauth.core.v20.ResponseType;
 import io.sgr.oauth.server.core.exceptions.BadOAuthRequestException;
-import io.sgr.oauth.server.core.exceptions.BadOAuthTokenRequestException;
 import io.sgr.oauth.server.core.models.AuthorizationCodeRequest;
-import io.sgr.oauth.server.core.models.TokenRequest;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -88,65 +83,6 @@ public class OAuthServerUtil {
 		scopes = scopes.replaceAll(" ", "");
 		final String state = req.getParameter(OAuth20.OAUTH_STATE);
 		return new AuthorizationCodeRequest(responseType, clientId, redirectUri, scopes, state);
-	}
-
-	public static TokenRequest parseTokenRequest(final HttpServletRequest req)
-			throws BadOAuthTokenRequestException {
-		notNull(req, "Missing HTTP servlet request");
-		final String clientId = req.getParameter(OAuth20.OAUTH_CLIENT_ID);
-		if (isEmptyString(clientId)) {
-			throw new BadOAuthTokenRequestException(INVALID_REQUEST, "Missing client ID");
-		}
-		final String clientSecret = req.getParameter(OAuth20.OAUTH_CLIENT_SECRET);
-		if (isEmptyString(clientSecret)) {
-			throw new BadOAuthTokenRequestException(INVALID_REQUEST, "Missing client secret");
-		}
-		String redirectUri = req.getParameter(OAuth20.OAUTH_REDIRECT_URI);
-		if (isEmptyString(redirectUri)) {
-			throw new BadOAuthTokenRequestException(INVALID_REQUEST, "Missing client redirect URI");
-		}
-		try {
-			redirectUri = URLDecoder.decode(redirectUri, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
-		final String grantTypeS = req.getParameter(OAuth20.OAUTH_GRANT_TYPE);
-		final GrantType grantType;
-		if (isEmptyString(grantTypeS)) {
-			grantType = GrantType.AUTHORIZATION_CODE;
-		} else {
-			try {
-				grantType = GrantType.valueOf(grantTypeS.toUpperCase());
-			} catch (Exception e) {
-				throw new BadOAuthTokenRequestException(UNSUPPORTED_GRANT_TYPE, MessageFormat.format("Invalid grant type '{0}'", grantTypeS));
-			}
-		}
-		switch (grantType) {
-			case AUTHORIZATION_CODE:
-				final String authCode = req.getParameter(OAuth20.OAUTH_CLIENT_SECRET);
-				if (isEmptyString(authCode)) {
-					throw new BadOAuthTokenRequestException(INVALID_REQUEST, "Missing authorization code");
-				}
-				return new TokenRequest(clientId, clientSecret, redirectUri, grantType, authCode, null, null, null);
-			case REFRESH_TOKEN:
-				final String refreshToken = req.getParameter(OAuth20.OAUTH_REFRESH_TOKEN);
-				if (isEmptyString(refreshToken)) {
-					throw new BadOAuthTokenRequestException(INVALID_REQUEST, "Missing refresh token");
-				}
-				return new TokenRequest(clientId, clientSecret, redirectUri, grantType, null, refreshToken, null, null);
-			case PASSWORD:
-				final String username = req.getParameter(OAuth20.OAUTH_USERNAME);
-				if (isEmptyString(username)) {
-					throw new BadOAuthTokenRequestException(INVALID_REQUEST, "Missing username");
-				}
-				final String password = req.getParameter(OAuth20.OAUTH_PASSWORD);
-				if (isEmptyString(password)) {
-					throw new BadOAuthTokenRequestException(INVALID_REQUEST, "Missing password");
-				}
-				return new TokenRequest(clientId, clientSecret, redirectUri, grantType, null, null, username, password);
-			default:
-				throw new BadOAuthTokenRequestException(UNSUPPORTED_GRANT_TYPE, MessageFormat.format("Unsupported grant type '{0}'", grantType));
-		}
 	}
 
 	public static boolean isRedirectUriRegistered(final String redirectUri, final String... callbacks) {
