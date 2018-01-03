@@ -15,19 +15,13 @@
  *
  */
 
-package io.sgr.oauth.server.core.exceptions;
+package io.sgr.oauth.server.core;
 
-import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
-import io.sgr.oauth.core.v20.AccessTokenErrorResponseType;
-import io.sgr.oauth.core.v20.OAuthError;
+import io.sgr.oauth.core.exceptions.InvalidRequestException;
+import io.sgr.oauth.core.exceptions.UnsupportedGrantTypeException;
+import io.sgr.oauth.server.core.models.TokenRequest;
 
-public class InvalidScopeException extends UnrecoverableOAuthException {
+public interface TokenRequestParser<T> {
 
-	/**
-	 * @param errorDescription The error description
-	 */
-	public InvalidScopeException(final String errorDescription) {
-		super(new OAuthError(AccessTokenErrorResponseType.INVALID_SCOPE.name().toLowerCase(), errorDescription));
-	}
-
+	TokenRequest parse(T from) throws InvalidRequestException, UnsupportedGrantTypeException;
 }

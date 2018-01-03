@@ -18,34 +18,30 @@
 package io.sgr.oauth.server;
 
 import static io.sgr.oauth.core.utils.Preconditions.isEmptyString;
-import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notNull;
-import static io.sgr.oauth.core.v20.GrantType.AUTHORIZATION_CODE;
 
 import io.sgr.oauth.core.OAuthCredential;
 import io.sgr.oauth.core.v20.GrantType;
-import io.sgr.oauth.core.v20.OAuth20;
 import io.sgr.oauth.server.core.OAuthV2Service;
-import io.sgr.oauth.server.core.exceptions.InvalidClientException;
-import io.sgr.oauth.server.core.exceptions.InvalidGrantException;
-import io.sgr.oauth.server.core.exceptions.InvalidRequestException;
-import io.sgr.oauth.server.core.exceptions.InvalidScopeException;
-import io.sgr.oauth.server.core.exceptions.UnsupportedGrantTypeException;
+import io.sgr.oauth.core.exceptions.InvalidClientException;
+import io.sgr.oauth.core.exceptions.InvalidGrantException;
+import io.sgr.oauth.core.exceptions.InvalidRequestException;
+import io.sgr.oauth.core.exceptions.InvalidScopeException;
+import io.sgr.oauth.core.exceptions.UnsupportedGrantTypeException;
 import io.sgr.oauth.server.core.models.AccessDefinition;
 import io.sgr.oauth.server.core.models.OAuthClientInfo;
 import io.sgr.oauth.server.core.models.ScopeDefinition;
+import io.sgr.oauth.server.core.models.TokenRequest;
 import io.sgr.oauth.server.core.utils.OAuthServerUtil;
+import io.sgr.oauth.server.core.TokenRequestParser;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
 
 public class AuthorizationServer {
 
@@ -61,7 +57,8 @@ public class AuthorizationServer {
 	}
 
 	/**
-	 * @param req  The HttpServletRequest
+	 * @param from   The source to parse and generate/refresh token from
+	 * @param parser THe parser to parse source to TokenRequest
 	 * @return The generated/refreshed OAuth access token
 	 * @throws InvalidRequestException       The request is missing a parameter so the server can’t proceed with the request.
 	 *                                       This may also be returned if the request includes an unsupported parameter
@@ -77,37 +74,14 @@ public class AuthorizationServer {
 	 *                                       Note that unknown grant types also use this specific error code rather than
 	 *                                       using the invalid_request above.
 	 */
-	public Optional<OAuthCredential> generateToken(final HttpServletRequest req)
+	public <T> Optional<OAuthCredential> generateToken(final T from, final TokenRequestParser<T> parser)
 			throws InvalidRequestException, InvalidClientException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException {
-		notNull(req, "Missing HttpServletRequest");
-		final String clientId = getOnlyOneParameter(req, OAuth20.OAUTH_CLIENT_ID);
-		if (isEmptyString(clientId)) {
-			throw new InvalidRequestException("Missing client ID");
-		}
-		final String clientSecret = getOnlyOneParameter(req, OAuth20.OAUTH_CLIENT_SECRET);
-		if (isEmptyString(clientSecret)) {
-			throw new InvalidRequestException("Missing client secret");
-		}
-		String redirectUri = getOnlyOneParameter(req, OAuth20.OAUTH_REDIRECT_URI);
-		if (isEmptyString(redirectUri)) {
-			throw new InvalidRequestException("Missing client redirect URI");
-		}
-		try {
-			redirectUri = URLDecoder.decode(redirectUri, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
-		final String grantTypeS = getOnlyOneParameter(req, OAuth20.OAUTH_GRANT_TYPE);
-		final GrantType grantType;
-		if (isEmptyString(grantTypeS)) {
-			grantType = AUTHORIZATION_CODE;
-		} else {
-			try {
-				grantType = GrantType.valueOf(grantTypeS.toUpperCase());
-			} catch (Exception e) {
-				throw new UnsupportedGrantTypeException(MessageFormat.format("Unsupported grant type '{0}'", grantTypeS));
-			}
-		}
+		notNull(parser, "Parser needs to be specified");
+		final TokenRequest tokenReq = parser.parse(from);
+		final String clientId = tokenReq.getClientId();
+		final String clientSecret = tokenReq.getClientSecret();
+		final String redirectUri = tokenReq.getRedirectUri();
+		final GrantType grantType = tokenReq.getGrantType();
 		final Optional<OAuthClientInfo> clientInfo = getOAuthV2Service().getOAuthClientByIdAndSecret(clientId, clientSecret);
 		if (!clientInfo.isPresent()) {
 			throw new InvalidClientException("Unauthorized client ID or secret");
@@ -121,11 +95,12 @@ public class AuthorizationServer {
 		final Collection<String> scopes;
 		final OAuthCredential credential;
 		switch (grantType) {
+			case REFRESH_TOKEN:
+				final String refreshToken = tokenReq.getRefreshToken().orElseThrow(() -> new InvalidRequestException("Missing refresh token"));
+				credential = getOAuthV2Service().refreshAccessToken(clientId, refreshToken);
+				break;
 			case AUTHORIZATION_CODE:
-				final String authCode = getOnlyOneParameter(req, OAuth20.OAUTH_CODE);
-				if (isEmptyString(authCode)) {
-					throw new InvalidRequestException("Missing authorization code");
-				}
+				final String authCode = tokenReq.getCode().orElseThrow(() -> new InvalidRequestException("Missing authorization code"));
 				final AccessDefinition accessDef = getOAuthV2Service().getOAuthAccessDefinitionByAuthCode(authCode);
 				if (accessDef == null) {
 					throw new InvalidGrantException("Unknown code");
@@ -140,12 +115,8 @@ public class AuthorizationServer {
 				credential = getOAuthV2Service().generateAccessToken(clientId, userId, scopes);
 				break;
 			case PASSWORD:
-				String scopeNames = getOnlyOneParameter(req, OAuth20.OAUTH_SCOPE);
-				if (isEmptyString(scopeNames)) {
-					throw new InvalidRequestException("Missing scope");
-				}
-				final String[] names = scopeNames.replaceAll(" ", "").split(",");
-				if (names.length == 0) {
+				final List<String> names = tokenReq.getScopes().orElse(Collections.emptyList());
+				if (names.isEmpty()) {
 					throw new InvalidRequestException("Missing scope");
 				}
 				final List<String> checkedScopes = new LinkedList<>();
@@ -159,14 +130,8 @@ public class AuthorizationServer {
 					}
 					checkedScopes.add(scope.get().getName());
 				}
-				final String username = getOnlyOneParameter(req, OAuth20.OAUTH_USERNAME);
-				if (isEmptyString(username)) {
-					throw new InvalidRequestException("Missing username");
-				}
-				final String password = getOnlyOneParameter(req, OAuth20.OAUTH_PASSWORD);
-				if (isEmptyString(password)) {
-					throw new InvalidRequestException("Missing password");
-				}
+				final String username = tokenReq.getUsername().orElseThrow(() -> new InvalidRequestException("Missing username"));
+				final String password = tokenReq.getPassword().orElseThrow(() -> new InvalidRequestException("Missing password"));
 				userId = getOAuthV2Service().getUserIdByUsernameAndPassword(username, password);
 				if (isEmptyString(userId)) {
 					throw new InvalidGrantException("Unknown username or password");
@@ -175,27 +140,10 @@ public class AuthorizationServer {
 				scopes.addAll(checkedScopes);
 				credential = getOAuthV2Service().generateAccessToken(clientId, userId, scopes);
 				break;
-			case REFRESH_TOKEN:
-				final String refreshToken = getOnlyOneParameter(req, OAuth20.OAUTH_REFRESH_TOKEN);
-				if (isEmptyString(refreshToken)) {
-					throw new InvalidRequestException("Missing refresh token");
-				}
-				credential = getOAuthV2Service().refreshAccessToken(clientId, refreshToken);
-				break;
 			default:
 				throw new UnsupportedGrantTypeException(MessageFormat.format("Unsupported grant type '{0}'", grantType));
 		}
 		return Optional.ofNullable(credential);
-	}
-
-	private static String getOnlyOneParameter(final HttpServletRequest req, final String parameter) throws InvalidRequestException {
-		notNull(req, "Missing HttpServletRequest");
-		notEmptyString(parameter, "Parameter name needs to be specified");
-		final String value = req.getParameter(parameter);
-		if (req.getParameterValues(parameter).length > 1) {
-			throw new InvalidRequestException(MessageFormat.format("Only one '{0}' parameter allowed", parameter));
-		}
-		return value;
 	}
 
 	private OAuthV2Service getOAuthV2Service() {

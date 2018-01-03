@@ -15,19 +15,19 @@
  *
  */
 
-package io.sgr.oauth.server.core.exceptions;
+package io.sgr.oauth.core.exceptions;
 
 import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
-import io.sgr.oauth.core.v20.AccessTokenErrorResponseType;
 import io.sgr.oauth.core.v20.OAuthError;
+import io.sgr.oauth.core.v20.OAuthErrorType;
 
-public class UnauthorizedClientException extends UnrecoverableOAuthException {
+public class AccessDeniedException extends UnrecoverableOAuthException {
 
 	/**
 	 * @param errorDescription The error description
 	 */
-	public UnauthorizedClientException(final String errorDescription) {
-		super(new OAuthError(AccessTokenErrorResponseType.UNAUTHORIZED_CLIENT.name().toLowerCase(), errorDescription));
+	public AccessDeniedException(final String errorDescription) {
+		super(new OAuthError(OAuthErrorType.ACCESS_DENIED.name().toLowerCase(), errorDescription));
 	}
 
 }

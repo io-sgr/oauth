@@ -15,19 +15,16 @@
  *
  */
 
-package io.sgr.oauth.server.core.exceptions;
+package io.sgr.oauth.core.v20;
 
-import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
-import io.sgr.oauth.core.v20.AccessTokenErrorResponseType;
-import io.sgr.oauth.core.v20.OAuthError;
+import static org.junit.Assert.assertEquals;
 
-public class InvalidGrantException extends UnrecoverableOAuthException {
+import org.junit.Test;
 
-	/**
-	 * @param errorDescription The error description
-	 */
-	public InvalidGrantException(final String errorDescription) {
-		super(new OAuthError(AccessTokenErrorResponseType.INVALID_GRANT.name().toLowerCase(), errorDescription));
+public class GrantTypeTest {
+
+	@Test
+	public void simple() {
+		assertEquals(5, GrantType.values().length);
 	}
-
 }

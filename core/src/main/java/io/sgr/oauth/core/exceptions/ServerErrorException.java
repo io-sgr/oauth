@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 SgrAlpha
+ * Copyright 2018 SgrAlpha
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,19 @@
  * limitations under the License.
  *
  */
-package io.sgr.oauth.client.core.exceptions;
 
-import static io.sgr.oauth.core.v20.OAuthErrorType.INVALID_GRANT;
+package io.sgr.oauth.core.exceptions;
 
 import io.sgr.oauth.core.v20.OAuthError;
-import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
+import io.sgr.oauth.core.v20.OAuthErrorType;
 
-/**
- * @author SgrAlpha
- *
- */
-public class MissingRefreshTokenException extends UnrecoverableOAuthException {
-
-	public MissingRefreshTokenException() {
-		super(new OAuthError(INVALID_GRANT.name().toLowerCase(), "The refresh token should be specified."));
-	}
+public class ServerErrorException extends RecoverableOAuthException {
 
 	/**
-	 * 
+	 * @param errorDescription The error description
 	 */
-	private static final long serialVersionUID = 6290573815101966462L;
-	
+	public ServerErrorException(final String errorDescription) {
+		super(new OAuthError(OAuthErrorType.SERVER_ERROR.name().toLowerCase(), errorDescription));
+	}
+
 }

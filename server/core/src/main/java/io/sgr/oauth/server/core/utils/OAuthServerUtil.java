@@ -24,7 +24,8 @@ import io.sgr.oauth.core.OAuthCredential;
 import io.sgr.oauth.core.v20.OAuth20;
 import io.sgr.oauth.core.v20.ResponseType;
 import io.sgr.oauth.server.core.exceptions.BadOAuthRequestException;
-import io.sgr.oauth.server.core.models.AuthorizationCodeRequest;
+import io.sgr.oauth.core.exceptions.InvalidRequestException;
+import io.sgr.oauth.server.core.models.AuthorizationRequest;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -44,8 +45,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class OAuthServerUtil {
 
-	public static AuthorizationCodeRequest parseAuthorizationCodeRequest(final HttpServletRequest req)
-			throws BadOAuthRequestException {
+	public static AuthorizationRequest parseAuthorizationCodeRequest(final HttpServletRequest req)
+			throws BadOAuthRequestException, InvalidRequestException {
 		notNull(req, "Missing HTTP servlet request");
 		final String responseTypeS = req.getParameter(OAuth20.OAUTH_RESPONSE_TYPE);
 		final ResponseType responseType;
@@ -71,18 +72,9 @@ public class OAuthServerUtil {
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
-		String scopes = req.getParameter(OAuth20.OAUTH_SCOPE);
-		if (isEmptyString(scopes)) {
-			throw new BadOAuthRequestException("Missing client request scopes");
-		}
-		try {
-			scopes = URLDecoder.decode(scopes, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
-		scopes = scopes.replaceAll(" ", "");
+		final List<String> scopes = parseScopes(req);
 		final String state = req.getParameter(OAuth20.OAUTH_STATE);
-		return new AuthorizationCodeRequest(responseType, clientId, redirectUri, scopes, state);
+		return new AuthorizationRequest(responseType, clientId, redirectUri, scopes, state);
 	}
 
 	public static boolean isRedirectUriRegistered(final String redirectUri, final String... callbacks) {
@@ -118,6 +110,42 @@ public class OAuthServerUtil {
 			return null;
 		}
 		return new OAuthCredential(a[1], a[0]);
+	}
+
+	public static List<String> parseScopes(final HttpServletRequest req) throws InvalidRequestException {
+		return parseScopes(req, ",");
+	}
+
+	public static List<String> parseScopes(final HttpServletRequest req, final String splitter) throws InvalidRequestException {
+		notNull(req, "Missing HttpServletRequest");
+		notEmptyString(splitter, "Splitter needs to be specified");
+		final String scopeNames = getOnlyOneParameter(req, OAuth20.OAUTH_SCOPE);
+		final List<String> scopes;
+		if (isEmptyString(scopeNames)) {
+			scopes = null;
+		} else {
+			final String[] names = scopeNames.replaceAll(" ", "").split(splitter);
+			if (names.length == 0) {
+				scopes = null;
+			} else {
+				scopes = Arrays.asList(names);
+			}
+		}
+		return scopes;
+	}
+
+	public static String getOnlyOneParameter(final HttpServletRequest req, final String parameter) throws InvalidRequestException {
+		notNull(req, "Missing HttpServletRequest");
+		notEmptyString(parameter, "Parameter name needs to be specified");
+		final String value = req.getParameter(parameter);
+		if (req.getParameterValues(parameter).length > 1) {
+			throw new InvalidRequestException(MessageFormat.format("Only one '{0}' parameter allowed", parameter));
+		}
+		try {
+			return URLDecoder.decode(value, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

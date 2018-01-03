@@ -15,19 +15,19 @@
  *
  */
 
-package io.sgr.oauth.server.core.exceptions;
+package io.sgr.oauth.core.exceptions;
 
 import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
-import io.sgr.oauth.core.v20.AccessTokenErrorResponseType;
+import io.sgr.oauth.core.v20.OAuthErrorType;
 import io.sgr.oauth.core.v20.OAuthError;
 
-public class InvalidClientException extends UnrecoverableOAuthException {
+public class InvalidRequestException extends UnrecoverableOAuthException {
 
 	/**
 	 * @param errorDescription The error description
 	 */
-	public InvalidClientException(final String errorDescription) {
-		super(new OAuthError(AccessTokenErrorResponseType.INVALID_CLIENT.name().toLowerCase(), errorDescription));
+	public InvalidRequestException(final String errorDescription) {
+		super(new OAuthError(OAuthErrorType.INVALID_REQUEST.name().toLowerCase(), errorDescription));
 	}
 
 }

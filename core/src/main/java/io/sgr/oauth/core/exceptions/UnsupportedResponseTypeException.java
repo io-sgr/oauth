@@ -15,19 +15,19 @@
  *
  */
 
-package io.sgr.oauth.server.core.exceptions;
+package io.sgr.oauth.core.exceptions;
 
 import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
-import io.sgr.oauth.core.v20.AccessTokenErrorResponseType;
 import io.sgr.oauth.core.v20.OAuthError;
+import io.sgr.oauth.core.v20.OAuthErrorType;
 
-public class UnsupportedGrantTypeException extends UnrecoverableOAuthException {
+public class UnsupportedResponseTypeException extends UnrecoverableOAuthException {
 
 	/**
 	 * @param errorDescription The error description
 	 */
-	public UnsupportedGrantTypeException(final String errorDescription) {
-		super(new OAuthError(AccessTokenErrorResponseType.UNSUPPORTED_GRANT_TYPE.name().toLowerCase(), errorDescription));
+	public UnsupportedResponseTypeException(final String errorDescription) {
+		super(new OAuthError(OAuthErrorType.UNSUPPORTED_RESPONSE_TYPE.name().toLowerCase(), errorDescription));
 	}
 
 }

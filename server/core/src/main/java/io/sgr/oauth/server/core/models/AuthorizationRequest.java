@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 SgrAlpha
+ * Copyright 2018 SgrAlpha
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,44 +24,71 @@ import static io.sgr.oauth.core.utils.Preconditions.notNull;
 import io.sgr.oauth.core.v20.ResponseType;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
-public class AuthorizationCodeRequest implements Serializable {
+public class AuthorizationRequest implements Serializable {
 
 	private final ResponseType responseType;
 	private final String clientId;
 	private final String redirectUri;
-	private final String scopes;
+	private final List<String> scopes;
 	private final String state;
 
-	public AuthorizationCodeRequest(final ResponseType responseType, final String clientId, final String redirectUri, final String scopes, final String state) {
+	/**
+	 * @param responseType The response type
+	 * @param clientId     The client ID
+	 * @param redirectUri  The redirect URI
+	 * @param scopes       The scopes
+	 * @param state        The state
+	 */
+	public AuthorizationRequest(
+			final ResponseType responseType, final String clientId, final String redirectUri, final List<String> scopes,
+			final String state) {
 		notNull(responseType, "Response type needs to be specified");
 		this.responseType = responseType;
 		notEmptyString(clientId, "Client ID needs to be specified");
 		this.clientId = clientId;
 		notEmptyString(redirectUri, "Redirect URI needs to be specified");
 		this.redirectUri = redirectUri;
-		notEmptyString(scopes, "Request scope needs to be specified");
+		notNull(scopes, "Scopes need to be specified");
 		this.scopes = scopes;
 		this.state = isEmptyString(state) ? null : state;
 	}
 
+	/**
+	 * @return The response type
+	 */
 	public ResponseType getResponseType() {
 		return responseType;
 	}
 
+	/**
+	 * @return The client ID
+	 */
 	public String getClientId() {
 		return clientId;
 	}
 
+	/**
+	 * @return The redirect URI
+	 */
 	public String getRedirectUri() {
 		return redirectUri;
 	}
 
-	public String getScopes() {
-		return scopes;
+	/**
+	 * @return The scopes
+	 */
+	public List<String> getScopes() {
+		return Collections.unmodifiableList(scopes);
 	}
 
-	public String getState() {
-		return state;
+	/**
+	 * @return The state
+	 */
+	public Optional<String> getState() {
+		return Optional.ofNullable(state);
 	}
 }

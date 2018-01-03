@@ -29,7 +29,7 @@ public class OAuthErrorTest {
 	public void testConstructor() {
 		OAuthError err;
 
-		final String error = AccessTokenErrorResponseType.INVALID_GRANT.name().toLowerCase();
+		final String error = OAuthErrorType.INVALID_GRANT.name().toLowerCase();
 		final String errorDescription = "This is a description";
 		err = new OAuthError(error, errorDescription);
 		assertEquals(error, err.getName());

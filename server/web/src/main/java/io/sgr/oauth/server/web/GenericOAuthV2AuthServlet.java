@@ -25,13 +25,14 @@ import static io.sgr.oauth.server.web.utils.OAuthV2WebConstants.SESSION_ATTRS_KE
 import static io.sgr.oauth.server.web.utils.OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN;
 import static io.sgr.oauth.server.web.utils.OAuthV2WebConstants.SESSION_ATTRS_KEY_SCOPES;
 
+import io.sgr.oauth.core.exceptions.InvalidRequestException;
 import io.sgr.oauth.core.v20.OAuthError;
 import io.sgr.oauth.core.v20.OAuth20;
 import io.sgr.oauth.core.v20.ResponseType;
 import io.sgr.oauth.server.core.OAuthV2Service;
 import io.sgr.oauth.server.core.exceptions.BadOAuthRequestException;
 import io.sgr.oauth.server.core.models.AccessDefinition;
-import io.sgr.oauth.server.core.models.AuthorizationCodeRequest;
+import io.sgr.oauth.server.core.models.AuthorizationRequest;
 import io.sgr.oauth.server.core.models.OAuthClientInfo;
 import io.sgr.oauth.server.core.models.ScopeDefinition;
 import io.sgr.oauth.server.core.utils.OAuthServerUtil;
@@ -61,10 +62,10 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 			return;
 		}
 
-		final AuthorizationCodeRequest oauthReq;
+		final AuthorizationRequest oauthReq;
 		try {
 			oauthReq = OAuthServerUtil.parseAuthorizationCodeRequest(req);
-		} catch (BadOAuthRequestException e) {
+		} catch (BadOAuthRequestException | InvalidRequestException e) {
 			onBadOAuthRequest(req, resp, e.getError());
 			return;
 		}
@@ -90,14 +91,14 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 			return;
 		}
 
-		final String[] names = oauthReq.getScopes().split(",");
-		if (names.length == 0 ) {
+		final List<String> scopes = oauthReq.getScopes();
+		if (scopes.isEmpty()) {
 			onBadOAuthRequest(req, resp, new OAuthError("missing_scope", "Missing OAuth client request scopes."));
 			return;
 		}
 
 		final List<ScopeDefinition> checkedScopes = new LinkedList<>();
-		for (String name : names) {
+		for (String name : scopes) {
 			if (isEmptyString(name)) {
 				continue;
 			}
@@ -134,14 +135,14 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 		}
 		session.removeAttribute(SESSION_ATTRS_KEY_CSRF_TOKEN);
 
-		final AuthorizationCodeRequest oauthReq = (AuthorizationCodeRequest) session.getAttribute(SESSION_ATTRS_KEY_AUTH_CODE_REQ);
+		final AuthorizationRequest oauthReq = (AuthorizationRequest) session.getAttribute(SESSION_ATTRS_KEY_AUTH_CODE_REQ);
 		if (oauthReq == null) {
 			onBadOAuthRequest(req, resp, new OAuthError("bad_oauth_request", "Bad OAuth request"));
 			return;
 		}
 		final ResponseType responseType = oauthReq.getResponseType();
 		final String redirectUri = oauthReq.getRedirectUri();
-		final String state = oauthReq.getState();
+		final String state = oauthReq.getState().orElse(null);
 		final OAuthClientInfo clientInfo = (OAuthClientInfo) session.getAttribute(SESSION_ATTRS_KEY_CLIENT_INFO);
 		if (clientInfo == null) {
 			onBadOAuthRequest(req, resp, new OAuthError("bad_oauth_request", "Missing OAuth client info"));
@@ -198,7 +199,7 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 
 	protected abstract void onBadOAuthRequest(final HttpServletRequest req, final HttpServletResponse resp, final OAuthError error) throws ServletException, IOException;
 
-	protected abstract void onDisplayUserAuthorizePage(final AuthorizationCodeRequest oauthReq, final OAuthClientInfo oAuthClientInfo, final List<ScopeDefinition> checkedScopes, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
+	protected abstract void onDisplayUserAuthorizePage(final AuthorizationRequest oauthReq, final OAuthClientInfo oAuthClientInfo, final List<ScopeDefinition> checkedScopes, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
 
 	protected abstract OAuthV2Service getOAuthV2Service();
 
