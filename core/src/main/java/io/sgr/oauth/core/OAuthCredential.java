@@ -16,20 +16,19 @@
  */
 package io.sgr.oauth.core;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import io.sgr.oauth.core.utils.JsonUtil;
 import io.sgr.oauth.core.v20.OAuth20;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author SgrAlpha
@@ -91,11 +90,7 @@ public class OAuthCredential implements Serializable {
 		} else {
 			this.tokenType = null;
 		}
-		if (this.accessToken != null && this.accessToken.trim().length() > 0) {
-			this.setAccessTokenExpiration(System.currentTimeMillis() + expiresIn * 1000);
-		} else {
-			this.setAccessTokenExpiration(null);
-		}
+		this.setAccessTokenExpiresIn(expiresIn);
 		this.setRefreshToken(refreshToken);
 	}
 	
@@ -139,11 +134,11 @@ public class OAuthCredential implements Serializable {
 	 * 				The accessTokenExpiresIn to set
 	 */
 	public void setAccessTokenExpiresIn(Integer accessTokenExpiresIn) {
-		if (accessTokenExpiresIn == null) {
-			this.accessTokenExpiration = null;
-			return;
+		if (this.accessToken != null && this.accessToken.trim().length() > 0) {
+			this.setAccessTokenExpiration(System.currentTimeMillis() + (accessTokenExpiresIn == null || accessTokenExpiresIn <= 0 ? DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC : accessTokenExpiresIn) * 1000);
+		} else {
+			this.setAccessTokenExpiration(null);
 		}
-		this.setAccessTokenExpiration(System.currentTimeMillis() + accessTokenExpiresIn * 1000);
 	}
 
 	/**
