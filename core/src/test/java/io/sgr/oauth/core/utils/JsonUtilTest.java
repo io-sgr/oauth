@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 SgrAlpha
+ * Copyright 2017-2018 SgrAlpha
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,6 @@
 
 package io.sgr.oauth.core.utils;
 
-import static io.sgr.oauth.core.utils.JsonUtil.getDefaultDateFormat;
-import static io.sgr.oauth.core.utils.JsonUtil.getJsonFactory;
-import static io.sgr.oauth.core.utils.JsonUtil.getObjectMapper;
 import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
@@ -28,8 +25,8 @@ public class JsonUtilTest {
 
 	@Test
 	public void testGetter() {
-		assertNotNull(getObjectMapper());
-		assertNotNull(getJsonFactory());
-		assertNotNull(getDefaultDateFormat());
+		assertNotNull(JsonUtil.getObjectMapper());
+		assertNotNull(JsonUtil.getJsonFactory());
+		assertNotNull(JsonUtil.getDefaultDateFormat());
 	}
 }

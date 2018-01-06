@@ -25,15 +25,15 @@ import org.junit.Test;
 
 import java.text.MessageFormat;
 
-public class TemporarilyUnavailableExceptionTest {
+public class ServerErrorExceptionTest {
 
-	@Test(expected = TemporarilyUnavailableException.class)
-	public void testBasicMethods() throws TemporarilyUnavailableException {
-		final String errorDescription = "Server 503";
-		final TemporarilyUnavailableException e = new TemporarilyUnavailableException(errorDescription);
+	@Test(expected = ServerErrorException.class)
+	public void testBasicMethods() throws ServerErrorException {
+		final String errorDescription = "Server 500";
+		final ServerErrorException e = new ServerErrorException(errorDescription);
 		assertNotNull(e.getError());
-		assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.TEMPORARILY_UNAVAILABLE.name().toLowerCase(), errorDescription), e.getMessage());
-		assertEquals(OAuthErrorType.TEMPORARILY_UNAVAILABLE.name().toLowerCase(), e.getError().getName());
+		assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.SERVER_ERROR.name().toLowerCase(), errorDescription), e.getMessage());
+		assertEquals(OAuthErrorType.SERVER_ERROR.name().toLowerCase(), e.getError().getName());
 		assertEquals(errorDescription, e.getError().getErrorDescription());
 		throw e;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 SgrAlpha
+ * Copyright 2017-2018 SgrAlpha
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ package io.sgr.oauth.core.utils;
  */
 public final class Preconditions {
 
-	private static final String DEFAULT_MESSAGE = "Received an invalid parameter";
+	public static final String DEFAULT_ERROR_MESSAGE = "Received an invalid parameter";
 
 	/**
 	 * Make sure the given object is not null, otherwise an IllegalArgumentException will be thrown
@@ -65,7 +65,7 @@ public final class Preconditions {
 	}
 
 	private static void matchRequirement(boolean requirements, String errorMsg) {
-		String message = (isEmptyString(errorMsg)) ? DEFAULT_MESSAGE : errorMsg;
+		String message = (isEmptyString(errorMsg)) ? DEFAULT_ERROR_MESSAGE : errorMsg;
 		if (!requirements) {
 			throw new IllegalArgumentException(message);
 		}
