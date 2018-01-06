@@ -26,45 +26,64 @@ public class ScopeDefinitionTest {
 
 	@Test
 	public void testCreateScopeDefinition() {
-		final ScopeDefinition def = new ScopeDefinition("basic", "The basic scope");
-		assertEquals("basic", def.getName());
+		final ScopeDefinition def = new ScopeDefinition("basic", "Basic", "The basic scope");
+		assertEquals("basic", def.getId());
+		assertEquals("Basic", def.getName());
 		assertEquals("The basic scope", def.getDescription());
 	}
 
 	@Test
 	public void testCreateWithInvalidArguments() {
 		try {
-			new ScopeDefinition(null, null);
+			new ScopeDefinition(null, null, null);
 			fail();
 		} catch (IllegalArgumentException e) {
 			// Ignored
 		}
 		try {
-			new ScopeDefinition("", null);
+			new ScopeDefinition("", null, null);
 			fail();
 		} catch (IllegalArgumentException e) {
 			// Ignored
 		}
 		try {
-			new ScopeDefinition("\n", null);
+			new ScopeDefinition("\n", null, null);
 			fail();
 		} catch (IllegalArgumentException e) {
 			// Ignored
 		}
 		try {
-			new ScopeDefinition(null, "");
+			new ScopeDefinition("basic", null, null);
 			fail();
 		} catch (IllegalArgumentException e) {
 			// Ignored
 		}
 		try {
-			new ScopeDefinition(null, "\n");
+			new ScopeDefinition("basic", "", null);
 			fail();
 		} catch (IllegalArgumentException e) {
 			// Ignored
 		}
 		try {
-			new ScopeDefinition("", "");
+			new ScopeDefinition("basic", "\n", null);
+			fail();
+		} catch (IllegalArgumentException e) {
+			// Ignored
+		}
+		try {
+			new ScopeDefinition("basic", "Basic", null);
+			fail();
+		} catch (IllegalArgumentException e) {
+			// Ignored
+		}
+		try {
+			new ScopeDefinition("basic", "Basic", "");
+			fail();
+		} catch (IllegalArgumentException e) {
+			// Ignored
+		}
+		try {
+			new ScopeDefinition("basic", "Basic", "\n");
 			fail();
 		} catch (IllegalArgumentException e) {
 			// Ignored

@@ -23,14 +23,21 @@ import java.io.Serializable;
 
 public class ScopeDefinition implements Serializable {
 
+	private final String id;
 	private final String name;
 	private final String description;
 
-	public ScopeDefinition(final String name, final String description) {
+	public ScopeDefinition(final String id, final String name, final String description) {
+		notEmptyString(id, "Scope ID needs to be specified");
+		this.id = id;
 		notEmptyString(name, "Scope name needs to be specified");
 		this.name = name;
-		notEmptyString(name, "Scope description needs to be specified");
+		notEmptyString(description, "Scope description needs to be specified");
 		this.description = description;
+	}
+
+	public String getId() {
+		return id;
 	}
 
 	public String getName() {

@@ -37,5 +37,7 @@ public class OAuth20 {
 	public static final String OAUTH_SCOPE = "scope";
 	public static final String OAUTH_GRANT_TYPE = "grant_type";
 	public static final String OAUTH_TOKEN = "token";
+	public static final String OAUTH_ERROR = "error";
+	public static final String OAUTH_ERROR_DESCRIPTION = "error_description";
 
 }

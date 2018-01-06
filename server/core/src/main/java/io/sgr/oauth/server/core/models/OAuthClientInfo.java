@@ -32,15 +32,15 @@ public class OAuthClientInfo implements Serializable {
 	private String description;
 	private String iconUrl;
 	private String privacyUrl;
-	private final String ownerUid;
+	private final String owner;
 	private final long createdTimeMs;
 	private List<String> callbacks;
 
-	public OAuthClientInfo(final String id, final String secret, final String name, final String description, final String iconUrl, final String privacyUrl, final String ownerUid, final long createdTimeMs) {
-		this(id, secret, name, description, iconUrl, privacyUrl, ownerUid, createdTimeMs, null);
+	public OAuthClientInfo(final String id, final String secret, final String name, final String description, final String iconUrl, final String privacyUrl, final String owner, final long createdTimeMs) {
+		this(id, secret, name, description, iconUrl, privacyUrl, owner, createdTimeMs, null);
 	}
 
-	public OAuthClientInfo(final String id, final String secret, final String name, final String description, final String iconUrl, final String privacyUrl, final String ownerUid, final long createdTimeMs, final List<String> callbacks) {
+	public OAuthClientInfo(final String id, final String secret, final String name, final String description, final String iconUrl, final String privacyUrl, final String owner, final long createdTimeMs, final List<String> callbacks) {
 		notEmptyString(id, "Client ID needs to be specified");
 		this.id = id;
 		setSecret(secret);
@@ -48,8 +48,8 @@ public class OAuthClientInfo implements Serializable {
 		setDescription(description);
 		setIconUrl(iconUrl);
 		setPrivacyUrl(privacyUrl);
-		notEmptyString(ownerUid, "Owner UID needs to be specified");
-		this.ownerUid = ownerUid;
+		notEmptyString(owner, "Owner UID needs to be specified");
+		this.owner = owner;
 		this.createdTimeMs = createdTimeMs;
 		setCallbacks(callbacks);
 	}
@@ -100,8 +100,8 @@ public class OAuthClientInfo implements Serializable {
 		this.privacyUrl = Optional.ofNullable(privacyUrl).orElse(null);
 	}
 
-	public String getOwnerUid() {
-		return ownerUid;
+	public String getOwner() {
+		return owner;
 	}
 
 	public long getCreatedTimeMs() {

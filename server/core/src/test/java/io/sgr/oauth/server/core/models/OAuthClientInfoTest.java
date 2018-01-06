@@ -94,7 +94,7 @@ public class OAuthClientInfoTest {
 //			assertFalse(info.getPrivacyUrl().isPresent());
 //			assertNotNull(info.getCallbacks());
 //			assertEquals(0, info.getCallbacks().size());
-//			assertEquals(ownerUid, info.getOwnerUid());
+//			assertEquals(ownerUid, info.getOwner());
 //			assertTrue(info.getCreatedTimeMs() > 0);
 //
 			info = new OAuthClientInfo(UUID.randomUUID().toString(), UUID.randomUUID().toString(), name, null, null, null, ownerUid, now, null);
@@ -106,7 +106,7 @@ public class OAuthClientInfoTest {
 			assertFalse(info.getPrivacyUrl().isPresent());
 			assertNotNull(info.getCallbacks());
 			assertEquals(0, info.getCallbacks().size());
-			assertEquals(ownerUid, info.getOwnerUid());
+			assertEquals(ownerUid, info.getOwner());
 			assertEquals(now, info.getCreatedTimeMs());
 
 			info = new OAuthClientInfo(UUID.randomUUID().toString(), UUID.randomUUID().toString(), name, desc, iconUrl, privacyUrl, ownerUid, now, callbacks);
@@ -122,7 +122,7 @@ public class OAuthClientInfoTest {
 			assertNotNull(info.getCallbacks());
 			assertEquals(callbacks.size(), info.getCallbacks().size());
 			assertEquals(callbacks.get(0), info.getCallbacks().get(0));
-			assertEquals(ownerUid, info.getOwnerUid());
+			assertEquals(ownerUid, info.getOwner());
 			assertEquals(now, info.getCreatedTimeMs());
 		} catch (IllegalArgumentException e) {
 			fail(e.getMessage());

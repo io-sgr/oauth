@@ -15,23 +15,20 @@
  *
  */
 
-package io.sgr.oauth.server.web.utils;
+package io.sgr.oauth.server.authserver.j2ee.utils;
 
 import static io.sgr.oauth.core.utils.Preconditions.isEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notNull;
 import static io.sgr.oauth.core.v20.GrantType.AUTHORIZATION_CODE;
-import static io.sgr.oauth.server.core.utils.OAuthServerUtil.getOnlyOneParameter;
 
-import io.sgr.oauth.core.v20.GrantType;
-import io.sgr.oauth.core.v20.OAuth20;
 import io.sgr.oauth.core.exceptions.InvalidRequestException;
 import io.sgr.oauth.core.exceptions.UnsupportedGrantTypeException;
-import io.sgr.oauth.server.core.models.TokenRequest;
+import io.sgr.oauth.core.v20.GrantType;
+import io.sgr.oauth.core.v20.OAuth20;
 import io.sgr.oauth.server.core.TokenRequestParser;
-import io.sgr.oauth.server.core.utils.OAuthServerUtil;
+import io.sgr.oauth.server.core.models.TokenRequest;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,10 +48,10 @@ public class ServletBasedTokenRequestParser implements TokenRequestParser<HttpSe
 	@Override public TokenRequest parse(final HttpServletRequest req)
 			throws InvalidRequestException, UnsupportedGrantTypeException {
 		notNull(req, "Missing HttpServletRequest");
-		final String clientId = getOnlyOneParameter(req, OAuth20.OAUTH_CLIENT_ID);
-		final String clientSecret = getOnlyOneParameter(req, OAuth20.OAUTH_CLIENT_SECRET);
-		final String redirectUri = getOnlyOneParameter(req, OAuth20.OAUTH_REDIRECT_URI);
-		final String grantTypeS = getOnlyOneParameter(req, OAuth20.OAUTH_GRANT_TYPE);
+		final String clientId = OAuthWebServerUtil.getOnlyOneParameter(req, OAuth20.OAUTH_CLIENT_ID);
+		final String clientSecret = OAuthWebServerUtil.getOnlyOneParameter(req, OAuth20.OAUTH_CLIENT_SECRET);
+		final String redirectUri = OAuthWebServerUtil.getOnlyOneParameter(req, OAuth20.OAUTH_REDIRECT_URI);
+		final String grantTypeS = OAuthWebServerUtil.getOnlyOneParameter(req, OAuth20.OAUTH_GRANT_TYPE);
 		final GrantType grantType;
 		if (isEmptyString(grantTypeS)) {
 			grantType = AUTHORIZATION_CODE;
@@ -66,11 +63,11 @@ public class ServletBasedTokenRequestParser implements TokenRequestParser<HttpSe
 			}
 		}
 
-		final String authCode = getOnlyOneParameter(req, OAuth20.OAUTH_CODE);
-		final String refreshToken = getOnlyOneParameter(req, OAuth20.OAUTH_REFRESH_TOKEN);
-		final String username = getOnlyOneParameter(req, OAuth20.OAUTH_USERNAME);
-		final String password = getOnlyOneParameter(req, OAuth20.OAUTH_PASSWORD);
-		final List<String> scopes = OAuthServerUtil.parseScopes(req);
+		final String authCode = OAuthWebServerUtil.getOnlyOneParameter(req, OAuth20.OAUTH_CODE);
+		final String refreshToken = OAuthWebServerUtil.getOnlyOneParameter(req, OAuth20.OAUTH_REFRESH_TOKEN);
+		final String username = OAuthWebServerUtil.getOnlyOneParameter(req, OAuth20.OAUTH_USERNAME);
+		final String password = OAuthWebServerUtil.getOnlyOneParameter(req, OAuth20.OAUTH_PASSWORD);
+		final List<String> scopes = OAuthWebServerUtil.parseScopes(req);
 		try {
 			return new TokenRequest(grantType, clientId, clientSecret, redirectUri, authCode, refreshToken, username, password, scopes);
 		} catch (IllegalArgumentException e) {

@@ -31,9 +31,9 @@ public interface OAuthV2Service {
 
 	void updateScope(final ScopeDefinition scope);
 
-	void deleteScope(final String name);
+	void deleteScope(final String id);
 
-	Optional<ScopeDefinition> getScopeByName(final String name);
+	Optional<ScopeDefinition> getScopeById(final String id);
 
 	void createOAuthClient(final OAuthClientInfo client);
 
@@ -45,9 +45,7 @@ public interface OAuthV2Service {
 
 	Optional<OAuthClientInfo> getOAuthClientByIdAndSecret(final String clientId, final String clientSecret);
 
-	void createOAuthAccessDefinition(final String authCode, final AccessDefinition accessDefinition);
-
-	AccessDefinition getOAuthAccessDefinitionByAuthCode(final String authCode);
+	void cacheAuthorizationCode(String authCode);
 
 	void revokeAuthorizationCode(final String authCode);
 
@@ -58,4 +56,8 @@ public interface OAuthV2Service {
 	String getUserIdByUsernameAndPassword(final String username, final String password);
 
 	OAuthCredential refreshAccessToken(final String clientId, final String refreshToken);
+
+	String getServerTokenIssuer();
+
+	String getServerTokenSecret();
 }

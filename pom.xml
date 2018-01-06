@@ -55,6 +55,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.7</java.version>
+        <jwt.version>0.9.0</jwt.version>
         <javaee.api.version>7.0</javaee.api.version>
         <google.client.version>1.23.0</google.client.version>
         <commons.codec.version>1.11</commons.codec.version>
@@ -64,7 +65,8 @@
     <modules>
         <module>core</module>
         <module>server/core</module>
-        <module>server/web</module>
+        <module>server/authserver/core</module>
+        <module>server/authserver/j2ee</module>
         <module>client/core</module>
         <module>client/googlehttp</module>
         <module>client/apachehttp</module>
@@ -86,6 +88,16 @@
                 <groupId>io.sgr.oauth</groupId>
                 <artifactId>oauth-server-core</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.sgr.oauth</groupId>
+                <artifactId>oauth-authserver-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jwt.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.http-client</groupId>

@@ -15,13 +15,8 @@
  *
  */
 
-package io.sgr.oauth.server.core;
+package io.sgr.oauth.server.authserver.j2ee.utils;
 
-import io.sgr.oauth.core.exceptions.InvalidRequestException;
-import io.sgr.oauth.core.exceptions.UnsupportedResponseTypeException;
-import io.sgr.oauth.server.core.models.AuthorizationRequest;
+public class OAuthWebServerUtilTest {
 
-public interface AuthRequestParser<T> {
-
-	AuthorizationRequest parse(T from) throws InvalidRequestException, UnsupportedResponseTypeException;
 }

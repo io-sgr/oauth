@@ -15,20 +15,21 @@
  *
  */
 
-package io.sgr.oauth.server.web;
+package io.sgr.oauth.server.authserver.j2ee;
 
+import io.sgr.oauth.authserver.core.AuthorizationServer;
 import io.sgr.oauth.core.OAuthCredential;
-import io.sgr.oauth.core.utils.JsonUtil;
-import io.sgr.oauth.core.v20.OAuthError;
-import io.sgr.oauth.core.v20.OAuthErrorType;
-import io.sgr.oauth.server.AuthorizationServer;
-import io.sgr.oauth.server.core.OAuthV2Service;
 import io.sgr.oauth.core.exceptions.InvalidClientException;
 import io.sgr.oauth.core.exceptions.InvalidGrantException;
 import io.sgr.oauth.core.exceptions.InvalidRequestException;
 import io.sgr.oauth.core.exceptions.InvalidScopeException;
+import io.sgr.oauth.core.exceptions.ServerErrorException;
 import io.sgr.oauth.core.exceptions.UnsupportedGrantTypeException;
-import io.sgr.oauth.server.web.utils.ServletBasedTokenRequestParser;
+import io.sgr.oauth.core.utils.JsonUtil;
+import io.sgr.oauth.core.v20.OAuthError;
+import io.sgr.oauth.core.v20.OAuthErrorType;
+import io.sgr.oauth.server.authserver.j2ee.utils.ServletBasedTokenRequestParser;
+import io.sgr.oauth.server.core.OAuthV2Service;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -53,6 +54,10 @@ public abstract class GenericOAuthV2TokenServlet extends HttpServlet {
 			return;
 		} catch (InvalidClientException e) {
 			resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			resp.getWriter().write(JsonUtil.getObjectMapper().writeValueAsString(e.getError()));
+			return;
+		} catch (ServerErrorException e) {
+			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			resp.getWriter().write(JsonUtil.getObjectMapper().writeValueAsString(e.getError()));
 			return;
 		}

@@ -15,13 +15,14 @@
  *
  */
 
-package io.sgr.oauth.server.core.models;
+package io.sgr.oauth.authserver.core;
 
 import static io.sgr.oauth.core.utils.Preconditions.isEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notNull;
 
 import io.sgr.oauth.core.v20.ResponseType;
+import io.sgr.oauth.server.core.models.OAuthClientInfo;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -30,28 +31,32 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class AuthorizationRequest implements Serializable {
+public class AuthorizationDetail implements Serializable {
 
 	private final ResponseType responseType;
-	private final String clientId;
-	private final String redirectUri;
+	private final OAuthClientInfo client;
+	private final String currentUser;
 	private final List<String> scopes;
+	private final String redirectUri;
 	private final String state;
 
 	/**
 	 * @param responseType The response type
-	 * @param clientId     The client ID
+	 * @param client       The client
+	 * @param currentUser  Current user
 	 * @param redirectUri  The redirect URI
 	 * @param scopes       The scopes
 	 * @param state        The state
 	 */
-	public AuthorizationRequest(
-			final ResponseType responseType, final String clientId, final String redirectUri, final List<String> scopes,
+	public AuthorizationDetail(
+			final ResponseType responseType, final OAuthClientInfo client, final String currentUser, final String redirectUri, final List<String> scopes,
 			final String state) {
 		notNull(responseType, "Missing response type");
 		this.responseType = responseType;
-		notEmptyString(clientId, "Missing client ID");
-		this.clientId = clientId;
+		notNull(client, "Missing client info");
+		this.client = client;
+		notEmptyString(currentUser, "Missing current user");
+		this.currentUser = currentUser;
 		notEmptyString(redirectUri, "Missing redirect URI");
 		try {
 			this.redirectUri = URLDecoder.decode(redirectUri, "UTF-8");
@@ -76,8 +81,15 @@ public class AuthorizationRequest implements Serializable {
 	/**
 	 * @return The client ID
 	 */
-	public String getClientId() {
-		return clientId;
+	public OAuthClientInfo getClient() {
+		return client;
+	}
+
+	/**
+	 * @return The current user
+	 */
+	public String getCurrentUser() {
+		return currentUser;
 	}
 
 	/**

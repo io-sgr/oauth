@@ -27,10 +27,10 @@ public class AccessDefinition implements Serializable {
 
 	private final String clientId;
 	private final String userId;
-	private final Collection<String> scopes;
+	private final Collection<ScopeDefinition> scopes;
 	private final String redirectUri;
 
-	public AccessDefinition(final String clientId, final String userId, final Collection<String> scopes, final String redirectUri) {
+	public AccessDefinition(final String clientId, final String userId, final Collection<ScopeDefinition> scopes, final String redirectUri) {
 		notEmptyString(clientId, "Client ID needs to be specified");
 		this.clientId = clientId;
 		notEmptyString(userId, "User ID needs to be specified");
@@ -52,7 +52,7 @@ public class AccessDefinition implements Serializable {
 		return userId;
 	}
 
-	public Collection<String> getScopes() {
+	public Collection<ScopeDefinition> getScopes() {
 		return scopes;
 	}
 

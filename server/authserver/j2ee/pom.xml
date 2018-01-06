@@ -24,7 +24,7 @@
         <version>1.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>oauth-server-web</artifactId>
+    <artifactId>oauth-authserver-j2ee</artifactId>
 
     <properties>
         <java.version>1.8</java.version>
@@ -33,7 +33,7 @@
     <dependencies>
         <dependency>
             <groupId>io.sgr.oauth</groupId>
-            <artifactId>oauth-server-core</artifactId>
+            <artifactId>oauth-authserver-core</artifactId>
         </dependency>
         <dependency>
             <groupId>javax</groupId>

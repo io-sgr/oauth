@@ -15,24 +15,14 @@
  *
  */
 
-package io.sgr.oauth.server.core.exceptions;
+package io.sgr.oauth.server.authserver.j2ee.utils;
 
-import io.sgr.oauth.core.v20.OAuthError;
-import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
+public class OAuthV2WebConstants {
 
-public class BadOAuthRequestException extends UnrecoverableOAuthException {
+	public static final String SESSION_ATTRS_KEY_AUTH_DETAIL = "oauth.v2.auth_detail";
+	public static final String SESSION_ATTRS_KEY_CSRF_TOKEN = "csrf_token";
 
-	/**
-	 * @param message The error message
-	 */
-	public BadOAuthRequestException(final String message) {
-		this(new OAuthError("bad_oauth_request", message, null));
-	}
+	public static final String REQ_PARAMS_KEY_CSRF_TOKEN = "csrf_token";
+	public static final String REQ_PARAMS_KEY_APPROVED = "approved";
 
-	/**
-	 * @param error The error
-	 */
-	public BadOAuthRequestException(final OAuthError error) {
-		super(error);
-	}
 }
