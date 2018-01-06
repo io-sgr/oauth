@@ -18,6 +18,8 @@ package io.sgr.oauth.core.exceptions;
 
 import io.sgr.oauth.core.v20.OAuthError;
 
+import java.text.MessageFormat;
+
 /**
  * @author SgrAlpha
  *
@@ -40,7 +42,10 @@ public abstract class OAuthException extends Exception {
 	 */
 	@Override
 	public String getMessage() {
-		return this.getError() == null ? null : this.getError().getName();
+		if (this.getError() == null) {
+			return "No more detail";
+		}
+		return this.getError().getErrorDescription() == null ? this.getError().getName() : MessageFormat.format("{0}: {1}", this.getError().getName(), this.getError().getErrorDescription());
 	}
 
 	/**
