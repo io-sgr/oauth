@@ -35,6 +35,26 @@ import java.util.Map;
 public class OAuthCredentialTest {
 
 	@Test
+	public void testSetExpiresInSec() {
+		OAuthCredential credential;
+		credential = new OAuthCredential(null, null);
+		credential.setAccessTokenExpiresIn(null);
+		assertNull(credential.getAccessTokenExpiration());
+		credential.setAccessTokenExpiresIn(-1);
+		assertNull(credential.getAccessTokenExpiration());
+		credential.setAccessTokenExpiresIn((int) OAuthCredential.DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC);
+		assertNull(credential.getAccessTokenExpiration());
+
+		credential = new OAuthCredential("abcdefg", null);
+		credential.setAccessTokenExpiresIn(null);
+		assertTrue(OAuthCredential.DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC >= credential.getAccessTokenExpiresIn());
+		credential.setAccessTokenExpiresIn(-1);
+		assertTrue(OAuthCredential.DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC >= credential.getAccessTokenExpiresIn());
+		credential.setAccessTokenExpiresIn((int) OAuthCredential.DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC);
+		assertTrue(OAuthCredential.DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC >= credential.getAccessTokenExpiresIn());
+	}
+
+	@Test
 	public void testOAuthCredential() {
 		OAuthCredential credential;
 		credential = new OAuthCredential(null, null);
@@ -53,6 +73,14 @@ public class OAuthCredentialTest {
 		assertNull(credential.getRefreshToken());
 		assertNull(credential.getExtraParams());
 
+		credential = new OAuthCredential("", null);
+		assertNull(credential.getAccessToken());
+		assertNull(credential.getTokenType());
+		assertNull(credential.getAccessTokenExpiration());
+		assertNull(credential.getAccessTokenExpiresIn());
+		assertNull(credential.getRefreshToken());
+		assertNull(credential.getExtraParams());
+
 		credential = new OAuthCredential(null, "test_type");
 		assertNull(credential.getAccessToken());
 		assertNull(credential.getTokenType());
@@ -64,16 +92,16 @@ public class OAuthCredentialTest {
 		credential = new OAuthCredential("abcdefghijklmn", null);
 		assertEquals("abcdefghijklmn", credential.getAccessToken());
 		assertEquals(OAuthCredential.DEFAULT_TOKEN_TYPE, credential.getTokenType());
-		assertNull(credential.getAccessTokenExpiration());
-		assertNull(credential.getAccessTokenExpiresIn());
+		assertTrue(credential.getAccessTokenExpiration() > System.currentTimeMillis());
+		assertTrue(OAuthCredential.DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC >= credential.getAccessTokenExpiresIn());
 		assertNull(credential.getRefreshToken());
 		assertNull(credential.getExtraParams());
 
 		credential = new OAuthCredential("abcdefghijklmn", "");
 		assertEquals("abcdefghijklmn", credential.getAccessToken());
 		assertEquals(OAuthCredential.DEFAULT_TOKEN_TYPE, credential.getTokenType());
-		assertNull(credential.getAccessTokenExpiration());
-		assertNull(credential.getAccessTokenExpiresIn());
+		assertTrue(credential.getAccessTokenExpiration() > System.currentTimeMillis());
+		assertTrue(OAuthCredential.DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC >= credential.getAccessTokenExpiresIn());
 		assertNull(credential.getRefreshToken());
 		assertNull(credential.getExtraParams());
 
@@ -86,8 +114,8 @@ public class OAuthCredentialTest {
 		credential.addExtraParams("ddd", 1024);
 		assertEquals("abcdefghijklmn", credential.getAccessToken());
 		assertEquals("test_type", credential.getTokenType());
-		assertNull(credential.getAccessTokenExpiration());
-		assertNull(credential.getAccessTokenExpiresIn());
+		assertTrue(credential.getAccessTokenExpiration() > System.currentTimeMillis());
+		assertTrue(OAuthCredential.DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC >= credential.getAccessTokenExpiresIn());
 		assertNull(credential.getRefreshToken());
 		assertNotNull(credential.getExtraParams());
 		assertTrue(credential.getExtraParams().containsKey("aaa"));

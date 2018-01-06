@@ -59,12 +59,7 @@ public class OAuthCredential implements Serializable {
 	 * 				The token_type
 	 */
 	public OAuthCredential(String accessToken, String tokenType) {
-		this.accessToken = accessToken;
-		if (this.accessToken != null && this.accessToken.trim().length() > 0) {
-			this.tokenType = tokenType == null || tokenType.trim().length() <= 0 ? DEFAULT_TOKEN_TYPE : tokenType;
-		} else {
-			this.tokenType = null;
-		}
+		this(accessToken, tokenType, null, null);
 	}
 	
 	/**
@@ -84,9 +79,9 @@ public class OAuthCredential implements Serializable {
 			@JsonProperty(OAuth20.OAUTH_EXPIRES_IN) Integer expiresIn,
 			@JsonProperty(OAuth20.OAUTH_REFRESH_TOKEN) String refreshToken
 			) {
-		this.accessToken = accessToken;
-		if (this.accessToken != null && this.accessToken.trim().length() > 0) {
-			this.tokenType = tokenType == null || tokenType.trim().length() <= 0 ? DEFAULT_TOKEN_TYPE : tokenType;
+		this.accessToken = accessToken == null || accessToken.trim().length() == 0 ? null : accessToken;
+		if (this.getAccessToken() != null) {
+			this.tokenType = tokenType == null || tokenType.trim().length() == 0 ? DEFAULT_TOKEN_TYPE : tokenType;
 		} else {
 			this.tokenType = null;
 		}
@@ -134,10 +129,10 @@ public class OAuthCredential implements Serializable {
 	 * 				The accessTokenExpiresIn to set
 	 */
 	public void setAccessTokenExpiresIn(Integer accessTokenExpiresIn) {
-		if (this.accessToken != null && this.accessToken.trim().length() > 0) {
-			this.setAccessTokenExpiration(System.currentTimeMillis() + (accessTokenExpiresIn == null || accessTokenExpiresIn <= 0 ? DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC : accessTokenExpiresIn) * 1000);
-		} else {
+		if (this.getAccessToken() == null) {
 			this.setAccessTokenExpiration(null);
+		} else {
+			this.setAccessTokenExpiration(System.currentTimeMillis() + (accessTokenExpiresIn == null || accessTokenExpiresIn <= 0 ? DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC : accessTokenExpiresIn) * 1000);
 		}
 	}
 
