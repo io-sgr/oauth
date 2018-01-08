@@ -21,9 +21,8 @@ import static io.sgr.oauth.core.utils.Preconditions.isEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notNull;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.sgr.oauth.core.OAuthCredential;
 import io.sgr.oauth.core.exceptions.InvalidClientException;
 import io.sgr.oauth.core.exceptions.InvalidGrantException;
@@ -32,7 +31,6 @@ import io.sgr.oauth.core.exceptions.InvalidScopeException;
 import io.sgr.oauth.core.exceptions.ServerErrorException;
 import io.sgr.oauth.core.exceptions.UnsupportedGrantTypeException;
 import io.sgr.oauth.core.exceptions.UnsupportedResponseTypeException;
-import io.sgr.oauth.core.utils.JsonUtil;
 import io.sgr.oauth.core.v20.GrantType;
 import io.sgr.oauth.core.v20.OAuth20;
 import io.sgr.oauth.core.v20.ResponseType;
@@ -48,13 +46,10 @@ import io.sgr.oauth.server.core.utils.OAuthServerUtil;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
-import java.time.Clock;
-import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,19 +63,13 @@ public class AuthorizationServer {
 	private static final TemporalUnit DEFAULT_AUTHORIZATION_CODE_EXPIRES_TIME_UNIT = ChronoUnit.MINUTES;
 
 	private final OAuthV2Service service;
-	private long authCodeExpiresTimeAmount;
-	private TemporalUnit authCodeExpiresTimeUnit;
+	private final AuthorizationCodec<AuthorizationDetail> authCodec;
 
-	private AuthorizationServer(final OAuthV2Service service,
-	                            final long authCodeExpiresTimeAmount, final TemporalUnit authCodeExpiresTimeUnit) {
+	private AuthorizationServer(final OAuthV2Service service, final AuthorizationCodec<AuthorizationDetail> authCodec) {
 		notNull(service, "Missing implementation of " + OAuthV2Service.class);
 		this.service = service;
-		if (authCodeExpiresTimeAmount <= 0) {
-			throw new IllegalArgumentException(MessageFormat.format("Authorization token expiration should be greater than 0, but got {0}", authCodeExpiresTimeAmount));
-		}
-		this.authCodeExpiresTimeAmount = authCodeExpiresTimeAmount;
-		notNull(authCodeExpiresTimeUnit, "Time unit needs to be specified");
-		this.authCodeExpiresTimeUnit = authCodeExpiresTimeUnit;
+		notNull(service, "Missing implementation of " + AuthorizationCodec.class);
+		this.authCodec = authCodec;
 	}
 
 	public static Builder with(final OAuthV2Service service) {
@@ -141,15 +130,12 @@ public class AuthorizationServer {
 		if (approved) {
 			switch (responseType) {
 				case CODE:
-					final String serverTokenIssuer = getOAuthV2Service().getServerTokenIssuer();
-					if (isEmptyString(serverTokenIssuer)) {
-						throw new ServerErrorException("Unable to generate authorization token because of missing server token issuer");
+					final String code;
+					try {
+						code = authCodec.encode(authDetail);
+					} catch (JwtException e) {
+						throw new ServerErrorException("Failed to generate authorization code");
 					}
-					final String serverTokenSecret = getOAuthV2Service().getServerTokenSecret();
-					if (isEmptyString(serverTokenSecret)) {
-						throw new ServerErrorException("Unable to generate authorization token because of missing server token secret");
-					}
-					final String code = encode(serverTokenIssuer, serverTokenSecret, authDetail);
 					getOAuthV2Service().cacheAuthorizationCode(code);
 					if (uriBuilder.indexOf("?") < 0) {
 						uriBuilder.append("?");
@@ -220,16 +206,15 @@ public class AuthorizationServer {
 				credential = getOAuthV2Service().refreshAccessToken(clientId, refreshToken);
 				break;
 			case AUTHORIZATION_CODE:
-				final String serverTokenIssuer = getOAuthV2Service().getServerTokenIssuer();
-				if (isEmptyString(serverTokenIssuer)) {
-					throw new ServerErrorException("Unable to parse authorization code because of missing server token issuer");
-				}
-				final String serverTokenSecret = getOAuthV2Service().getServerTokenSecret();
-				if (isEmptyString(serverTokenSecret)) {
-					throw new ServerErrorException("Unable to parse authorization code because of missing server token secret");
-				}
 				final String authCode = tokenReq.getCode().orElseThrow(() -> new InvalidRequestException("Missing authorization code"));
-				final AuthorizationDetail authDetail = decode(serverTokenIssuer, serverTokenSecret, authCode).orElse(null);
+				final AuthorizationDetail authDetail;
+				try {
+					authDetail = authCodec.decode(authCode);
+				} catch (ExpiredJwtException e) {
+					throw new InvalidGrantException("Invalid authorization code");
+				} catch (JwtException e) {
+					throw new ServerErrorException("Failed to parse authorization code");
+				}
 				getOAuthV2Service().revokeAuthorizationCode(authCode);
 				if (authDetail == null) {
 					throw new InvalidGrantException("Invalid authorization code");
@@ -277,46 +262,6 @@ public class AuthorizationServer {
 		return credential;
 	}
 
-	private String encode(final String serverTokenIssuer, final String serverTokenSecret, final AuthorizationDetail authDetail) throws ServerErrorException {
-		notEmptyString(serverTokenIssuer, "Missing server token issuer");
-		notEmptyString(serverTokenSecret, "Missing server token secret");
-		notNull(authDetail, "Missing authorization detail");
-		final Instant now = Instant.now(Clock.systemUTC());
-		final Instant expiration = now.plus(authCodeExpiresTimeAmount, authCodeExpiresTimeUnit);
-		try {
-			return Jwts.builder()
-					.setIssuer(serverTokenIssuer)
-					.setSubject(JsonUtil.getObjectMapper().writeValueAsString(authDetail))
-					.setIssuedAt(Date.from(now))
-					.setExpiration(Date.from(expiration))
-					.signWith(SignatureAlgorithm.HS512, serverTokenSecret)
-					.compact();
-		} catch (Exception e) {
-			throw new ServerErrorException(MessageFormat.format("Unable to generate authorization token because of: {0}", e.getMessage()));
-		}
-	}
-
-	private Optional<AuthorizationDetail> decode(final String serverTokenIssuer, final String serverTokenSecret, final String authCode) {
-		notEmptyString(serverTokenIssuer, "Missing server token issuer");
-		notEmptyString(serverTokenSecret, "Missing server token secret");
-		notEmptyString(authCode, "Missing authorization code");
-		try {
-			final Claims body = Jwts.parser()
-					.requireIssuer(serverTokenIssuer)
-					.setSigningKey(serverTokenSecret)
-					.parseClaimsJws(authCode).getBody();
-			final String subject = body.getSubject();
-			if (isEmptyString(subject)) {
-				return Optional.empty();
-			}
-			final AuthorizationDetail authDetail = JsonUtil.getObjectMapper().readValue(subject, AuthorizationDetail.class);
-			return Optional.ofNullable(authDetail);
-		} catch (Exception e) {
-			// Ignored
-		}
-		return Optional.empty();
-	}
-
 	private OAuthV2Service getOAuthV2Service() {
 		return service;
 	}
@@ -325,6 +270,8 @@ public class AuthorizationServer {
 
 		private OAuthV2Service service;
 
+		private String issuer;
+		private String serverSecret;
 		private long authCodeExpiresTimeAmount;
 		private TemporalUnit authCodeExpiresTimeUnit;
 
@@ -333,9 +280,21 @@ public class AuthorizationServer {
 			this.service = service;
 		}
 
+		public Builder setIssuer(final String issuer) {
+			notEmptyString(issuer, "Issuer needs to be specified");
+			this.issuer = issuer;
+			return this;
+		}
+
+		public Builder setServerSecret(final String serverSecret) {
+			notEmptyString(serverSecret, "Server secret needs to be specified");
+			this.serverSecret = serverSecret;
+			return this;
+		}
+
 		/**
 		 * @param amount The time period that authorization code can live.
-		 * @param unit The unit of time amount, default to minute.
+		 * @param unit   The unit of time amount, default to minute.
 		 * @return The builder
 		 */
 		public Builder setAuthCodeExpiresAfter(final long amount, final TemporalUnit unit) {
@@ -348,7 +307,8 @@ public class AuthorizationServer {
 		 * @return The authorization server which built with specified parameters.
 		 */
 		public AuthorizationServer build() {
-			return new AuthorizationServer(this.service, authCodeExpiresTimeAmount, authCodeExpiresTimeUnit);
+			final JwtAuthorizationCodec authCodec = new JwtAuthorizationCodec(issuer, serverSecret).setExpiresIn(authCodeExpiresTimeAmount, authCodeExpiresTimeUnit);
+			return new AuthorizationServer(this.service, authCodec);
 		}
 
 	}
