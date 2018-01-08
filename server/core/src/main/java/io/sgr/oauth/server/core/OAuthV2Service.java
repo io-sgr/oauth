@@ -18,11 +18,11 @@
 package io.sgr.oauth.server.core;
 
 import io.sgr.oauth.core.OAuthCredential;
-import io.sgr.oauth.server.core.models.AccessDefinition;
 import io.sgr.oauth.server.core.models.OAuthClientInfo;
 import io.sgr.oauth.server.core.models.ScopeDefinition;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Optional;
 
 public interface OAuthV2Service {
@@ -33,7 +33,7 @@ public interface OAuthV2Service {
 
 	void deleteScope(final String id);
 
-	Optional<ScopeDefinition> getScopeById(final String id);
+	Optional<ScopeDefinition> getScopeById(final String id, final Locale locale);
 
 	void createOAuthClient(final OAuthClientInfo client);
 

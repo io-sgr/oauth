@@ -26,13 +26,11 @@ import io.sgr.oauth.core.exceptions.InvalidScopeException;
 import io.sgr.oauth.core.exceptions.ServerErrorException;
 import io.sgr.oauth.core.exceptions.UnsupportedGrantTypeException;
 import io.sgr.oauth.core.utils.JsonUtil;
-import io.sgr.oauth.core.v20.OAuthError;
-import io.sgr.oauth.core.v20.OAuthErrorType;
 import io.sgr.oauth.server.authserver.j2ee.utils.ServletBasedTokenRequestParser;
 import io.sgr.oauth.server.core.OAuthV2Service;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -44,7 +42,7 @@ public abstract class GenericOAuthV2TokenServlet extends HttpServlet {
 	protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
 		resp.setContentType("application/json;charset=UTF-8");
 		resp.setCharacterEncoding("UTF-8");
-		final Optional<OAuthCredential> credential;
+		final OAuthCredential credential;
 		try {
 			credential = AuthorizationServer.with(getOAuthV2Service()).build()
 					.generateToken(req, ServletBasedTokenRequestParser.instance());
@@ -61,15 +59,10 @@ public abstract class GenericOAuthV2TokenServlet extends HttpServlet {
 			resp.getWriter().write(JsonUtil.getObjectMapper().writeValueAsString(e.getError()));
 			return;
 		}
-
-		if (!credential.isPresent()) {
-			resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			final OAuthError error = new OAuthError(OAuthErrorType.SERVER_ERROR.name().toLowerCase(), "Unable to create OAuth token");
-			resp.getWriter().write(JsonUtil.getObjectMapper().writeValueAsString(error));
-			return;
-		}
 		resp.getWriter().write(JsonUtil.getObjectMapper().writeValueAsString(credential));
 	}
+
+	protected abstract Locale getUserLocale();
 
 	protected abstract OAuthV2Service getOAuthV2Service();
 

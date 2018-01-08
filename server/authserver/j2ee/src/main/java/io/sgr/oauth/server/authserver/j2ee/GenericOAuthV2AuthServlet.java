@@ -33,6 +33,7 @@ import io.sgr.oauth.server.authserver.j2ee.utils.ServletBasedAuthorizationReques
 import io.sgr.oauth.server.core.OAuthV2Service;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
@@ -54,7 +55,7 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 		final AuthorizationDetail authDetail;
 		try {
 			authDetail = AuthorizationServer.with(getOAuthV2Service()).build()
-					.preAuthorization(curUserId, req, ServletBasedAuthorizationRequestParser.instance());
+					.preAuthorization(req, ServletBasedAuthorizationRequestParser.instance(), curUserId, getUserLocale(req, resp));
 		} catch (InvalidClientException e) {
 			resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			resp.getWriter().write(JsonUtil.getObjectMapper().writeValueAsString(e.getError()));
@@ -116,6 +117,8 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 	}
 
 	protected abstract String getCurrentUserId(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
+
+	protected abstract Locale getUserLocale(final HttpServletRequest req, final HttpServletResponse resp);
 
 	protected abstract void onUserNotSignedIn(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
 

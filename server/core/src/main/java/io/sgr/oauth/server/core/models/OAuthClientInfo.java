@@ -19,11 +19,18 @@ package io.sgr.oauth.server.core.models;
 
 import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OAuthClientInfo implements Serializable {
 
 	private final String id;
@@ -40,7 +47,17 @@ public class OAuthClientInfo implements Serializable {
 		this(id, secret, name, description, iconUrl, privacyUrl, owner, createdTimeMs, null);
 	}
 
-	public OAuthClientInfo(final String id, final String secret, final String name, final String description, final String iconUrl, final String privacyUrl, final String owner, final long createdTimeMs, final List<String> callbacks) {
+	@JsonCreator
+	public OAuthClientInfo(
+			@JsonProperty("id") final String id,
+			@JsonProperty("secret") final String secret,
+			@JsonProperty("name") final String name,
+			@JsonProperty("description") final String description,
+			@JsonProperty("icon_url") final String iconUrl,
+			@JsonProperty("privacy_url") final String privacyUrl,
+			@JsonProperty("owner") final String owner,
+			@JsonProperty("created_time") final long createdTimeMs,
+			@JsonProperty("callbacks") final List<String> callbacks) {
 		notEmptyString(id, "Client ID needs to be specified");
 		this.id = id;
 		setSecret(secret);
@@ -54,10 +71,12 @@ public class OAuthClientInfo implements Serializable {
 		setCallbacks(callbacks);
 	}
 
+	@JsonProperty("id")
 	public String getId() {
 		return id;
 	}
 
+	@JsonProperty("secret")
 	public String getSecret() {
 		return secret;
 	}
@@ -67,6 +86,7 @@ public class OAuthClientInfo implements Serializable {
 		this.secret = secret;
 	}
 
+	@JsonProperty("name")
 	public String getName() {
 		return name;
 	}
@@ -76,6 +96,7 @@ public class OAuthClientInfo implements Serializable {
 		this.name = name;
 	}
 
+	@JsonProperty("description")
 	public Optional<String> getDescription() {
 		return Optional.ofNullable(description);
 	}
@@ -84,6 +105,7 @@ public class OAuthClientInfo implements Serializable {
 		this.description = Optional.ofNullable(description).orElse(null);
 	}
 
+	@JsonProperty("icon_url")
 	public Optional<String> getIconUrl() {
 		return Optional.ofNullable(iconUrl);
 	}
@@ -92,6 +114,7 @@ public class OAuthClientInfo implements Serializable {
 		this.iconUrl = Optional.ofNullable(iconUrl).orElse(null);
 	}
 
+	@JsonProperty("privacy_url")
 	public Optional<String> getPrivacyUrl() {
 		return Optional.ofNullable(privacyUrl);
 	}
@@ -100,14 +123,17 @@ public class OAuthClientInfo implements Serializable {
 		this.privacyUrl = Optional.ofNullable(privacyUrl).orElse(null);
 	}
 
+	@JsonProperty("owner")
 	public String getOwner() {
 		return owner;
 	}
 
+	@JsonProperty("created_time")
 	public long getCreatedTimeMs() {
 		return createdTimeMs;
 	}
 
+	@JsonProperty("callbacks")
 	public List<String> getCallbacks() {
 		return callbacks;
 	}

@@ -21,8 +21,15 @@ import static io.sgr.oauth.core.utils.Preconditions.isEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notNull;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.sgr.oauth.core.v20.OAuth20;
 import io.sgr.oauth.core.v20.ResponseType;
 import io.sgr.oauth.server.core.models.OAuthClientInfo;
+import io.sgr.oauth.server.core.models.ScopeDefinition;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -31,12 +38,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AuthorizationDetail implements Serializable {
 
 	private final ResponseType responseType;
 	private final OAuthClientInfo client;
 	private final String currentUser;
-	private final List<String> scopes;
+	private final List<ScopeDefinition> scopes;
 	private final String redirectUri;
 	private final String state;
 
@@ -46,11 +55,16 @@ public class AuthorizationDetail implements Serializable {
 	 * @param currentUser  Current user
 	 * @param redirectUri  The redirect URI
 	 * @param scopes       The scopes
-	 * @param state        The state
+	 * @param state        Optional. The state of request, default to null
 	 */
+	@JsonCreator
 	public AuthorizationDetail(
-			final ResponseType responseType, final OAuthClientInfo client, final String currentUser, final String redirectUri, final List<String> scopes,
-			final String state) {
+			@JsonProperty(OAuth20.OAUTH_RESPONSE_TYPE) final ResponseType responseType,
+			@JsonProperty("client") final OAuthClientInfo client,
+			@JsonProperty("current_user") final String currentUser,
+			@JsonProperty(OAuth20.OAUTH_REDIRECT_URI) final String redirectUri,
+			@JsonProperty("scopes") final List<ScopeDefinition> scopes,
+			@JsonProperty(OAuth20.OAUTH_STATE) final String state) {
 		notNull(responseType, "Missing response type");
 		this.responseType = responseType;
 		notNull(client, "Missing client info");
@@ -74,6 +88,7 @@ public class AuthorizationDetail implements Serializable {
 	/**
 	 * @return The response type
 	 */
+	@JsonProperty(OAuth20.OAUTH_RESPONSE_TYPE)
 	public ResponseType getResponseType() {
 		return responseType;
 	}
@@ -81,6 +96,7 @@ public class AuthorizationDetail implements Serializable {
 	/**
 	 * @return The client ID
 	 */
+	@JsonProperty("client")
 	public OAuthClientInfo getClient() {
 		return client;
 	}
@@ -88,6 +104,7 @@ public class AuthorizationDetail implements Serializable {
 	/**
 	 * @return The current user
 	 */
+	@JsonProperty("current_user")
 	public String getCurrentUser() {
 		return currentUser;
 	}
@@ -95,6 +112,7 @@ public class AuthorizationDetail implements Serializable {
 	/**
 	 * @return The redirect URI
 	 */
+	@JsonProperty(OAuth20.OAUTH_REDIRECT_URI)
 	public String getRedirectUri() {
 		return redirectUri;
 	}
@@ -102,13 +120,15 @@ public class AuthorizationDetail implements Serializable {
 	/**
 	 * @return The scopes
 	 */
-	public List<String> getScopes() {
+	@JsonProperty("scopes")
+	public List<ScopeDefinition> getScopes() {
 		return Collections.unmodifiableList(scopes);
 	}
 
 	/**
 	 * @return The state
 	 */
+	@JsonProperty(OAuth20.OAUTH_STATE)
 	public Optional<String> getState() {
 		return Optional.ofNullable(state);
 	}

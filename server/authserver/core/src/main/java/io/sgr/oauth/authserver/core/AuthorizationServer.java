@@ -58,11 +58,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class AuthorizationServer {
 
-	private static final int DEFAULT_AUTHORIZATION_CODE_EXPIRES_IN_MINUTES = 1;
+	private static final int DEFAULT_AUTHORIZATION_CODE_EXPIRES_TIME_AMOUNT = 1;
+	private static final TemporalUnit DEFAULT_AUTHORIZATION_CODE_EXPIRES_TIME_UNIT = ChronoUnit.MINUTES;
 
 	private final OAuthV2Service service;
 	private long authCodeExpiresTimeAmount;
@@ -77,17 +80,18 @@ public class AuthorizationServer {
 		}
 		this.authCodeExpiresTimeAmount = authCodeExpiresTimeAmount;
 		notNull(authCodeExpiresTimeUnit, "Time unit needs to be specified");
+		this.authCodeExpiresTimeUnit = authCodeExpiresTimeUnit;
 	}
 
 	public static Builder with(final OAuthV2Service service) {
 		return new Builder(service);
 	}
 
-	public <T> AuthorizationDetail preAuthorization(final String currentUser, final T from, final AuthRequestParser<T> parser)
+	public <T> AuthorizationDetail preAuthorization(final T from, final AuthRequestParser<T> parser, final String currentUser, final Locale locale)
 			throws InvalidRequestException, InvalidClientException, InvalidScopeException, UnsupportedResponseTypeException {
-		notEmptyString(currentUser, "Current user needs to be specified");
 		notNull(from, "Cannot parse from NULL");
 		notNull(parser, "Parser needs to be specified");
+		notEmptyString(currentUser, "Current user needs to be specified");
 		final AuthorizationRequest authReq = parser.parse(from);
 		final ResponseType responseType = authReq.getResponseType();
 		final String clientId = authReq.getClientId();
@@ -102,16 +106,16 @@ public class AuthorizationServer {
 		if (!OAuthServerUtil.isRedirectUriRegistered(redirectUri, callbacks)) {
 			throw new InvalidRequestException(MessageFormat.format("Redirect URI mismatch: {0}", redirectUri));
 		}
-		final List<String> checkedScopes = new LinkedList<>();
+		final List<ScopeDefinition> checkedScopes = new LinkedList<>();
 		for (String id : requestedScopes) {
 			if (isEmptyString(id)) {
 				continue;
 			}
-			Optional<ScopeDefinition> scope = getOAuthV2Service().getScopeById(id);
+			Optional<ScopeDefinition> scope = getOAuthV2Service().getScopeById(id, locale);
 			if (!scope.isPresent()) {
 				throw new InvalidScopeException(MessageFormat.format("Invalid scope: {0}", id));
 			}
-			checkedScopes.add(scope.get().getId());
+			checkedScopes.add(scope.get());
 		}
 		switch (responseType) {
 			case CODE:
@@ -187,9 +191,9 @@ public class AuthorizationServer {
 	 * @throws UnsupportedGrantTypeException If a grant type is requested that the authorization server doesn't recognize, use this code.
 	 *                                       Note that unknown grant types also use this specific error code rather than
 	 *                                       using the invalid_request above.
-	 * @throws ServerErrorException
+	 * @throws ServerErrorException          If something is wrong when generating/refreshing access token
 	 */
-	public <T> Optional<OAuthCredential> generateToken(final T from, final TokenRequestParser<T> parser)
+	public <T> OAuthCredential generateToken(final T from, final TokenRequestParser<T> parser)
 			throws InvalidRequestException, InvalidClientException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException, ServerErrorException {
 		notNull(from, "Cannot parse from NULL");
 		notNull(parser, "Parser needs to be specified");
@@ -235,24 +239,24 @@ public class AuthorizationServer {
 				}
 				userId = authDetail.getCurrentUser();
 				scopes = new HashSet<>(getOAuthV2Service().getGrantedScopes(clientId, userId));
-				scopes.addAll(authDetail.getScopes());
+				scopes.addAll(authDetail.getScopes().parallelStream().map(ScopeDefinition::getId).collect(Collectors.toList()));
 				credential = getOAuthV2Service().generateAccessToken(clientId, userId, scopes);
 				break;
 			case PASSWORD:
-				final List<String> names = tokenReq.getScopes().orElse(Collections.emptyList());
-				if (names.isEmpty()) {
+				final List<String> idList = tokenReq.getScopes().orElse(Collections.emptyList());
+				if (idList.isEmpty()) {
 					throw new InvalidRequestException("Missing scope");
 				}
 				final List<String> checkedScopes = new LinkedList<>();
-				for (String name : names) {
-					if (isEmptyString(name)) {
+				for (String id : idList) {
+					if (isEmptyString(id)) {
 						continue;
 					}
-					Optional<ScopeDefinition> scope = getOAuthV2Service().getScopeById(name);
+					Optional<ScopeDefinition> scope = getOAuthV2Service().getScopeById(id, null);
 					if (!scope.isPresent()) {
-						throw new InvalidScopeException(MessageFormat.format("Unknown scope: {0}", name));
+						throw new InvalidScopeException(MessageFormat.format("Unknown scope: {0}", id));
 					}
-					checkedScopes.add(scope.get().getName());
+					checkedScopes.add(scope.get().getId());
 				}
 				final String username = tokenReq.getUsername().orElseThrow(() -> new InvalidRequestException("Missing username"));
 				final String password = tokenReq.getPassword().orElseThrow(() -> new InvalidRequestException("Missing password"));
@@ -267,7 +271,10 @@ public class AuthorizationServer {
 			default:
 				throw new UnsupportedGrantTypeException(MessageFormat.format("Unsupported grant type '{0}'", grantType));
 		}
-		return Optional.ofNullable(credential);
+		if (credential == null) {
+			throw new ServerErrorException("Unable to generate access token");
+		}
+		return credential;
 	}
 
 	private String encode(final String serverTokenIssuer, final String serverTokenSecret, final AuthorizationDetail authDetail) throws ServerErrorException {
@@ -332,8 +339,8 @@ public class AuthorizationServer {
 		 * @return The builder
 		 */
 		public Builder setAuthCodeExpiresAfter(final long amount, final TemporalUnit unit) {
-			this.authCodeExpiresTimeAmount = amount <= 0 ? DEFAULT_AUTHORIZATION_CODE_EXPIRES_IN_MINUTES : amount;
-			this.authCodeExpiresTimeUnit = unit == null ? ChronoUnit.MINUTES : unit;
+			this.authCodeExpiresTimeAmount = amount <= 0 ? DEFAULT_AUTHORIZATION_CODE_EXPIRES_TIME_AMOUNT : amount;
+			this.authCodeExpiresTimeUnit = unit == null ? DEFAULT_AUTHORIZATION_CODE_EXPIRES_TIME_UNIT : unit;
 			return this;
 		}
 
