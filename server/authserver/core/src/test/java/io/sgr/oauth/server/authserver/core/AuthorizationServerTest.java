@@ -24,6 +24,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.sgr.oauth.core.exceptions.InvalidClientException;
@@ -71,7 +73,7 @@ public class AuthorizationServerTest {
 	@Mock
 	private OAuthV2Service mockService;
 	@Mock
-	private AuthRequestParser<Object> mockParser;
+	private AuthRequestParser<Object> mockAuthReqParser;
 
 	@Before
 	public void initMock() {
@@ -90,9 +92,9 @@ public class AuthorizationServerTest {
 		final List<String> scopes = Collections.singletonList(REGISTERED_SCOPE_ID);
 		final String state = UUID.randomUUID().toString();
 		final AuthorizationRequest authReq = new AuthorizationRequest(ResponseType.CODE, REGISTERED_CLIENT_ID, REGISTERED_CALLBACK, scopes, state);
-		when(mockParser.parse(any())).thenReturn(authReq);
+		when(mockAuthReqParser.parse(any())).thenReturn(authReq);
 		final String currentUser = "user_1";
-		final AuthorizationDetail authDetail = authServer.preAuthorization(new Object(), mockParser, currentUser, null);
+		final AuthorizationDetail authDetail = authServer.preAuthorization(new Object(), mockAuthReqParser, currentUser, null);
 		assertNotNull(authDetail);
 		assertEquals(authReq.getResponseType(), authDetail.getResponseType());
 		assertEquals(client, authDetail.getClient());
@@ -119,11 +121,12 @@ public class AuthorizationServerTest {
 		final String authCode = fetchParamValueInUrl(url, OAuth20.OAUTH_CODE);
 		System.out.println(authCode);
 		assertNotNull(authCode);
+		verify(mockService, times(1)).cacheAuthorizationCode(eq(authCode));
 	}
 
 	private String fetchParamValueInUrl(final String url, final String paramKey) {
 		String value = url.substring(url.indexOf(paramKey) + paramKey.length() + 1);
-		return value.substring(0, !value.contains("&") ? value.length() - 1 : value.indexOf("&"));
+		return value.substring(0, value.contains("&") ? value.indexOf("&") : value.length());
 	}
 
 	@Test(expected = InvalidScopeException.class)
@@ -136,8 +139,8 @@ public class AuthorizationServerTest {
 		final List<String> scopes = Arrays.asList(null, "", "bad_scope");
 		final String state = UUID.randomUUID().toString();
 		final AuthorizationRequest authReq = new AuthorizationRequest(ResponseType.CODE, REGISTERED_CLIENT_ID, REGISTERED_CALLBACK, scopes, state);
-		when(mockParser.parse(any())).thenReturn(authReq);
-		authServer.preAuthorization(new Object(), mockParser, "user_1", null);
+		when(mockAuthReqParser.parse(any())).thenReturn(authReq);
+		authServer.preAuthorization(new Object(), mockAuthReqParser, "user_1", null);
 	}
 
 	@Test(expected = InvalidRequestException.class)
@@ -150,8 +153,8 @@ public class AuthorizationServerTest {
 		final List<String> scopes = Collections.singletonList(REGISTERED_SCOPE_ID);
 		final String state = UUID.randomUUID().toString();
 		final AuthorizationRequest authReq = new AuthorizationRequest(ResponseType.CODE, REGISTERED_CLIENT_ID, "http://localhost/redirect", scopes, state);
-		when(mockParser.parse(any())).thenReturn(authReq);
-		authServer.preAuthorization(new Object(), mockParser, "user_1", null);
+		when(mockAuthReqParser.parse(any())).thenReturn(authReq);
+		authServer.preAuthorization(new Object(), mockAuthReqParser, "user_1", null);
 	}
 
 	@Test(expected = InvalidClientException.class)
@@ -164,8 +167,8 @@ public class AuthorizationServerTest {
 		final List<String> scopes = Collections.singletonList(REGISTERED_SCOPE_ID);
 		final String state = UUID.randomUUID().toString();
 		final AuthorizationRequest authReq = new AuthorizationRequest(ResponseType.CODE, "some_other_client", REGISTERED_CALLBACK, scopes, state);
-		when(mockParser.parse(any())).thenReturn(authReq);
-		authServer.preAuthorization(new Object(), mockParser, "user_1", null);
+		when(mockAuthReqParser.parse(any())).thenReturn(authReq);
+		authServer.preAuthorization(new Object(), mockAuthReqParser, "user_1", null);
 	}
 
 	@Test(expected = UnsupportedResponseTypeException.class)
@@ -178,8 +181,8 @@ public class AuthorizationServerTest {
 		final List<String> scopes = Collections.singletonList(REGISTERED_SCOPE_ID);
 		final String state = UUID.randomUUID().toString();
 		final AuthorizationRequest authReq = new AuthorizationRequest(ResponseType.CODE_AND_TOKEN, REGISTERED_CLIENT_ID, REGISTERED_CALLBACK, scopes, state);
-		when(mockParser.parse(any())).thenReturn(authReq);
-		authServer.preAuthorization(new Object(), mockParser, "user_1", null);
+		when(mockAuthReqParser.parse(any())).thenReturn(authReq);
+		authServer.preAuthorization(new Object(), mockAuthReqParser, "user_1", null);
 	}
 
 	@Test
