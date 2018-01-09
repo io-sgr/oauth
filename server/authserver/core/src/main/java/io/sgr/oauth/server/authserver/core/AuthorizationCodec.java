@@ -15,7 +15,7 @@
  *
  */
 
-package io.sgr.oauth.authserver.core;
+package io.sgr.oauth.server.authserver.core;
 
 public interface AuthorizationCodec<T> {
 

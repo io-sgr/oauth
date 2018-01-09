@@ -15,7 +15,7 @@
  *
  */
 
-package io.sgr.oauth.authserver.core;
+package io.sgr.oauth.server.authserver.core;
 
 import static io.sgr.oauth.core.utils.Preconditions.isEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;
@@ -59,8 +59,8 @@ import java.util.stream.Collectors;
 
 public class AuthorizationServer {
 
-	private static final int DEFAULT_AUTHORIZATION_CODE_EXPIRES_TIME_AMOUNT = 1;
-	private static final TemporalUnit DEFAULT_AUTHORIZATION_CODE_EXPIRES_TIME_UNIT = ChronoUnit.MINUTES;
+	public static final int DEFAULT_AUTHORIZATION_CODE_EXPIRES_TIME_AMOUNT = 1;
+	public static final TemporalUnit DEFAULT_AUTHORIZATION_CODE_EXPIRES_TIME_UNIT = ChronoUnit.MINUTES;
 
 	private final OAuthV2Service service;
 	private final AuthorizationCodec<AuthorizationDetail> authCodec;
@@ -125,6 +125,9 @@ public class AuthorizationServer {
 			if (uriBuilder.indexOf("?") < 0) {
 				uriBuilder.append("?");
 			}
+			if (uriBuilder.lastIndexOf("?") != uriBuilder.length() - 1) {
+				uriBuilder.append("&");
+			}
 			uriBuilder.append(OAuth20.OAUTH_STATE).append("=").append(state);
 		}
 		if (approved) {
@@ -140,6 +143,9 @@ public class AuthorizationServer {
 					if (uriBuilder.indexOf("?") < 0) {
 						uriBuilder.append("?");
 					}
+					if (uriBuilder.lastIndexOf("?") != uriBuilder.length() - 1) {
+						uriBuilder.append("&");
+					}
 					uriBuilder.append(OAuth20.OAUTH_CODE).append("=").append(code);
 					break;
 				default:
@@ -150,8 +156,12 @@ public class AuthorizationServer {
 				if (uriBuilder.indexOf("?") < 0) {
 					uriBuilder.append("?");
 				}
+				if (uriBuilder.lastIndexOf("?") != uriBuilder.length() - 1) {
+					uriBuilder.append("&");
+				}
 				uriBuilder
 						.append(OAuth20.OAUTH_ERROR).append("=").append("access_denied")
+						.append("&")
 						.append(OAuth20.OAUTH_ERROR_DESCRIPTION).append("=").append(URLEncoder.encode("User denied the request", "UTF-8"));
 			} catch (UnsupportedEncodingException e) {
 				throw new RuntimeException(e);
@@ -272,12 +282,24 @@ public class AuthorizationServer {
 
 		private String issuer;
 		private String serverSecret;
-		private long authCodeExpiresTimeAmount;
+		private Long authCodeExpiresTimeAmount;
 		private TemporalUnit authCodeExpiresTimeUnit;
 
 		private Builder(final OAuthV2Service service) {
 			notNull(service, "Missing implementation of " + OAuthV2Service.class);
 			this.service = service;
+		}
+
+		public OAuthV2Service getOAuthV2Service() {
+			return service;
+		}
+
+		/**
+		 *
+		 * @return The issure
+		 */
+		public String getIssuer() {
+			return issuer;
 		}
 
 		public Builder setIssuer(final String issuer) {
@@ -286,10 +308,26 @@ public class AuthorizationServer {
 			return this;
 		}
 
+		/**
+		 *
+		 * @return The server secret
+		 */
+		public String getServerSecret() {
+			return serverSecret;
+		}
+
 		public Builder setServerSecret(final String serverSecret) {
 			notEmptyString(serverSecret, "Server secret needs to be specified");
 			this.serverSecret = serverSecret;
 			return this;
+		}
+
+		public Long getAuthCodeExpiresTimeAmount() {
+			return authCodeExpiresTimeAmount;
+		}
+
+		public TemporalUnit getAuthCodeExpiresTimeUnit() {
+			return authCodeExpiresTimeUnit;
 		}
 
 		/**
@@ -297,9 +335,9 @@ public class AuthorizationServer {
 		 * @param unit   The unit of time amount, default to minute.
 		 * @return The builder
 		 */
-		public Builder setAuthCodeExpiresAfter(final long amount, final TemporalUnit unit) {
-			this.authCodeExpiresTimeAmount = amount <= 0 ? DEFAULT_AUTHORIZATION_CODE_EXPIRES_TIME_AMOUNT : amount;
-			this.authCodeExpiresTimeUnit = unit == null ? DEFAULT_AUTHORIZATION_CODE_EXPIRES_TIME_UNIT : unit;
+		public Builder setAuthCodeExpiresAfter(final Long amount, final TemporalUnit unit) {
+			this.authCodeExpiresTimeAmount = amount;
+			this.authCodeExpiresTimeUnit = unit;
 			return this;
 		}
 
@@ -307,7 +345,9 @@ public class AuthorizationServer {
 		 * @return The authorization server which built with specified parameters.
 		 */
 		public AuthorizationServer build() {
-			final JwtAuthorizationCodec authCodec = new JwtAuthorizationCodec(issuer, serverSecret).setExpiresIn(authCodeExpiresTimeAmount, authCodeExpiresTimeUnit);
+			final JwtAuthorizationCodec authCodec = new JwtAuthorizationCodec(issuer, serverSecret)
+					.setExpiresIn(authCodeExpiresTimeAmount == null || authCodeExpiresTimeAmount <=0 ? DEFAULT_AUTHORIZATION_CODE_EXPIRES_TIME_AMOUNT : authCodeExpiresTimeAmount,
+							authCodeExpiresTimeUnit == null ? DEFAULT_AUTHORIZATION_CODE_EXPIRES_TIME_UNIT : authCodeExpiresTimeUnit);
 			return new AuthorizationServer(this.service, authCodec);
 		}
 

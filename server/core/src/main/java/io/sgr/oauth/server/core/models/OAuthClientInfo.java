@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -141,4 +142,16 @@ public class OAuthClientInfo implements Serializable {
 	public void setCallbacks(final List<String> callbacks) {
 		this.callbacks = Optional.ofNullable(callbacks).orElse(Collections.emptyList());
 	}
+
+	@Override public boolean equals(final Object o) {
+		if (this == o) return true;
+		if (!(o instanceof OAuthClientInfo)) return false;
+		final OAuthClientInfo that = (OAuthClientInfo) o;
+		return Objects.equals(getId(), that.getId());
+	}
+
+	@Override public int hashCode() {
+		return Objects.hash(getId());
+	}
+
 }

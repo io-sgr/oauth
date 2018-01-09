@@ -15,7 +15,7 @@
  *
  */
 
-package io.sgr.oauth.authserver.core;
+package io.sgr.oauth.server.authserver.core;
 
 import static io.sgr.oauth.core.utils.Preconditions.isEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;

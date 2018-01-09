@@ -17,7 +17,7 @@
 
 package io.sgr.oauth.server.authserver.j2ee;
 
-import io.sgr.oauth.authserver.core.AuthorizationServer;
+import io.sgr.oauth.server.authserver.core.AuthorizationServer;
 import io.sgr.oauth.core.OAuthCredential;
 import io.sgr.oauth.core.exceptions.InvalidClientException;
 import io.sgr.oauth.core.exceptions.InvalidGrantException;
