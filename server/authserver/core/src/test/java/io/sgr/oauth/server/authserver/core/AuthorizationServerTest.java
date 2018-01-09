@@ -47,6 +47,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.Clock;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -123,6 +124,62 @@ public class AuthorizationServerTest {
 	private String fetchParamValueInUrl(final String url, final String paramKey) {
 		String value = url.substring(url.indexOf(paramKey) + paramKey.length() + 1);
 		return value.substring(0, !value.contains("&") ? value.length() - 1 : value.indexOf("&"));
+	}
+
+	@Test(expected = InvalidScopeException.class)
+	public void testInvalidScope()
+			throws InvalidRequestException, UnsupportedResponseTypeException, InvalidScopeException, InvalidClientException {
+		final AuthorizationServer authServer = AuthorizationServer
+				.with(mockService)
+				.setIssuer("unit_test").setServerSecret("test_secret")
+				.build();
+		final List<String> scopes = Arrays.asList(null, "", "bad_scope");
+		final String state = UUID.randomUUID().toString();
+		final AuthorizationRequest authReq = new AuthorizationRequest(ResponseType.CODE, REGISTERED_CLIENT_ID, REGISTERED_CALLBACK, scopes, state);
+		when(mockParser.parse(any())).thenReturn(authReq);
+		authServer.preAuthorization(new Object(), mockParser, "user_1", null);
+	}
+
+	@Test(expected = InvalidRequestException.class)
+	public void testInvalidRedirectUri()
+			throws InvalidRequestException, UnsupportedResponseTypeException, InvalidScopeException, InvalidClientException {
+		final AuthorizationServer authServer = AuthorizationServer
+				.with(mockService)
+				.setIssuer("unit_test").setServerSecret("test_secret")
+				.build();
+		final List<String> scopes = Collections.singletonList(REGISTERED_SCOPE_ID);
+		final String state = UUID.randomUUID().toString();
+		final AuthorizationRequest authReq = new AuthorizationRequest(ResponseType.CODE, REGISTERED_CLIENT_ID, "http://localhost/redirect", scopes, state);
+		when(mockParser.parse(any())).thenReturn(authReq);
+		authServer.preAuthorization(new Object(), mockParser, "user_1", null);
+	}
+
+	@Test(expected = InvalidClientException.class)
+	public void testInvalidClient()
+			throws InvalidRequestException, UnsupportedResponseTypeException, InvalidScopeException, InvalidClientException {
+		final AuthorizationServer authServer = AuthorizationServer
+				.with(mockService)
+				.setIssuer("unit_test").setServerSecret("test_secret")
+				.build();
+		final List<String> scopes = Collections.singletonList(REGISTERED_SCOPE_ID);
+		final String state = UUID.randomUUID().toString();
+		final AuthorizationRequest authReq = new AuthorizationRequest(ResponseType.CODE, "some_other_client", REGISTERED_CALLBACK, scopes, state);
+		when(mockParser.parse(any())).thenReturn(authReq);
+		authServer.preAuthorization(new Object(), mockParser, "user_1", null);
+	}
+
+	@Test(expected = UnsupportedResponseTypeException.class)
+	public void testUnsupportedResponseType()
+			throws InvalidRequestException, UnsupportedResponseTypeException, InvalidScopeException, InvalidClientException {
+		final AuthorizationServer authServer = AuthorizationServer
+				.with(mockService)
+				.setIssuer("unit_test").setServerSecret("test_secret")
+				.build();
+		final List<String> scopes = Collections.singletonList(REGISTERED_SCOPE_ID);
+		final String state = UUID.randomUUID().toString();
+		final AuthorizationRequest authReq = new AuthorizationRequest(ResponseType.CODE_AND_TOKEN, REGISTERED_CLIENT_ID, REGISTERED_CALLBACK, scopes, state);
+		when(mockParser.parse(any())).thenReturn(authReq);
+		authServer.preAuthorization(new Object(), mockParser, "user_1", null);
 	}
 
 	@Test
