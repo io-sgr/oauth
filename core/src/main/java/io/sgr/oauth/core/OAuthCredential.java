@@ -55,6 +55,14 @@ public class OAuthCredential implements Serializable {
 	/**
 	 * @param accessToken
 	 * 				The access_token
+	 */
+	public OAuthCredential(String accessToken) {
+		this(accessToken, null, null, null);
+	}
+
+	/**
+	 * @param accessToken
+	 * 				The access_token
 	 * @param tokenType
 	 * 				The token_type
 	 */

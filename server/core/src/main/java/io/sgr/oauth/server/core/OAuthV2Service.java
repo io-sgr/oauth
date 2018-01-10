@@ -45,7 +45,7 @@ public interface OAuthV2Service {
 
 	Optional<OAuthClientInfo> getOAuthClientByIdAndSecret(final String clientId, final String clientSecret);
 
-	void cacheAuthorizationCode(String authCode);
+	boolean isAuthorizationCodeRevoked(final String authCode);
 
 	void revokeAuthorizationCode(final String authCode);
 
@@ -55,9 +55,8 @@ public interface OAuthV2Service {
 
 	String getUserIdByUsernameAndPassword(final String username, final String password);
 
+	boolean isValidRefreshToken(final String clientId, final String refreshToken);
+
 	OAuthCredential refreshAccessToken(final String clientId, final String refreshToken);
 
-	String getServerTokenIssuer();
-
-	String getServerTokenSecret();
 }

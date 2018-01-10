@@ -59,8 +59,8 @@ import java.util.stream.Collectors;
 
 public class AuthorizationServer {
 
-	public static final int DEFAULT_AUTHORIZATION_CODE_EXPIRES_TIME_AMOUNT = 1;
-	public static final TemporalUnit DEFAULT_AUTHORIZATION_CODE_EXPIRES_TIME_UNIT = ChronoUnit.MINUTES;
+	private static final int DEFAULT_AUTHORIZATION_CODE_EXPIRES_TIME_AMOUNT = 1;
+	private static final TemporalUnit DEFAULT_AUTHORIZATION_CODE_EXPIRES_TIME_UNIT = ChronoUnit.MINUTES;
 
 	private final OAuthV2Service service;
 	private final AuthorizationCodec<AuthorizationDetail> authCodec;
@@ -72,6 +72,11 @@ public class AuthorizationServer {
 		this.authCodec = authCodec;
 	}
 
+	/**
+	 *
+	 * @param service The OAuth V2 service provider
+	 * @return The builder
+	 */
 	public static Builder with(final OAuthV2Service service) {
 		return new Builder(service);
 	}
@@ -139,7 +144,6 @@ public class AuthorizationServer {
 					} catch (JwtException e) {
 						throw new ServerErrorException("Failed to generate authorization code");
 					}
-					getOAuthV2Service().cacheAuthorizationCode(code);
 					if (uriBuilder.indexOf("?") < 0) {
 						uriBuilder.append("?");
 					}
@@ -213,19 +217,26 @@ public class AuthorizationServer {
 		switch (grantType) {
 			case REFRESH_TOKEN:
 				final String refreshToken = tokenReq.getRefreshToken().orElseThrow(() -> new InvalidRequestException("Missing refresh token"));
+				if (!getOAuthV2Service().isValidRefreshToken(clientId, refreshToken)) {
+					throw new InvalidGrantException("Invalid refresh token");
+				}
 				credential = getOAuthV2Service().refreshAccessToken(clientId, refreshToken);
 				break;
 			case AUTHORIZATION_CODE:
 				final String authCode = tokenReq.getCode().orElseThrow(() -> new InvalidRequestException("Missing authorization code"));
+				if (getOAuthV2Service().isAuthorizationCodeRevoked(authCode)) {
+					throw new InvalidGrantException("Authorization code already been revoked");
+				}
 				final AuthorizationDetail authDetail;
 				try {
 					authDetail = authCodec.decode(authCode);
 				} catch (ExpiredJwtException e) {
-					throw new InvalidGrantException("Invalid authorization code");
+					throw new InvalidGrantException("Expired authorization code");
 				} catch (JwtException e) {
-					throw new ServerErrorException("Failed to parse authorization code");
+					throw new InvalidGrantException("Unable to parse authorization code");
+				} finally {
+					getOAuthV2Service().revokeAuthorizationCode(authCode);
 				}
-				getOAuthV2Service().revokeAuthorizationCode(authCode);
 				if (authDetail == null) {
 					throw new InvalidGrantException("Invalid authorization code");
 				}
@@ -290,18 +301,27 @@ public class AuthorizationServer {
 			this.service = service;
 		}
 
+		/**
+		 *
+		 * @return The OAuth V2 service provider
+		 */
 		public OAuthV2Service getOAuthV2Service() {
 			return service;
 		}
 
 		/**
 		 *
-		 * @return The issure
+		 * @return The issuer
 		 */
 		public String getIssuer() {
 			return issuer;
 		}
 
+		/**
+		 *
+		 * @param issuer The issuer
+		 * @return The builder
+		 */
 		public Builder setIssuer(final String issuer) {
 			notEmptyString(issuer, "Issuer needs to be specified");
 			this.issuer = issuer;
@@ -316,16 +336,29 @@ public class AuthorizationServer {
 			return serverSecret;
 		}
 
+		/**
+		 *
+		 * @param serverSecret The server secret
+		 * @return The builder
+		 */
 		public Builder setServerSecret(final String serverSecret) {
 			notEmptyString(serverSecret, "Server secret needs to be specified");
 			this.serverSecret = serverSecret;
 			return this;
 		}
 
+		/**
+		 *
+		 * @return The amount of authorization code expire time
+		 */
 		public Long getAuthCodeExpiresTimeAmount() {
 			return authCodeExpiresTimeAmount;
 		}
 
+		/**
+		 *
+		 * @return The unit of authorization code expire time
+		 */
 		public TemporalUnit getAuthCodeExpiresTimeUnit() {
 			return authCodeExpiresTimeUnit;
 		}

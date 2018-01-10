@@ -17,11 +17,12 @@
 
 package io.sgr.oauth.server.core;
 
+import io.sgr.oauth.core.exceptions.InvalidGrantException;
 import io.sgr.oauth.core.exceptions.InvalidRequestException;
 import io.sgr.oauth.core.exceptions.UnsupportedGrantTypeException;
 import io.sgr.oauth.server.core.models.TokenRequest;
 
 public interface TokenRequestParser<T> {
 
-	TokenRequest parse(T from) throws InvalidRequestException, UnsupportedGrantTypeException;
+	TokenRequest parse(T from) throws InvalidRequestException, InvalidGrantException, UnsupportedGrantTypeException;
 }
