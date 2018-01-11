@@ -249,12 +249,12 @@ public class AuthorizationServer {
 				credential = getOAuthV2Service().generateAccessToken(clientId, userId, scopes);
 				break;
 			case PASSWORD:
-				final List<String> idList = tokenReq.getScopes().orElse(Collections.emptyList());
-				if (idList.isEmpty()) {
+				final List<String> scopeIdList = tokenReq.getScopes().orElse(Collections.emptyList());
+				if (scopeIdList.isEmpty()) {
 					throw new InvalidRequestException("Missing scope");
 				}
 				final List<String> checkedScopes = new LinkedList<>();
-				for (String id : idList) {
+				for (String id : scopeIdList) {
 					if (isEmptyString(id)) {
 						continue;
 					}
