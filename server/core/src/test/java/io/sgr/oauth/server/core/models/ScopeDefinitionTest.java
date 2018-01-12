@@ -18,11 +18,33 @@
 package io.sgr.oauth.server.core.models;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class ScopeDefinitionTest {
+
+	@Test
+	public void testEqual() {
+		final ScopeDefinition def1 = new ScopeDefinition("basic", "Basic", "The basic scope");
+		assertNotEquals(null, def1);
+		assertNotEquals(new Object(), def1);
+		assertEquals(def1, def1);
+		assertFalse(def1.equals(new Object()));
+
+		final ScopeDefinition def2 = new ScopeDefinition("basic", "Basic2", "The basic scope2");
+		assertEquals(def1, def2);
+
+		final Set<ScopeDefinition> all = new HashSet<>();
+		all.add(def1);
+		all.add(def2);
+		assertEquals(1, all.size());
+	}
 
 	@Test
 	public void testCreateScopeDefinition() {

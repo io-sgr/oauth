@@ -144,8 +144,12 @@ public class OAuthClientInfo implements Serializable {
 	}
 
 	@Override public boolean equals(final Object o) {
-		if (this == o) return true;
-		if (!(o instanceof OAuthClientInfo)) return false;
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof OAuthClientInfo)) {
+			return false;
+		}
 		final OAuthClientInfo that = (OAuthClientInfo) o;
 		return Objects.equals(getId(), that.getId());
 	}

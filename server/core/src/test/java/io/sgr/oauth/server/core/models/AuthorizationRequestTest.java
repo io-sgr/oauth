@@ -80,6 +80,12 @@ public class AuthorizationRequestTest {
 		} catch (IllegalArgumentException e) {
 			// Expected
 		}
+		try {
+			new AuthorizationRequest(ResponseType.CODE, UUID.randomUUID().toString(), "http://localhost/callback", Collections.emptyList(), null);
+			fail();
+		} catch (IllegalArgumentException e) {
+			// Expected
+		}
 	}
 
 }

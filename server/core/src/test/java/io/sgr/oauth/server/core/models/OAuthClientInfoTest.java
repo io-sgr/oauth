@@ -19,6 +19,7 @@ package io.sgr.oauth.server.core.models;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -27,10 +28,38 @@ import org.junit.Test;
 
 import java.time.Clock;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class OAuthClientInfoTest {
+
+	@Test
+	public void testEqual() {
+		final String clientId = UUID.randomUUID().toString();
+		final String name = "example";
+		final String desc = "This is a simple description";
+		final String iconUrl = "https://localhost/images/app.png";
+		final String privacyUrl = "https://localhost/privacy.html";
+		final List<String> callbacks = Collections.singletonList("https://localhost/callback");
+		final String ownerUid = "example_uid";
+		final long now = Clock.systemUTC().millis();
+
+		OAuthClientInfo client1 = new OAuthClientInfo(clientId, UUID.randomUUID().toString(), name, desc, iconUrl, privacyUrl, ownerUid, now, callbacks);
+		assertNotEquals(null, client1);
+		assertNotEquals(new Object(), client1);
+		assertEquals(client1, client1);
+		assertFalse(client1.equals(new Object()));
+
+		OAuthClientInfo client2 = new OAuthClientInfo(clientId, UUID.randomUUID().toString(), name, desc, iconUrl, privacyUrl, ownerUid, now, callbacks);
+		assertEquals(client1, client2);
+
+		final Set<OAuthClientInfo> all = new HashSet<>();
+		all.add(client1);
+		all.add(client2);
+		assertEquals(1, all.size());
+	}
 
 	@Test
 	public void testCreateWithInvalidArguments() {
