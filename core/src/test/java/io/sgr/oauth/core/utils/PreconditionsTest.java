@@ -56,6 +56,8 @@ public class PreconditionsTest {
 		assertTrue(Preconditions.isEmptyString(""));
 		assertTrue(Preconditions.isEmptyString("\n"));
 		assertTrue(Preconditions.isEmptyString("\n\n\n"));
+		assertTrue(Preconditions.isEmptyString(" "));
+		assertTrue(Preconditions.isEmptyString(" \n"));
 		assertFalse(Preconditions.isEmptyString("abd"));
 		try {
 			Preconditions.notEmptyString(null, "err msg");

@@ -15,16 +15,8 @@
  *
  */
 
-package io.sgr.oauth.server.authserver.j2ee.utils;
+package io.sgr.oauth.server.authserver.j2ee;
 
-public class OAuthV2WebConstants {
-
-	public static final String DEFAULT_SCOPE_SPLITTER = ",";
-
-	public static final String SESSION_ATTRS_KEY_AUTH_DETAIL = "oauth.v2.auth_detail";
-	public static final String SESSION_ATTRS_KEY_CSRF_TOKEN = "csrf_token";
-
-	public static final String REQ_PARAMS_KEY_CSRF_TOKEN = "csrf_token";
-	public static final String REQ_PARAMS_KEY_APPROVED = "approved";
+public class AuthServletTest {
 
 }

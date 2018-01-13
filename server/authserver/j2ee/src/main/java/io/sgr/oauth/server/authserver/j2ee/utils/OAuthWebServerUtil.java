@@ -19,23 +19,17 @@ package io.sgr.oauth.server.authserver.j2ee.utils;
 import static io.sgr.oauth.core.utils.Preconditions.isEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notNull;
+import static io.sgr.oauth.server.authserver.j2ee.utils.OAuthV2WebConstants.DEFAULT_SCOPE_SPLITTER;
 
-import io.sgr.oauth.core.OAuthCredential;
-import io.sgr.oauth.core.v20.OAuth20;
-import io.sgr.oauth.core.v20.ResponseType;
-import io.sgr.oauth.server.authserver.j2ee.exceptions.BadOAuthRequestException;
 import io.sgr.oauth.core.exceptions.InvalidRequestException;
-import io.sgr.oauth.server.core.models.AuthorizationRequest;
+import io.sgr.oauth.core.v20.OAuth20;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -45,69 +39,43 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class OAuthWebServerUtil {
 
-	public static AuthorizationRequest parseAuthorizationCodeRequest(final HttpServletRequest req)
-			throws BadOAuthRequestException, InvalidRequestException {
-		notNull(req, "Missing HTTP servlet request");
-		final String responseTypeS = req.getParameter(OAuth20.OAUTH_RESPONSE_TYPE);
-		final ResponseType responseType;
-		if (isEmptyString(responseTypeS)) {
-			responseType = ResponseType.CODE;
-		} else {
-			try {
-				responseType = ResponseType.valueOf(responseTypeS.toUpperCase());
-			} catch (Exception e) {
-				throw new BadOAuthRequestException(MessageFormat.format("Invalid response type '{0}'", responseTypeS));
-			}
-		}
-		final String clientId = req.getParameter(OAuth20.OAUTH_CLIENT_ID);
-		if (isEmptyString(clientId)) {
-			throw new BadOAuthRequestException("Missing client ID");
-		}
-		String redirectUri = req.getParameter(OAuth20.OAUTH_REDIRECT_URI);
-		if (isEmptyString(redirectUri)) {
-			throw new BadOAuthRequestException("Missing client redirect URI");
-		}
-		try {
-			redirectUri = URLDecoder.decode(redirectUri, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
-		final List<String> scopes = parseScopes(req);
-		final String state = req.getParameter(OAuth20.OAUTH_STATE);
-		return new AuthorizationRequest(responseType, clientId, redirectUri, scopes, state);
+	public static Optional<List<String>> parseScopes(final HttpServletRequest req) throws InvalidRequestException {
+		return parseScopes(req, DEFAULT_SCOPE_SPLITTER);
 	}
 
-	public static List<String> parseScopes(final HttpServletRequest req) throws InvalidRequestException {
-		return parseScopes(req, ",");
-	}
-
-	public static List<String> parseScopes(final HttpServletRequest req, final String splitter) throws InvalidRequestException {
+	public static Optional<List<String>> parseScopes(final HttpServletRequest req, final String splitter) throws InvalidRequestException {
 		notNull(req, "Missing HttpServletRequest");
 		notEmptyString(splitter, "Splitter needs to be specified");
-		final String scopeNames = getOnlyOneParameter(req, OAuth20.OAUTH_SCOPE);
+		final String scopeNames = getOnlyOneParameter(req, OAuth20.OAUTH_SCOPE).orElse(null);
 		final List<String> scopes;
 		if (isEmptyString(scopeNames)) {
 			scopes = null;
 		} else {
-			final String[] names = scopeNames.replaceAll(" ", "").split(splitter);
+			final String[] names = scopeNames.split(splitter);
 			if (names.length == 0) {
 				scopes = null;
 			} else {
 				scopes = Arrays.asList(names);
 			}
 		}
-		return scopes;
+		return Optional.ofNullable(scopes);
 	}
 
-	public static String getOnlyOneParameter(final HttpServletRequest req, final String parameter) throws InvalidRequestException {
+	public static Optional<String> getOnlyOneParameter(final HttpServletRequest req, final String parameter) throws InvalidRequestException {
 		notNull(req, "Missing HttpServletRequest");
 		notEmptyString(parameter, "Parameter name needs to be specified");
+		if (req.getParameterValues(parameter) == null) {
+			return Optional.empty();
+		}
 		if (req.getParameterValues(parameter).length > 1) {
 			throw new InvalidRequestException(MessageFormat.format("Only one '{0}' parameter allowed", parameter));
 		}
 		final String value = req.getParameter(parameter);
+		if (isEmptyString(value)) {
+			return Optional.empty();
+		}
 		try {
-			return URLDecoder.decode(value, "UTF-8");
+			return Optional.of(URLDecoder.decode(value.trim(), "UTF-8"));
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}

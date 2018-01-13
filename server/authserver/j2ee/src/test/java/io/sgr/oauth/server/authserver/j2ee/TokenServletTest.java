@@ -15,24 +15,8 @@
  *
  */
 
-package io.sgr.oauth.server.authserver.j2ee.exceptions;
+package io.sgr.oauth.server.authserver.j2ee;
 
-import io.sgr.oauth.core.v20.OAuthError;
-import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
+public class TokenServletTest {
 
-public class BadOAuthRequestException extends UnrecoverableOAuthException {
-
-	/**
-	 * @param message The error message
-	 */
-	public BadOAuthRequestException(final String message) {
-		this(new OAuthError("bad_oauth_request", message, null));
-	}
-
-	/**
-	 * @param error The error
-	 */
-	public BadOAuthRequestException(final OAuthError error) {
-		super(error);
-	}
 }

@@ -20,6 +20,8 @@ package io.sgr.oauth.server.authserver.j2ee.utils;
 import static io.sgr.oauth.core.utils.Preconditions.isEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notNull;
 import static io.sgr.oauth.core.v20.GrantType.AUTHORIZATION_CODE;
+import static io.sgr.oauth.server.authserver.j2ee.utils.OAuthWebServerUtil.getOnlyOneParameter;
+import static io.sgr.oauth.server.authserver.j2ee.utils.OAuthWebServerUtil.parseScopes;
 
 import io.sgr.oauth.core.exceptions.InvalidRequestException;
 import io.sgr.oauth.core.exceptions.UnsupportedGrantTypeException;
@@ -48,10 +50,7 @@ public class ServletBasedTokenRequestParser implements TokenRequestParser<HttpSe
 	@Override public TokenRequest parse(final HttpServletRequest req)
 			throws InvalidRequestException, UnsupportedGrantTypeException {
 		notNull(req, "Missing HttpServletRequest");
-		final String clientId = OAuthWebServerUtil.getOnlyOneParameter(req, OAuth20.OAUTH_CLIENT_ID);
-		final String clientSecret = OAuthWebServerUtil.getOnlyOneParameter(req, OAuth20.OAUTH_CLIENT_SECRET);
-		final String redirectUri = OAuthWebServerUtil.getOnlyOneParameter(req, OAuth20.OAUTH_REDIRECT_URI);
-		final String grantTypeS = OAuthWebServerUtil.getOnlyOneParameter(req, OAuth20.OAUTH_GRANT_TYPE);
+		final String grantTypeS = getOnlyOneParameter(req, OAuth20.OAUTH_GRANT_TYPE).orElse(null);
 		final GrantType grantType;
 		if (isEmptyString(grantTypeS)) {
 			grantType = AUTHORIZATION_CODE;
@@ -62,12 +61,14 @@ public class ServletBasedTokenRequestParser implements TokenRequestParser<HttpSe
 				throw new UnsupportedGrantTypeException(MessageFormat.format("Unsupported grant type '{0}'", grantTypeS));
 			}
 		}
-
-		final String authCode = OAuthWebServerUtil.getOnlyOneParameter(req, OAuth20.OAUTH_CODE);
-		final String refreshToken = OAuthWebServerUtil.getOnlyOneParameter(req, OAuth20.OAUTH_REFRESH_TOKEN);
-		final String username = OAuthWebServerUtil.getOnlyOneParameter(req, OAuth20.OAUTH_USERNAME);
-		final String password = OAuthWebServerUtil.getOnlyOneParameter(req, OAuth20.OAUTH_PASSWORD);
-		final List<String> scopes = OAuthWebServerUtil.parseScopes(req);
+		final String clientId = getOnlyOneParameter(req, OAuth20.OAUTH_CLIENT_ID).orElse(null);
+		final String clientSecret = getOnlyOneParameter(req, OAuth20.OAUTH_CLIENT_SECRET).orElse(null);
+		final String redirectUri = getOnlyOneParameter(req, OAuth20.OAUTH_REDIRECT_URI).orElse(null);
+		final String authCode = getOnlyOneParameter(req, OAuth20.OAUTH_CODE).orElse(null);
+		final String refreshToken = getOnlyOneParameter(req, OAuth20.OAUTH_REFRESH_TOKEN).orElse(null);
+		final String username = getOnlyOneParameter(req, OAuth20.OAUTH_USERNAME).orElse(null);
+		final String password = getOnlyOneParameter(req, OAuth20.OAUTH_PASSWORD).orElse(null);
+		final List<String> scopes = parseScopes(req).orElse(null);
 		try {
 			return new TokenRequest(grantType, clientId, clientSecret, redirectUri, authCode, refreshToken, username, password, scopes);
 		} catch (IllegalArgumentException e) {
