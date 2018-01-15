@@ -17,6 +17,50 @@
 
 package io.sgr.oauth.server.authserver.j2ee;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import io.sgr.oauth.server.authserver.core.AuthorizationServer;
+import io.sgr.oauth.server.authserver.j2ee.dummy.DummyAuthServlet;
+import io.sgr.oauth.server.authserver.j2ee.dummy.DummyBackend;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@RunWith(MockitoJUnitRunner.class)
 public class AuthServletTest {
+
+	private DummyAuthServlet servlet;
+
+	@Mock
+	private AuthorizationServer mockAuthServer;
+	@Mock
+	private DummyBackend mockBackend;
+	@Mock
+	private HttpServletRequest mockReq;
+	@Mock
+	private HttpServletResponse mockResp;
+
+	@Before
+	public void init() {
+		servlet = new DummyAuthServlet(mockAuthServer, mockBackend);
+	}
+
+	@Test
+	public void testUserNotSignedIn() throws ServletException, IOException {
+		when(mockBackend.getCurrentUserId()).thenReturn(null);
+		servlet.doGet(mockReq, mockResp);
+		verify(mockBackend, times(1)).getCurrentUserId();
+		verify(mockBackend, times(1)).onUserNotSignedIn();
+	}
 
 }

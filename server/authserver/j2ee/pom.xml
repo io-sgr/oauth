@@ -36,8 +36,8 @@
             <artifactId>oauth-authserver-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-servlet_3.0_spec</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

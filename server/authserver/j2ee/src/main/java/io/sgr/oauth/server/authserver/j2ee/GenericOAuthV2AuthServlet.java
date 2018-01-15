@@ -19,8 +19,6 @@ package io.sgr.oauth.server.authserver.j2ee;
 
 import static io.sgr.oauth.core.utils.Preconditions.isEmptyString;
 
-import io.sgr.oauth.server.authserver.core.AuthorizationDetail;
-import io.sgr.oauth.server.authserver.core.AuthorizationServer;
 import io.sgr.oauth.core.exceptions.InvalidClientException;
 import io.sgr.oauth.core.exceptions.InvalidRequestException;
 import io.sgr.oauth.core.exceptions.InvalidScopeException;
@@ -28,9 +26,10 @@ import io.sgr.oauth.core.exceptions.ServerErrorException;
 import io.sgr.oauth.core.exceptions.UnsupportedResponseTypeException;
 import io.sgr.oauth.core.utils.JsonUtil;
 import io.sgr.oauth.core.v20.OAuthError;
+import io.sgr.oauth.server.authserver.core.AuthorizationDetail;
+import io.sgr.oauth.server.authserver.core.AuthorizationServer;
 import io.sgr.oauth.server.authserver.j2ee.utils.OAuthV2WebConstants;
 import io.sgr.oauth.server.authserver.j2ee.utils.ServletBasedAuthorizationRequestParser;
-import io.sgr.oauth.server.core.OAuthV2Service;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -54,7 +53,7 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 
 		final AuthorizationDetail authDetail;
 		try {
-			authDetail = AuthorizationServer.with(getOAuthV2Service()).build()
+			authDetail = getAuthorizationServer()
 					.preAuthorization(req, ServletBasedAuthorizationRequestParser.instance(), curUserId, getUserLocale(req, resp));
 		} catch (InvalidClientException e) {
 			resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -102,8 +101,7 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 
 		final String location;
 		try {
-			location = AuthorizationServer.with(getOAuthV2Service()).build()
-					.postAuthorization(approved, authDetail);
+			location = getAuthorizationServer().postAuthorization(approved, authDetail);
 		} catch (UnsupportedResponseTypeException e) {
 			onBadOAuthRequest(req, resp, e.getError());
 			return;
@@ -128,6 +126,5 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 
 	protected abstract void onDisplayUserAuthorizePage(final AuthorizationDetail authDetail, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
 
-	protected abstract OAuthV2Service getOAuthV2Service();
-
+	protected abstract AuthorizationServer getAuthorizationServer();
 }

@@ -56,7 +56,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.7</java.version>
         <jwt.version>0.9.0</jwt.version>
-        <javaee.api.version>7.0</javaee.api.version>
+        <servlet.api.version>1.0</servlet.api.version>
         <google.client.version>1.23.0</google.client.version>
         <commons.codec.version>1.11</commons.codec.version>
         <commons.logging.version>1.2</commons.logging.version>
@@ -149,9 +149,9 @@
                 <scope>runtime</scope>
             </dependency>
             <dependency>
-                <groupId>javax</groupId>
-                <artifactId>javaee-api</artifactId>
-                <version>${javaee.api.version}</version>
+                <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-servlet_3.0_spec</artifactId>
+                <version>${servlet.api.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
