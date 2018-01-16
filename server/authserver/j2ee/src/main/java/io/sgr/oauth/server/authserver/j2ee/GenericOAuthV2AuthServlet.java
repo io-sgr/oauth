@@ -60,7 +60,7 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 			resp.getWriter().write(JsonUtil.getObjectMapper().writeValueAsString(e.getError()));
 			return;
 		} catch (InvalidRequestException | InvalidScopeException | UnsupportedResponseTypeException e) {
-			onBadOAuthRequest(req, resp, e.getError());
+			onBadOAuthRequest(e.getError(), req, resp);
 			return;
 		}
 
@@ -82,7 +82,7 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 
 		final String reqCsrfToken = req.getParameter(OAuthV2WebConstants.REQ_PARAMS_KEY_CSRF_TOKEN);
 		if (isEmptyString(reqCsrfToken) || !session.getAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN).equals(reqCsrfToken)) {
-			onBadOAuthRequest(req, resp, new OAuthError("csrf_token_mismatch", "CSRF token mismatch!"));
+			onBadOAuthRequest(new OAuthError("csrf_token_mismatch", "CSRF token mismatch!"), req, resp);
 			return;
 		}
 		session.removeAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN);
@@ -92,7 +92,7 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 
 		final Object detail = session.getAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_AUTH_DETAIL);
 		if (!(detail instanceof AuthorizationDetail)) {
-			onBadOAuthRequest(req, resp, new OAuthError("bad_oauth_request", "Bad OAuth request"));
+			onBadOAuthRequest(new OAuthError("bad_oauth_request", "Bad OAuth request"), req, resp);
 			return;
 		}
 		final AuthorizationDetail authDetail = (AuthorizationDetail) detail;
@@ -103,10 +103,10 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 		try {
 			location = getAuthorizationServer().postAuthorization(approved, authDetail);
 		} catch (UnsupportedResponseTypeException e) {
-			onBadOAuthRequest(req, resp, e.getError());
+			onBadOAuthRequest(e.getError(), req, resp);
 			return;
 		} catch (ServerErrorException e) {
-			onServerError(req, resp, e.getError());
+			onServerError(e.getError(), req, resp);
 			return;
 		}
 
@@ -120,9 +120,9 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 
 	protected abstract void onUserNotSignedIn(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
 
-	protected abstract void onBadOAuthRequest(final HttpServletRequest req, final HttpServletResponse resp, final OAuthError error) throws ServletException, IOException;
+	protected abstract void onBadOAuthRequest(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
 
-	protected abstract void onServerError(final HttpServletRequest req, final HttpServletResponse resp, final OAuthError error);
+	protected abstract void onServerError(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp);
 
 	protected abstract void onDisplayUserAuthorizePage(final AuthorizationDetail authDetail, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
 

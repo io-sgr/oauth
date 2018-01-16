@@ -42,7 +42,7 @@ public class DummyAuthServlet extends GenericOAuthV2AuthServlet {
 	}
 
 	@Override
-	protected String getCurrentUserId(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+	protected String getCurrentUserId(final HttpServletRequest req, final HttpServletResponse resp) {
 		return backend.getCurrentUserId();
 	}
 
@@ -51,22 +51,22 @@ public class DummyAuthServlet extends GenericOAuthV2AuthServlet {
 	}
 
 	@Override
-	protected void onUserNotSignedIn(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+	protected void onUserNotSignedIn(final HttpServletRequest req, final HttpServletResponse resp) {
 		backend.onUserNotSignedIn();
 	}
 
 	@Override
-	protected void onBadOAuthRequest(final HttpServletRequest req, final HttpServletResponse resp, final OAuthError error) throws ServletException, IOException {
-		backend.onError(error);
+	protected void onBadOAuthRequest(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) {
+		backend.onBadOAuthRequest(error);
 	}
 
 	@Override
-	protected void onServerError(final HttpServletRequest req, final HttpServletResponse resp, final OAuthError error) {
-		backend.onError(error);
+	protected void onServerError(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) {
+		backend.onServerError(error);
 	}
 
 	@Override
-	protected void onDisplayUserAuthorizePage(final AuthorizationDetail authDetail, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+	protected void onDisplayUserAuthorizePage(final AuthorizationDetail authDetail, final HttpServletRequest req, final HttpServletResponse resp) {
 		backend.onDisplayUserAuthorizePage(authDetail);
 	}
 

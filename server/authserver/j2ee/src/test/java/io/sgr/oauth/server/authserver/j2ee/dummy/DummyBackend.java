@@ -27,7 +27,10 @@ public interface DummyBackend {
 	String getCurrentUserId();
 	Locale getUserLocale();
 	void onUserNotSignedIn();
-	void onError(final OAuthError error);
 	void onDisplayUserAuthorizePage(final AuthorizationDetail authDetail);
 
+	void onBadOAuthRequest(final OAuthError error);
+	void onBadTokenRequest(final OAuthError error);
+	void onInvalidClient(final OAuthError error);
+	void onServerError(final OAuthError error);
 }
