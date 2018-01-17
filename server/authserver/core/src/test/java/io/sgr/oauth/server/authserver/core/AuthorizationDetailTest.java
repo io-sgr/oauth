@@ -41,50 +41,51 @@ public class AuthorizationDetailTest {
 	public void testGetters() {
 		final List<ScopeDefinition> scopes = Collections.singletonList(new ScopeDefinition("basic", "Basic", "Basic Scope"));
 		AuthorizationDetail authDetail;
-		authDetail = new AuthorizationDetail(ResponseType.CODE, TEST_CLIENT, "user_1", "http://localhost/callback", scopes, null);
+		authDetail = new AuthorizationDetail(ResponseType.CODE, TEST_CLIENT, "user_1", "http://localhost/callback", scopes, null, false);
 		assertEquals(ResponseType.CODE, authDetail.getResponseType());
 		assertEquals(TEST_CLIENT, authDetail.getClient());
 		assertEquals("user_1", authDetail.getCurrentUser());
 		assertEquals("http://localhost/callback", authDetail.getRedirectUri());
 		assertEquals(scopes.get(0), authDetail.getScopes().get(0));
 		assertFalse(authDetail.getState().isPresent());
+		assertFalse(authDetail.isAlreadyAuthorized());
 
 	}
 
 	@Test
 	public void testConstructWithInvalidArguments() {
 		try {
-			new AuthorizationDetail(null, null, null, null, null, null);
+			new AuthorizationDetail(null, null, null, null, null, null, false);
 			fail();
 		} catch (IllegalArgumentException e) {
 			// Expected
 		}
 		try {
-			new AuthorizationDetail(ResponseType.CODE, null, null, null, null, null);
+			new AuthorizationDetail(ResponseType.CODE, null, null, null, null, null, false);
 			fail();
 		} catch (IllegalArgumentException e) {
 			// Expected
 		}
 		try {
-			new AuthorizationDetail(ResponseType.CODE, TEST_CLIENT, null, null, null, null);
+			new AuthorizationDetail(ResponseType.CODE, TEST_CLIENT, null, null, null, null, false);
 			fail();
 		} catch (IllegalArgumentException e) {
 			// Expected
 		}
 		try {
-			new AuthorizationDetail(ResponseType.CODE, TEST_CLIENT, "user_1", null, null, null);
+			new AuthorizationDetail(ResponseType.CODE, TEST_CLIENT, "user_1", null, null, null, false);
 			fail();
 		} catch (IllegalArgumentException e) {
 			// Expected
 		}
 		try {
-			new AuthorizationDetail(ResponseType.CODE, TEST_CLIENT, "user_1", "http://localhost/callback", null, null);
+			new AuthorizationDetail(ResponseType.CODE, TEST_CLIENT, "user_1", "http://localhost/callback", null, null, false);
 			fail();
 		} catch (IllegalArgumentException e) {
 			// Expected
 		}
 		try {
-			new AuthorizationDetail(ResponseType.CODE, TEST_CLIENT, "user_1", "http://localhost/callback", Collections.emptyList(), null);
+			new AuthorizationDetail(ResponseType.CODE, TEST_CLIENT, "user_1", "http://localhost/callback", Collections.emptyList(), null, false);
 			fail();
 		} catch (IllegalArgumentException e) {
 			// Expected

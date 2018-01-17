@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -112,10 +113,7 @@ public class AuthorizationServerTest {
 			throws UnsupportedResponseTypeException, ServerErrorException {
 		final String currentUser = "user_1";
 		final List<ScopeDefinition> scopes = Collections.singletonList(REGISTERED_SCOPE);
-		AuthorizationDetail authDetail;
-		String url;
-
-		authDetail = new AuthorizationDetail(ResponseType.CODE_AND_TOKEN, REGISTERED_CLIENT, currentUser, REGISTERED_CALLBACK, scopes, null);
+		AuthorizationDetail authDetail = new AuthorizationDetail(ResponseType.CODE_AND_TOKEN, REGISTERED_CLIENT, currentUser, REGISTERED_CALLBACK, scopes, null, false);
 		authServer.postAuthorization(true, authDetail);
 	}
 
@@ -127,25 +125,25 @@ public class AuthorizationServerTest {
 		AuthorizationDetail authDetail;
 		String url;
 
-		authDetail = new AuthorizationDetail(ResponseType.CODE, REGISTERED_CLIENT, currentUser, REGISTERED_CALLBACK, scopes, null);
+		authDetail = new AuthorizationDetail(ResponseType.CODE, REGISTERED_CLIENT, currentUser, REGISTERED_CALLBACK, scopes, null, false);
 		url = authServer.postAuthorization(true, authDetail);
 		assertTrue(url.startsWith(REGISTERED_CALLBACK + "?" + OAuth20.OAUTH_CODE + "="));
 		url = authServer.postAuthorization(false, authDetail);
 		assertTrue(url.startsWith(REGISTERED_CALLBACK + "?" + OAuth20.OAUTH_ERROR + "="));
 
-		authDetail = new AuthorizationDetail(ResponseType.CODE, REGISTERED_CLIENT, currentUser, REGISTERED_CALLBACK + "?key1=value1", scopes, null);
+		authDetail = new AuthorizationDetail(ResponseType.CODE, REGISTERED_CLIENT, currentUser, REGISTERED_CALLBACK + "?key1=value1", scopes, null, false);
 		url = authServer.postAuthorization(true, authDetail);
 		assertTrue(url.startsWith(REGISTERED_CALLBACK + "?key1=value1&" + OAuth20.OAUTH_CODE + "="));
 		url = authServer.postAuthorization(false, authDetail);
 		assertTrue(url.startsWith(REGISTERED_CALLBACK + "?key1=value1&" + OAuth20.OAUTH_ERROR + "="));
 
-		authDetail = new AuthorizationDetail(ResponseType.CODE, REGISTERED_CLIENT, currentUser, REGISTERED_CALLBACK, scopes, "test_state");
+		authDetail = new AuthorizationDetail(ResponseType.CODE, REGISTERED_CLIENT, currentUser, REGISTERED_CALLBACK, scopes, "test_state", false);
 		url = authServer.postAuthorization(true, authDetail);
 		assertTrue(url.startsWith(REGISTERED_CALLBACK + "?" + OAuth20.OAUTH_STATE + "=test_state&" + OAuth20.OAUTH_CODE + "="));
 		url = authServer.postAuthorization(false, authDetail);
 		assertTrue(url.startsWith(REGISTERED_CALLBACK + "?" + OAuth20.OAUTH_STATE + "=test_state&" + OAuth20.OAUTH_ERROR + "="));
 
-		authDetail = new AuthorizationDetail(ResponseType.CODE, REGISTERED_CLIENT, currentUser, REGISTERED_CALLBACK + "?key1=value1", scopes, "test_state");
+		authDetail = new AuthorizationDetail(ResponseType.CODE, REGISTERED_CLIENT, currentUser, REGISTERED_CALLBACK + "?key1=value1", scopes, "test_state", false);
 		url = authServer.postAuthorization(true, authDetail);
 		assertTrue(url.startsWith(REGISTERED_CALLBACK + "?key1=value1&" + OAuth20.OAUTH_STATE + "=test_state&" + OAuth20.OAUTH_CODE + "="));
 		url = authServer.postAuthorization(false, authDetail);
@@ -317,6 +315,7 @@ public class AuthorizationServerTest {
 		assertEquals(REGISTERED_CALLBACK, authDetail.getRedirectUri());
 		assertTrue(authDetail.getState().isPresent());
 		assertEquals(state, authDetail.getState().get());
+		verify(mockService, times(1)).checkIfUserAuthorized(eq(currentUser), eq(REGISTERED_CLIENT_ID), anyList());
 
 		String url;
 		url = authServer.postAuthorization(false, authDetail);

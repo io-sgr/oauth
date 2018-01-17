@@ -22,6 +22,7 @@ import io.sgr.oauth.server.core.models.OAuthClientInfo;
 import io.sgr.oauth.server.core.models.ScopeDefinition;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -44,6 +45,8 @@ public interface OAuthV2Service {
 	Optional<OAuthClientInfo> getOAuthClientById(final String clientId);
 
 	Optional<OAuthClientInfo> getOAuthClientByIdAndSecret(final String clientId, final String clientSecret);
+
+	boolean checkIfUserAuthorized(final String currentUser, final String clientId, final List<String> requestedScopes);
 
 	boolean isAuthorizationCodeRevoked(final String authCode);
 

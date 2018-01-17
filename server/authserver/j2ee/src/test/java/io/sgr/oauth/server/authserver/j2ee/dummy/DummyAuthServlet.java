@@ -61,13 +61,18 @@ public class DummyAuthServlet extends GenericOAuthV2AuthServlet {
 	}
 
 	@Override
+	protected void onInvalidClient(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+		backend.onInvalidClient(error);
+	}
+
+	@Override
 	protected void onServerError(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) {
 		backend.onServerError(error);
 	}
 
 	@Override
-	protected void onDisplayUserAuthorizePage(final AuthorizationDetail authDetail, final HttpServletRequest req, final HttpServletResponse resp) {
-		backend.onDisplayUserAuthorizePage(authDetail);
+	protected void displayUserAuthorizePage(final AuthorizationDetail authDetail, final HttpServletRequest req, final HttpServletResponse resp) {
+		backend.displayUserAuthorizePage(authDetail);
 	}
 
 	@Override protected AuthorizationServer getAuthorizationServer() {

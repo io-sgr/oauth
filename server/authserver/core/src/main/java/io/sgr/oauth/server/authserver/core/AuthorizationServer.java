@@ -94,7 +94,7 @@ public class AuthorizationServer {
 		final String state = authReq.getState().orElse(null);
 		final Optional<OAuthClientInfo> clientInfo = getOAuthV2Service().getOAuthClientById(clientId);
 		if (!clientInfo.isPresent()) {
-			throw new InvalidClientException("Unauthorized client ID or secret");
+			throw new InvalidClientException("Unauthorized client");
 		}
 		final List<String> callbacks = clientInfo.map(OAuthClientInfo::getCallbacks).orElse(null);
 		if (!OAuthServerUtil.isRedirectUriRegistered(redirectUri, callbacks)) {
@@ -113,7 +113,8 @@ public class AuthorizationServer {
 		}
 		switch (responseType) {
 			case CODE:
-				return new AuthorizationDetail(responseType, clientInfo.get(), currentUser, redirectUri, checkedScopes, state);
+				final boolean isAuthorized = getOAuthV2Service().checkIfUserAuthorized(currentUser, clientId, requestedScopes);
+				return new AuthorizationDetail(responseType, clientInfo.get(), currentUser, redirectUri, checkedScopes, state, isAuthorized);
 			default:
 				throw new UnsupportedResponseTypeException(MessageFormat.format("Unsupported response type: {0}", responseType));
 		}

@@ -27,7 +27,7 @@ public interface DummyBackend {
 	String getCurrentUserId();
 	Locale getUserLocale();
 	void onUserNotSignedIn();
-	void onDisplayUserAuthorizePage(final AuthorizationDetail authDetail);
+	void displayUserAuthorizePage(final AuthorizationDetail authDetail);
 
 	void onBadOAuthRequest(final OAuthError error);
 	void onBadTokenRequest(final OAuthError error);

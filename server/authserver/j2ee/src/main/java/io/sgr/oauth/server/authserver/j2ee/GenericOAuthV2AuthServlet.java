@@ -24,7 +24,6 @@ import io.sgr.oauth.core.exceptions.InvalidRequestException;
 import io.sgr.oauth.core.exceptions.InvalidScopeException;
 import io.sgr.oauth.core.exceptions.ServerErrorException;
 import io.sgr.oauth.core.exceptions.UnsupportedResponseTypeException;
-import io.sgr.oauth.core.utils.JsonUtil;
 import io.sgr.oauth.core.v20.OAuthError;
 import io.sgr.oauth.server.authserver.core.AuthorizationDetail;
 import io.sgr.oauth.server.authserver.core.AuthorizationServer;
@@ -55,19 +54,29 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 		try {
 			authDetail = getAuthorizationServer()
 					.preAuthorization(req, ServletBasedAuthorizationRequestParser.instance(), curUserId, getUserLocale(req, resp));
+			if (authDetail == null) {
+				throw new ServerErrorException("Unable to check authorization request");
+			}
 		} catch (InvalidClientException e) {
-			resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-			resp.getWriter().write(JsonUtil.getObjectMapper().writeValueAsString(e.getError()));
+			onInvalidClient(e.getError(), req, resp);
 			return;
 		} catch (InvalidRequestException | InvalidScopeException | UnsupportedResponseTypeException e) {
 			onBadOAuthRequest(e.getError(), req, resp);
+			return;
+		} catch (ServerErrorException e) {
+			onServerError(e.getError(), req, resp);
+			return;
+		}
+
+		if (authDetail.isAlreadyAuthorized()) {
+			afterAuthorized(true, authDetail, req, resp);
 			return;
 		}
 
 		final HttpSession session = req.getSession(true);
 		session.setAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_AUTH_DETAIL, authDetail);
 		session.setAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN, UUID.randomUUID().toString().replaceAll("-", ""));
-		onDisplayUserAuthorizePage(authDetail, req, resp);
+		displayUserAuthorizePage(authDetail, req, resp);
 	}
 
 	@Override
@@ -99,6 +108,11 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 
 		session.removeAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_AUTH_DETAIL);
 
+		afterAuthorized(approved, authDetail, req, resp);
+	}
+
+	private void afterAuthorized(final boolean approved, final AuthorizationDetail authDetail, final HttpServletRequest req, final HttpServletResponse resp)
+			throws ServletException, IOException {
 		final String location;
 		try {
 			location = getAuthorizationServer().postAuthorization(approved, authDetail);
@@ -114,6 +128,8 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 		resp.sendError(HttpServletResponse.SC_MOVED_TEMPORARILY);
 	}
 
+	protected abstract void displayUserAuthorizePage(final AuthorizationDetail authDetail, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
+
 	protected abstract String getCurrentUserId(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
 
 	protected abstract Locale getUserLocale(final HttpServletRequest req, final HttpServletResponse resp);
@@ -122,9 +138,9 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 
 	protected abstract void onBadOAuthRequest(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
 
-	protected abstract void onServerError(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp);
+	protected abstract void onInvalidClient(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
 
-	protected abstract void onDisplayUserAuthorizePage(final AuthorizationDetail authDetail, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
+	protected abstract void onServerError(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
 
 	protected abstract AuthorizationServer getAuthorizationServer();
 }

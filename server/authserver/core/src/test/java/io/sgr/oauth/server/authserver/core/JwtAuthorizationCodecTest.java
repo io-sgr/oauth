@@ -41,7 +41,7 @@ public class JwtAuthorizationCodecTest {
 	private static final List<ScopeDefinition> TEST_SCOPES = Collections.singletonList(new ScopeDefinition("basic", "Basic", "Basic Scope"));
 	private static final AuthorizationDetail TEST_AUTH_DETAIL = new AuthorizationDetail(
 			ResponseType.CODE, TEST_CLIENT, "user_1",
-			"http://localhost/callback", TEST_SCOPES, null);
+			"http://localhost/callback", TEST_SCOPES, null, false);
 
 	@Test(expected = ExpiredJwtException.class)
 	public void testEncodeDecode() throws InterruptedException {

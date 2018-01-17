@@ -22,7 +22,6 @@ import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notNull;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -48,14 +47,16 @@ public class AuthorizationDetail implements Serializable {
 	private final List<ScopeDefinition> scopes;
 	private final String redirectUri;
 	private final String state;
+	private final boolean alreadyAuthorized;
 
 	/**
-	 * @param responseType The response type
-	 * @param client       The client
-	 * @param currentUser  Current user
-	 * @param redirectUri  The redirect URI
-	 * @param scopes       The scopes
-	 * @param state        Optional. The state of request, default to null
+	 * @param responseType      The response type
+	 * @param client            The client
+	 * @param currentUser       Current user
+	 * @param redirectUri       The redirect URI
+	 * @param scopes            The scopes
+	 * @param state             Optional. The state of request, default to null
+	 * @param alreadyAuthorized User already authorized or not
 	 */
 	@JsonCreator
 	public AuthorizationDetail(
@@ -64,7 +65,8 @@ public class AuthorizationDetail implements Serializable {
 			@JsonProperty("current_user") final String currentUser,
 			@JsonProperty(OAuth20.OAUTH_REDIRECT_URI) final String redirectUri,
 			@JsonProperty("scopes") final List<ScopeDefinition> scopes,
-			@JsonProperty(OAuth20.OAUTH_STATE) final String state) {
+			@JsonProperty(OAuth20.OAUTH_STATE) final String state,
+			@JsonProperty("already_authorized") final boolean alreadyAuthorized) {
 		notNull(responseType, "Missing response type");
 		this.responseType = responseType;
 		notNull(client, "Missing client info");
@@ -83,6 +85,7 @@ public class AuthorizationDetail implements Serializable {
 		}
 		this.scopes = scopes;
 		this.state = isEmptyString(state) ? null : state;
+		this.alreadyAuthorized = alreadyAuthorized;
 	}
 
 	/**
@@ -131,5 +134,12 @@ public class AuthorizationDetail implements Serializable {
 	@JsonProperty(OAuth20.OAUTH_STATE)
 	public Optional<String> getState() {
 		return Optional.ofNullable(state);
+	}
+
+	/**
+	 * @return User already authorized or not
+	 */
+	public boolean isAlreadyAuthorized() {
+		return alreadyAuthorized;
 	}
 }
