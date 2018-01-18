@@ -16,14 +16,13 @@
  */
 package io.sgr.oauth.client.core;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.sgr.oauth.core.utils.JsonUtil;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.sgr.oauth.core.utils.JsonUtil;
 
 /**
  * @author SgrAlpha

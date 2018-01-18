@@ -16,10 +16,10 @@
  */
 package io.sgr.oauth.client.googlehttp;
 
-import java.io.IOException;
-
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
+
+import java.io.IOException;
 
 /**
  * @author SgrAlpha

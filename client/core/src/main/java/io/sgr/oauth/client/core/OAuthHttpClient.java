@@ -16,12 +16,7 @@
  */
 package io.sgr.oauth.client.core;
 
-import java.io.Closeable;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import io.sgr.oauth.client.core.exceptions.AccessTokenExpiredException;
 import io.sgr.oauth.client.core.exceptions.InvalidAccessTokenException;
 import io.sgr.oauth.client.core.exceptions.MissingAccessTokenException;
@@ -33,6 +28,10 @@ import io.sgr.oauth.core.exceptions.OAuthException;
 import io.sgr.oauth.core.v20.GrantType;
 import io.sgr.oauth.core.v20.ParameterStyle;
 import io.sgr.oauth.core.v20.ResponseType;
+
+import java.io.Closeable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author SgrAlpha

@@ -18,8 +18,8 @@ package io.sgr.oauth.client.core.exceptions;
 
 import static io.sgr.oauth.core.v20.OAuthErrorType.INVALID_GRANT;
 
-import io.sgr.oauth.core.v20.OAuthError;
 import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
+import io.sgr.oauth.core.v20.OAuthError;
 
 /**
  * @author SgrAlpha
