@@ -90,23 +90,25 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 		final HttpSession session = req.getSession(true);
 
 		final String reqCsrfToken = req.getParameter(OAuthV2WebConstants.REQ_PARAMS_KEY_CSRF_TOKEN);
-		if (isEmptyString(reqCsrfToken) || !session.getAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN).equals(reqCsrfToken)) {
+		if (isEmptyString(reqCsrfToken) || !reqCsrfToken.equals(session.getAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN))) {
+			session.removeAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN);
 			onBadOAuthRequest(new OAuthError("csrf_token_mismatch", "CSRF token mismatch!"), req, resp);
 			return;
 		}
 		session.removeAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN);
 
-		final String approvedS = req.getParameter(OAuthV2WebConstants.REQ_PARAMS_KEY_APPROVED);
-		final boolean approved = !isEmptyString(approvedS) && Boolean.parseBoolean(approvedS);
-
 		final Object detail = session.getAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_AUTH_DETAIL);
 		if (!(detail instanceof AuthorizationDetail)) {
+			session.removeAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_AUTH_DETAIL);
 			onBadOAuthRequest(new OAuthError("bad_oauth_request", "Bad OAuth request"), req, resp);
 			return;
 		}
-		final AuthorizationDetail authDetail = (AuthorizationDetail) detail;
-
 		session.removeAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_AUTH_DETAIL);
+
+		final String approvedS = req.getParameter(OAuthV2WebConstants.REQ_PARAMS_KEY_APPROVED);
+		final boolean approved = !isEmptyString(approvedS) && Boolean.parseBoolean(approvedS);
+
+		final AuthorizationDetail authDetail = (AuthorizationDetail) detail;
 
 		afterAuthorized(approved, authDetail, req, resp);
 	}
@@ -116,6 +118,9 @@ public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 		final String location;
 		try {
 			location = getAuthorizationServer().postAuthorization(approved, authDetail);
+			if (isEmptyString(location)) {
+				throw new ServerErrorException("Unable to authorize");
+			}
 		} catch (UnsupportedResponseTypeException e) {
 			onBadOAuthRequest(e.getError(), req, resp);
 			return;
