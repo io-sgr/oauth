@@ -33,7 +33,7 @@ public class OAuthServerUtil {
 
 	public static boolean isRedirectUriRegistered(final String redirectUri, final String... callbacks) {
 		notEmptyString(redirectUri, "Redirect URI needs to be specified");
-		return callbacks != null && callbacks.length == 0 && isRedirectUriRegistered(redirectUri, new HashSet<>(Arrays.asList(callbacks)));
+		return callbacks != null && callbacks.length > 0 && isRedirectUriRegistered(redirectUri, new HashSet<>(Arrays.asList(callbacks)));
 	}
 
 	public static boolean isRedirectUriRegistered(final String redirectUri, final List<String> callbacks) {
