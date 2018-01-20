@@ -72,9 +72,11 @@ public class OAuthServerUtilTest {
 		assertFalse(OAuthServerUtil.isRedirectUriRegistered("http://localhost/callback", "http://somewhere/callback"));
 		assertTrue(OAuthServerUtil.isRedirectUriRegistered("http://localhost/callback", "http://localhost/callback"));
 		assertFalse(OAuthServerUtil.isRedirectUriRegistered("aaa", (List<String>) null));
+		assertFalse(OAuthServerUtil.isRedirectUriRegistered("http://localhost/callback", Collections.emptyList()));
 		assertFalse(OAuthServerUtil.isRedirectUriRegistered("http://localhost/callback", Collections.singletonList("http://somewhere/callback")));
 		assertTrue(OAuthServerUtil.isRedirectUriRegistered("http://localhost/callback", Collections.singletonList("http://localhost/callback")));
 		assertFalse(OAuthServerUtil.isRedirectUriRegistered("aaa", (Set<String>) null));
+		assertFalse(OAuthServerUtil.isRedirectUriRegistered("http://localhost/callback", Collections.emptySet()));
 		assertFalse(OAuthServerUtil.isRedirectUriRegistered("http://localhost/callback", new HashSet<>(Collections.singletonList("http://somewhere/callback"))));
 		assertTrue(OAuthServerUtil.isRedirectUriRegistered("http://localhost/callback", new HashSet<>(Collections.singletonList("http://localhost/callback"))));
 	}
