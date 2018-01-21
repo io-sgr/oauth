@@ -68,6 +68,8 @@
         <module>server/core</module>
         <module>server/authserver/core</module>
         <module>server/authserver/j2ee</module>
+        <module>server/resourceserver/core</module>
+        <module>server/resourceserver/j2ee</module>
         <module>client/core</module>
         <module>client/googlehttp</module>
         <module>client/apachehttp</module>
@@ -93,6 +95,11 @@
             <dependency>
                 <groupId>io.sgr.oauth</groupId>
                 <artifactId>oauth-authserver-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.sgr.oauth</groupId>
+                <artifactId>oauth-resourceserver-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
