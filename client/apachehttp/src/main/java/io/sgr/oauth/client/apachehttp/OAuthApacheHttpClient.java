@@ -17,6 +17,7 @@
 package io.sgr.oauth.client.apachehttp;
 
 import static io.sgr.oauth.core.utils.Preconditions.isEmptyString;
+import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notNull;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,8 +26,6 @@ import io.sgr.oauth.client.core.OAuthHttpClient;
 import io.sgr.oauth.client.core.exceptions.AccessTokenExpiredException;
 import io.sgr.oauth.client.core.exceptions.InvalidAccessTokenException;
 import io.sgr.oauth.client.core.exceptions.MissingAccessTokenException;
-import io.sgr.oauth.client.core.exceptions.MissingAuthorizationCodeException;
-import io.sgr.oauth.client.core.exceptions.MissingRefreshTokenException;
 import io.sgr.oauth.client.core.exceptions.RefreshTokenRevokedException;
 import io.sgr.oauth.core.OAuthCredential;
 import io.sgr.oauth.core.exceptions.OAuthException;
@@ -150,9 +149,7 @@ public class OAuthApacheHttpClient implements OAuthHttpClient {
 
 	@Override
 	public OAuthCredential retrieveAccessToken(ParameterStyle style, String code, GrantType grantType, String redirectURL) throws OAuthException {
-		if (isEmptyString(code)) {
-			throw new MissingAuthorizationCodeException();
-		}
+		notEmptyString(code, "Missing authorization code");
 		final GrantType oauthGrantType = grantType == null ? GrantType.AUTHORIZATION_CODE : grantType;
 		final HttpRequestBase request;
 		switch (style) {
@@ -214,11 +211,122 @@ public class OAuthApacheHttpClient implements OAuthHttpClient {
 	}
 
 	@Override
-	public OAuthCredential refreshToken(ParameterStyle style, String refreshToken, GrantType grantType) throws OAuthException {
-		if (isEmptyString(refreshToken)) {
-			throw new MissingRefreshTokenException();
+	public OAuthCredential getAccessTokenByAuthorizationCode(final String code, final String redirectURL) throws OAuthException {
+		return getAccessTokenByAuthorizationCode(ParameterStyle.BODY, code, redirectURL);
+	}
+
+	@Override
+	public OAuthCredential getAccessTokenByAuthorizationCode(final ParameterStyle style, final String code, final String redirectURL) throws OAuthException {
+		notEmptyString(code, "Missing authorization code");
+		final HttpRequestBase request;
+		switch (style) {
+			case QUERY_STRING:
+				try {
+					final URIBuilder builder = new URIBuilder(this.clientConfig.authUri);
+					builder.addParameter(OAuth20.OAUTH_CODE, code);
+					builder.addParameter(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId);
+					builder.addParameter(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret);
+					builder.addParameter(OAuth20.OAUTH_REDIRECT_URI, redirectURL);
+					builder.addParameter(OAuth20.OAUTH_GRANT_TYPE, GrantType.AUTHORIZATION_CODE.name().toLowerCase());
+					request = new HttpGet(builder.build());
+				} catch (URISyntaxException e) {
+					throw new UnrecoverableOAuthException(new OAuthError("invalid_token_uri", String.format("Invalid token URI: %s", this.clientConfig.tokenUri)));
+				}
+				break;
+			default:
+				try {
+					final HttpPost post = new HttpPost(this.clientConfig.tokenUri);
+					final List<NameValuePair> nameValuePairs = new ArrayList<>(5);
+					nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_CODE, code));
+					nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId));
+					nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret));
+					nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_REDIRECT_URI, redirectURL));
+					nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_GRANT_TYPE, GrantType.AUTHORIZATION_CODE.name().toLowerCase()));
+					post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+					request = post;
+				} catch (UnsupportedEncodingException e) {
+					throw new UnrecoverableOAuthException(new OAuthError(e.getMessage(), e.getMessage()));
+				}
+				break;
 		}
-		final GrantType oauthGrantType = grantType == null ? GrantType.REFRESH_TOKEN : grantType;
+		LOGGER.trace(request.getRequestLine().toString());
+		try {
+			final Future<HttpResponse> future = this.httpclient.execute(request, null);
+			final HttpResponse resp = future.get();
+			final StatusLine status = resp.getStatusLine();
+			final HttpEntity entity = resp.getEntity();
+			final String contentType = entity.getContentType().getValue();
+			final String content = EntityUtils.toString(entity);
+
+			LOGGER.trace(resp.getStatusLine().toString());
+			LOGGER.trace(contentType);
+			LOGGER.trace(content);
+
+			if (status.getStatusCode() == 200) {
+				try {
+					return JsonUtil.getObjectMapper().readValue(content, OAuthCredential.class);
+				} catch (Exception e) {
+					throw new UnrecoverableOAuthException(new OAuthError("invalid_response_content", content));
+				}
+			} else {
+				handlePossibleOAuthError(status, content);
+			}
+		} catch (InterruptedException | ExecutionException | IOException e) {
+			throw new RecoverableOAuthException(new OAuthError(e.getMessage(), e.getMessage()));
+		}
+		return null;
+	}
+
+	@Override
+	public OAuthCredential getAccessTokenByUsernameAndPassword(final String username, final String password, final String redirectURL) throws OAuthException {
+		notEmptyString(username, "Missing username");
+		notEmptyString(password, "Missing password");
+		final HttpRequestBase request;
+		try {
+			final HttpPost post = new HttpPost(this.clientConfig.tokenUri);
+			final List<NameValuePair> nameValuePairs = new ArrayList<>(5);
+			nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_USERNAME, username));
+			nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_PASSWORD, password));
+			nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId));
+			nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret));
+			nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_REDIRECT_URI, redirectURL));
+			nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_GRANT_TYPE, GrantType.PASSWORD.name().toLowerCase()));
+			post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+			request = post;
+		} catch (UnsupportedEncodingException e) {
+			throw new UnrecoverableOAuthException(new OAuthError(e.getMessage(), e.getMessage()));
+		}
+		LOGGER.trace(request.getRequestLine().toString());
+		try {
+			final Future<HttpResponse> future = this.httpclient.execute(request, null);
+			final HttpResponse resp = future.get();
+			final StatusLine status = resp.getStatusLine();
+			final HttpEntity entity = resp.getEntity();
+			final String contentType = entity.getContentType().getValue();
+			final String content = EntityUtils.toString(entity);
+
+			LOGGER.trace(resp.getStatusLine().toString());
+			LOGGER.trace(contentType);
+			LOGGER.trace(content);
+
+			if (status.getStatusCode() == 200) {
+				try {
+					return JsonUtil.getObjectMapper().readValue(content, OAuthCredential.class);
+				} catch (Exception e) {
+					throw new UnrecoverableOAuthException(new OAuthError("invalid_response_content", content));
+				}
+			} else {
+				handlePossibleOAuthError(status, content);
+			}
+		} catch (InterruptedException | ExecutionException | IOException e) {
+			throw new RecoverableOAuthException(new OAuthError(e.getMessage(), e.getMessage()));
+		}
+		return null;
+	}
+
+	@Override
+	public OAuthCredential refreshToken(ParameterStyle style, String refreshToken) throws OAuthException {
+		notEmptyString(refreshToken, "Missing refresh token");
 		final HttpRequestBase request;
 		try {
 			switch (style) {
@@ -227,7 +335,7 @@ public class OAuthApacheHttpClient implements OAuthHttpClient {
 				builder.addParameter(OAuth20.OAUTH_REFRESH_TOKEN, refreshToken);
 				builder.addParameter(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId);
 				builder.addParameter(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret);
-				builder.addParameter(OAuth20.OAUTH_GRANT_TYPE, oauthGrantType.name().toLowerCase());
+				builder.addParameter(OAuth20.OAUTH_GRANT_TYPE, GrantType.REFRESH_TOKEN.name().toLowerCase());
 				request = new HttpGet(builder.build());
 				break;
 			default:
@@ -236,7 +344,7 @@ public class OAuthApacheHttpClient implements OAuthHttpClient {
 				nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_REFRESH_TOKEN, refreshToken));
 				nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId));
 				nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret));
-				nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_GRANT_TYPE, oauthGrantType.name().toLowerCase()));
+				nameValuePairs.add(new BasicNameValuePair(OAuth20.OAUTH_GRANT_TYPE, GrantType.REFRESH_TOKEN.name().toLowerCase()));
 				post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 				request = post;
 				break;
@@ -282,9 +390,7 @@ public class OAuthApacheHttpClient implements OAuthHttpClient {
 
 	@Override
 	public void revokeToken(String token) throws OAuthException {
-		if (isEmptyString(token)) {
-			throw new UnrecoverableOAuthException(new OAuthError("blank_tokne", "Need to specify a token to revoke"));
-		}
+		notEmptyString(token, "Missing refresh token");
 		final HttpRequestBase request;
 		try {
 			final URIBuilder builder = new URIBuilder(this.clientConfig.revokeUri);

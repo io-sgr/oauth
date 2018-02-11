@@ -17,6 +17,7 @@
 package io.sgr.oauth.client.googlehttp;
 
 import static io.sgr.oauth.core.utils.Preconditions.isEmptyString;
+import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;
 import static io.sgr.oauth.core.utils.Preconditions.notNull;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,9 +32,6 @@ import io.sgr.oauth.client.core.OAuthHttpClient;
 import io.sgr.oauth.client.core.exceptions.AccessTokenExpiredException;
 import io.sgr.oauth.client.core.exceptions.InvalidAccessTokenException;
 import io.sgr.oauth.client.core.exceptions.MissingAccessTokenException;
-import io.sgr.oauth.client.core.exceptions.MissingAuthorizationCodeException;
-import io.sgr.oauth.client.core.exceptions.MissingRefreshTokenException;
-import io.sgr.oauth.client.core.exceptions.RefreshTokenRevokedException;
 import io.sgr.oauth.core.OAuthCredential;
 import io.sgr.oauth.core.exceptions.OAuthException;
 import io.sgr.oauth.core.exceptions.RecoverableOAuthException;
@@ -124,14 +122,9 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see io.sgr.oauth.http.OAuthHttpClient#retrieveAccessToken(io.sgr.oauth.v20.ParameterStyle, java.lang.String, io.sgr.oauth.v20.GrantType, java.lang.String)
-	 */
 	@Override
-	public OAuthCredential retrieveAccessToken(ParameterStyle style, String code, GrantType grantType, String redirectURL) throws MissingAuthorizationCodeException, OAuthException {
-		if (isEmptyString(code)) {
-			throw new MissingAuthorizationCodeException();
-		}
+	public OAuthCredential retrieveAccessToken(ParameterStyle style, String code, GrantType grantType, String redirectURL) throws OAuthException {
+		notEmptyString(code, "Missing authorization code");
 		final GrantType oauthGrantType = grantType == null ? GrantType.AUTHORIZATION_CODE : grantType;
 		final HttpRequest request;
 		try {
@@ -198,15 +191,139 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see io.sgr.oauth.client.OAuthHttpClient#refreshToken(io.sgr.oauth.v20.ParameterStyle, java.lang.String, io.sgr.oauth.v20.GrantType)
-	 */
 	@Override
-	public OAuthCredential refreshToken(ParameterStyle style, String refreshToken, GrantType grantType) throws MissingRefreshTokenException, RefreshTokenRevokedException, OAuthException {
-		if (isEmptyString(refreshToken)) {
-			throw new MissingRefreshTokenException();
+	public OAuthCredential getAccessTokenByAuthorizationCode(final String code, final String redirectURL) throws OAuthException {
+		return getAccessTokenByAuthorizationCode(ParameterStyle.BODY, code, redirectURL);
+	}
+
+	@Override
+	public OAuthCredential getAccessTokenByAuthorizationCode(final ParameterStyle style, final String code, final String redirectURL) throws OAuthException {
+		notEmptyString(code, "Missing authorization code");
+		final HttpRequest request;
+		try {
+			switch (style) {
+				case QUERY_STRING:
+					final GenericUrl url = new GenericUrl(this.clientConfig.tokenUri)
+							.set(OAuth20.OAUTH_CODE, code)
+							.set(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId)
+							.set(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret)
+							.set(OAuth20.OAUTH_REDIRECT_URI, redirectURL)
+							.set(OAuth20.OAUTH_GRANT_TYPE, GrantType.AUTHORIZATION_CODE.name().toLowerCase());
+					request = this.reqFac.buildGetRequest(url);
+					break;
+				default:
+					final Map<String, String> paramsMap = new HashMap<>();
+					paramsMap.put(OAuth20.OAUTH_CODE, code);
+					paramsMap.put(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId);
+					paramsMap.put(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret);
+					paramsMap.put(OAuth20.OAUTH_REDIRECT_URI, redirectURL);
+					paramsMap.put(OAuth20.OAUTH_GRANT_TYPE, GrantType.AUTHORIZATION_CODE.name().toLowerCase());
+					request = this.reqFac.buildPostRequest(new GenericUrl(this.clientConfig.tokenUri), new UrlEncodedContent(paramsMap));
+					break;
+			}
+		} catch (MalformedURLException e) {
+			throw new UnrecoverableOAuthException(new OAuthError("invalid_token_uri", String.format("Invalid token URI: %s", this.clientConfig.tokenUri)));
+		} catch (IOException e) {
+			throw new UnrecoverableOAuthException(new OAuthError("failed_to_build_request", "Failed to build request"));
 		}
-		final GrantType oauthGrantType = grantType == null ? GrantType.REFRESH_TOKEN : grantType;
+		try {
+			final HttpResponse resp = request.execute();
+			final String content = resp.parseAsString();
+			LOGGER.trace("Code: " + resp.getStatusCode());
+			LOGGER.trace("Type: " + resp.getContentType());
+			LOGGER.trace("Content: " + content);
+
+			if (resp.isSuccessStatusCode()) {
+				resp.disconnect();
+				try {
+					return JsonUtil.getObjectMapper().readValue(content, OAuthCredential.class);
+				} catch (Exception e) {
+					throw new UnrecoverableOAuthException(new OAuthError("invalid_response_content", content));
+				}
+			} else if (resp.getStatusCode() >= 400 && resp.getStatusCode() < 500) {
+				resp.disconnect();
+				OAuthError error;
+				try {
+					error = JsonUtil.getObjectMapper().readValue(content, OAuthError.class);
+				} catch (Exception e) {
+					error = new OAuthError("" + resp.getStatusCode(), content);
+				}
+				throw new UnrecoverableOAuthException(error);
+			} else {
+				resp.disconnect();
+				OAuthError error;
+				try {
+					error = JsonUtil.getObjectMapper().readValue(content, OAuthError.class);
+				} catch (Exception e) {
+					error = new OAuthError("" + resp.getStatusCode(), content);
+				}
+				throw new RecoverableOAuthException(error);
+			}
+		} catch (IOException e) {
+			throw new RecoverableOAuthException(new OAuthError(e.getMessage(), e.getMessage()));
+		}
+	}
+
+	@Override
+	public OAuthCredential getAccessTokenByUsernameAndPassword(final String username, final String password, final String redirectURL) throws OAuthException {
+		notEmptyString(username, "Missing username");
+		notEmptyString(password, "Missing password");
+		final HttpRequest request;
+		try {
+			final Map<String, String> paramsMap = new HashMap<>();
+			paramsMap.put(OAuth20.OAUTH_USERNAME, username);
+			paramsMap.put(OAuth20.OAUTH_PASSWORD, password);
+			paramsMap.put(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId);
+			paramsMap.put(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret);
+			paramsMap.put(OAuth20.OAUTH_REDIRECT_URI, redirectURL);
+			paramsMap.put(OAuth20.OAUTH_GRANT_TYPE, GrantType.PASSWORD.name().toLowerCase());
+			request = this.reqFac.buildPostRequest(new GenericUrl(this.clientConfig.tokenUri), new UrlEncodedContent(paramsMap));
+		} catch (MalformedURLException e) {
+			throw new UnrecoverableOAuthException(new OAuthError("invalid_token_uri", String.format("Invalid token URI: %s", this.clientConfig.tokenUri)));
+		} catch (IOException e) {
+			throw new UnrecoverableOAuthException(new OAuthError("failed_to_build_request", "Failed to build request"));
+		}
+		try {
+			final HttpResponse resp = request.execute();
+			final String content = resp.parseAsString();
+			LOGGER.trace("Code: " + resp.getStatusCode());
+			LOGGER.trace("Type: " + resp.getContentType());
+			LOGGER.trace("Content: " + content);
+
+			if (resp.isSuccessStatusCode()) {
+				resp.disconnect();
+				try {
+					return JsonUtil.getObjectMapper().readValue(content, OAuthCredential.class);
+				} catch (Exception e) {
+					throw new UnrecoverableOAuthException(new OAuthError("invalid_response_content", content));
+				}
+			} else if (resp.getStatusCode() >= 400 && resp.getStatusCode() < 500) {
+				resp.disconnect();
+				OAuthError error;
+				try {
+					error = JsonUtil.getObjectMapper().readValue(content, OAuthError.class);
+				} catch (Exception e) {
+					error = new OAuthError("" + resp.getStatusCode(), content);
+				}
+				throw new UnrecoverableOAuthException(error);
+			} else {
+				resp.disconnect();
+				OAuthError error;
+				try {
+					error = JsonUtil.getObjectMapper().readValue(content, OAuthError.class);
+				} catch (Exception e) {
+					error = new OAuthError("" + resp.getStatusCode(), content);
+				}
+				throw new RecoverableOAuthException(error);
+			}
+		} catch (IOException e) {
+			throw new RecoverableOAuthException(new OAuthError(e.getMessage(), e.getMessage()));
+		}
+	}
+
+	@Override
+	public OAuthCredential refreshToken(ParameterStyle style, String refreshToken) throws OAuthException {
+		notEmptyString(refreshToken, "Missing refresh token");
 		final HttpRequest request;
 		try {
 			switch (style) {
@@ -215,7 +332,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 										.set(OAuth20.OAUTH_REFRESH_TOKEN, refreshToken)
 										.set(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId)
 										.set(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret)
-										.set(OAuth20.OAUTH_GRANT_TYPE, oauthGrantType.name().toLowerCase());
+										.set(OAuth20.OAUTH_GRANT_TYPE, GrantType.REFRESH_TOKEN.name().toLowerCase());
 				request = this.reqFac.buildGetRequest(url);
 				break;
 			default:
@@ -223,7 +340,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 				paramsMap.put(OAuth20.OAUTH_REFRESH_TOKEN, refreshToken);
 				paramsMap.put(OAuth20.OAUTH_CLIENT_ID, this.clientConfig.clientId);
 				paramsMap.put(OAuth20.OAUTH_CLIENT_SECRET, this.clientConfig.clientSecret);
-				paramsMap.put(OAuth20.OAUTH_GRANT_TYPE, oauthGrantType.name().toLowerCase());
+				paramsMap.put(OAuth20.OAUTH_GRANT_TYPE, GrantType.REFRESH_TOKEN.name().toLowerCase());
 				request = this.reqFac.buildPostRequest(new GenericUrl(this.clientConfig.tokenUri), new UrlEncodedContent(paramsMap));
 				break;
 			}
@@ -279,9 +396,7 @@ public class OAuthGoogleHttpClient implements OAuthHttpClient {
 	 */
 	@Override
 	public void revokeToken(String token) throws OAuthException {
-		if (isEmptyString(token)) {
-			throw new UnrecoverableOAuthException(new OAuthError("blank_tokne", "Need to specify a token to revoke"));
-		}
+		notEmptyString(token, "Missing token");
 		final HttpRequest request;
 		try {
 			final GenericUrl url = new GenericUrl(this.clientConfig.revokeUri).set(OAuth20.OAUTH_TOKEN, token);

@@ -20,9 +20,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.sgr.oauth.client.core.exceptions.AccessTokenExpiredException;
 import io.sgr.oauth.client.core.exceptions.InvalidAccessTokenException;
 import io.sgr.oauth.client.core.exceptions.MissingAccessTokenException;
-import io.sgr.oauth.client.core.exceptions.MissingAuthorizationCodeException;
-import io.sgr.oauth.client.core.exceptions.MissingRefreshTokenException;
-import io.sgr.oauth.client.core.exceptions.RefreshTokenRevokedException;
 import io.sgr.oauth.core.OAuthCredential;
 import io.sgr.oauth.core.exceptions.OAuthException;
 import io.sgr.oauth.core.v20.GrantType;
@@ -55,8 +52,8 @@ public interface OAuthHttpClient extends Closeable {
 	 * @throws OAuthException
 	 * 				If anything goes wrong
 	 */
-	String getAuthorizeURL(ResponseType responseType, String redirectURL, String state, String scope, Map<String, String> props) throws OAuthException;
-	
+	String getAuthorizeURL(final ResponseType responseType, final String redirectURL, final String state, final String scope, final Map<String, String> props) throws OAuthException;
+
 	/**
 	 * @param style
 	 * 				The style of the parameter, use query string or the body
@@ -68,30 +65,63 @@ public interface OAuthHttpClient extends Closeable {
 	 * 				The redirect URL
 	 * @return
 	 * 				The OAuth credential, which contains access token, expiration time, and refresh token maybe
-	 * @throws MissingAuthorizationCodeException
-	 * 				If the authorization code is missing
 	 * @throws OAuthException
 	 * 				If anything goes wrong
 	 */
-	OAuthCredential retrieveAccessToken(ParameterStyle style, String code, GrantType grantType, String redirectURL) throws OAuthException;
+	@Deprecated
+	OAuthCredential retrieveAccessToken(final ParameterStyle style, final String code, final GrantType grantType, final String redirectURL) throws OAuthException;
+
+	/**
+	 * @param code
+	 * 				The code used to get access token
+	 * @param redirectURL
+	 * 				The redirect URL
+	 * @return
+	 * 				The OAuth credential, which contains access token, expiration time, and refresh token maybe
+	 * @throws OAuthException
+	 * 				If anything goes wrong
+	 */
+	OAuthCredential getAccessTokenByAuthorizationCode(final String code, final String redirectURL) throws OAuthException;
+
+	/**
+	 * @param style
+	 * 				The style of the parameter, use query string or the body
+	 * @param code
+	 * 				The code used to get access token
+	 * @param redirectURL
+	 * 				The redirect URL
+	 * @return
+	 * 				The OAuth credential, which contains access token, expiration time, and refresh token maybe
+	 * @throws OAuthException
+	 * 				If anything goes wrong
+	 */
+	OAuthCredential getAccessTokenByAuthorizationCode(final ParameterStyle style, final String code, final String redirectURL) throws OAuthException;
+
+	/**
+	 * @param username
+	 * 				The username
+	 * @param password
+	 * 				The password
+	 * @param redirectURL
+	 * 				The redirect URL
+	 * @return
+	 * 				The OAuth credential, which contains access token, expiration time, and refresh token maybe
+	 * @throws OAuthException
+	 * 				If anything goes wrong
+	 */
+	OAuthCredential getAccessTokenByUsernameAndPassword(final String username, final String password, final String redirectURL) throws OAuthException;
 	
 	/**
 	 * @param style
 	 * 				The style of the parameter, use query string or the body
 	 * @param refreshToken
 	 * 				The refresh token used to get a new access token
-	 * @param grantType
-	 * 				The grant type, authorization code or refresh token, etc.
 	 * @return
 	 * 				The OAuth credential, which contains access token, expiration time, and refresh token maybe
-	 * @throws MissingRefreshTokenException
-	 * 				If the refresh token is missing
-	 * @throws RefreshTokenRevokedException
-	 * 				If the refresh token has been revoked
 	 * @throws OAuthException
 	 * 				If anything goes wrong
 	 */
-	OAuthCredential refreshToken(ParameterStyle style, String refreshToken, GrantType grantType) throws OAuthException;
+	OAuthCredential refreshToken(final ParameterStyle style, final String refreshToken) throws OAuthException;
 	
 	/**
 	 * @param token
@@ -99,7 +129,7 @@ public interface OAuthHttpClient extends Closeable {
 	 * @throws OAuthException
 	 * 				If anything goes wrong
 	 */
-	void revokeToken(String token) throws OAuthException;
+	void revokeToken(final String token) throws OAuthException;
 	
 	/**
 	 * @param credential
@@ -119,7 +149,7 @@ public interface OAuthHttpClient extends Closeable {
 	 * @throws OAuthException
 	 * 				If anything goes wrong
 	 */
-	JsonNode getRawResource(OAuthCredential credential, String endpoint, String... params) throws MissingAccessTokenException, AccessTokenExpiredException, InvalidAccessTokenException, OAuthException;
+	JsonNode getRawResource(final OAuthCredential credential, final String endpoint, final String... params) throws OAuthException;
 
 	/**
 	 * @param resultClass
@@ -143,7 +173,7 @@ public interface OAuthHttpClient extends Closeable {
 	 * @throws OAuthException
 	 * 				If anything goes wrong
 	 */
-	<T> T getResource(Class<T> resultClass, OAuthCredential credential, String endpoint, String... params) throws OAuthException;
+	<T> T getResource(final Class<T> resultClass, final OAuthCredential credential, final String endpoint, final String... params) throws OAuthException;
 	
 	/**
 	 * @param resultClass
@@ -169,7 +199,7 @@ public interface OAuthHttpClient extends Closeable {
 	 * @throws OAuthException
 	 * 				If anything goes wrong
 	 */
-	<T> List<T> getResources(Class<T> resultClass, String treeKey, OAuthCredential credential, String endpoint, String... params) throws OAuthException;
+	<T> List<T> getResources(final Class<T> resultClass, final String treeKey, final OAuthCredential credential, final String endpoint, final String... params) throws OAuthException;
 	
 	/**
 	 * @return
