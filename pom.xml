@@ -41,8 +41,8 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git@github.com:sgr-io/oauth.git</connection>
-        <developerConnection>scm:git:git@github.com:sgr-io/oauth.git</developerConnection>
+        <connection>scm:git:git@github.com:io-sgr/oauth.git</connection>
+        <developerConnection>scm:git:git@github.com:io-sgr/oauth.git</developerConnection>
         <url>https://github.com/sgr-io/oauth</url>
         <tag>HEAD</tag>
     </scm>
