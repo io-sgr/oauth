@@ -32,193 +32,173 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author SgrAlpha
- *
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OAuthCredential implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6434693647236278615L;
+    public static final String DEFAULT_TOKEN_TYPE = "Bearer";
 
-	public static final String DEFAULT_TOKEN_TYPE = "Bearer";
+    public static final long DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC = TimeUnit.HOURS.toSeconds(1);
 
-	public static long DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC = TimeUnit.HOURS.toSeconds(1);
+    private static final long serialVersionUID = 6434693647236278615L;
 
-	private final String accessToken;
-	private final String tokenType;
-	private Long accessTokenExpiration;
-	private String refreshToken;
-	private Map<String, Object> extraParams;
+    private final String accessToken;
+    private final String tokenType;
+    private Long accessTokenExpiration;
+    private String refreshToken;
+    private Map<String, Object> extraParams;
 
-	/**
-	 * @param accessToken
-	 * 				The access_token
-	 */
-	public OAuthCredential(String accessToken) {
-		this(accessToken, null, null, null);
-	}
+    /**
+     * @param accessToken The access token
+     */
+    public OAuthCredential(String accessToken) {
+        this(accessToken, null, null, null);
+    }
 
-	/**
-	 * @param accessToken
-	 * 				The access_token
-	 * @param tokenType
-	 * 				The token_type
-	 */
-	public OAuthCredential(String accessToken, String tokenType) {
-		this(accessToken, tokenType, null, null);
-	}
-	
-	/**
-	 * @param accessToken
-	 * 				The access_token
-	 * @param tokenType
-	 * 				The token_type
-	 * @param expiresIn
-	 * 				The expires_in
-	 * @param refreshToken
-	 * 				The refresh_token
-	 */
-	@JsonCreator
-	public OAuthCredential(
-			@JsonProperty(OAuth20.OAUTH_ACCESS_TOKEN) String accessToken,
-			@JsonProperty(OAuth20.OAUTH_TOKEN_TYPE) String tokenType,
-			@JsonProperty(OAuth20.OAUTH_EXPIRES_IN) Integer expiresIn,
-			@JsonProperty(OAuth20.OAUTH_REFRESH_TOKEN) String refreshToken
-			) {
-		this.accessToken = accessToken == null || accessToken.trim().length() == 0 ? null : accessToken;
-		if (this.getAccessToken() != null) {
-			this.tokenType = tokenType == null || tokenType.trim().length() == 0 ? DEFAULT_TOKEN_TYPE : tokenType;
-		} else {
-			this.tokenType = null;
-		}
-		this.setAccessTokenExpiresIn(expiresIn);
-		this.setRefreshToken(refreshToken);
-	}
-	
-	/**
-	 * @return 
-	 * 				The access token
-	 */
-	@JsonProperty(OAuth20.OAUTH_ACCESS_TOKEN)
-	public String getAccessToken() {
-		return this.accessToken;
-	}
+    /**
+     * @param accessToken The access token
+     * @param tokenType   The type of access token
+     */
+    public OAuthCredential(String accessToken, String tokenType) {
+        this(accessToken, tokenType, null, null);
+    }
 
-	/**
-	 * @return
-	 * 				The tokenType
-	 */
-	@JsonProperty(OAuth20.OAUTH_TOKEN_TYPE)
-	public String getTokenType() {
-		return this.tokenType;
-	}
+    /**
+     * @param accessToken  The access token
+     * @param tokenType    The type of access token
+     * @param expiresIn    The seconds that access token will expire in
+     * @param refreshToken The refresh token
+     */
+    @JsonCreator
+    public OAuthCredential(
+            @JsonProperty(OAuth20.OAUTH_ACCESS_TOKEN) String accessToken,
+            @JsonProperty(OAuth20.OAUTH_TOKEN_TYPE) String tokenType,
+            @JsonProperty(OAuth20.OAUTH_EXPIRES_IN) Integer expiresIn,
+            @JsonProperty(OAuth20.OAUTH_REFRESH_TOKEN) String refreshToken
+    ) {
+        this.accessToken = accessToken == null || accessToken.trim().length() == 0 ? null : accessToken;
+        if (this.getAccessToken() != null) {
+            this.tokenType = tokenType == null || tokenType.trim().length() == 0 ? DEFAULT_TOKEN_TYPE : tokenType;
+        } else {
+            this.tokenType = null;
+        }
+        this.setAccessTokenExpiresIn(expiresIn);
+        this.setRefreshToken(refreshToken);
+    }
 
-	/**
-	 * @param accessTokenExpiration
-	 * 				The accessTokenExpiration to set
-	 */
-	public void setAccessTokenExpiration(Long accessTokenExpiration) {
-		this.accessTokenExpiration = accessTokenExpiration;
-	}
+    /**
+     * @return The access token
+     */
+    @JsonProperty(OAuth20.OAUTH_ACCESS_TOKEN)
+    public String getAccessToken() {
+        return this.accessToken;
+    }
 
-	/**
-	 * @return 
-	 * 				The access token expiration in second
-	 */
-	@JsonIgnore
-	public Long getAccessTokenExpiration() {
-		return this.accessTokenExpiration;
-	}
+    /**
+     * @return The type of access token
+     */
+    @JsonProperty(OAuth20.OAUTH_TOKEN_TYPE)
+    public String getTokenType() {
+        return this.tokenType;
+    }
 
-	/**
-	 * @param accessTokenExpiresIn
-	 * 				The accessTokenExpiresIn to set
-	 */
-	public void setAccessTokenExpiresIn(Integer accessTokenExpiresIn) {
-		if (this.getAccessToken() == null) {
-			this.setAccessTokenExpiration(null);
-		} else {
-			this.setAccessTokenExpiration(System.currentTimeMillis() + (accessTokenExpiresIn == null || accessTokenExpiresIn <= 0 ? DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC : accessTokenExpiresIn) * 1000);
-		}
-	}
+    /**
+     * @return The access token expiration time in millisecond.
+     */
+    @JsonIgnore
+    public Long getAccessTokenExpiration() {
+        return this.accessTokenExpiration;
+    }
 
-	/**
-	 * @return
-	 * 				The access token expires in second
-	 */
-	@JsonProperty(OAuth20.OAUTH_EXPIRES_IN)
-	public Integer getAccessTokenExpiresIn() {
-		if (this.getAccessTokenExpiration() == null) {
-			return null;
-		}
-		return (int) ((this.getAccessTokenExpiration() - System.currentTimeMillis()) / 1000);
-	}
+    /**
+     * @param accessTokenExpiration The access token expiration time to set, in millisecond.
+     */
+    public void setAccessTokenExpiration(Long accessTokenExpiration) {
+        this.accessTokenExpiration = accessTokenExpiration;
+    }
 
-	/**
-	 * @return
-	 * 				The refresh token
-	 */
-	@JsonProperty(OAuth20.OAUTH_REFRESH_TOKEN)
-	public String getRefreshToken() {
-		return this.refreshToken;
-	}
+    /**
+     * @return The seconds that access token will expire in
+     */
+    @JsonProperty(OAuth20.OAUTH_EXPIRES_IN)
+    public Integer getAccessTokenExpiresIn() {
+        if (this.getAccessTokenExpiration() == null) {
+            return null;
+        }
+        return (int) ((this.getAccessTokenExpiration() - System.currentTimeMillis()) / 1000);
+    }
 
-	/**
-	 * @param refreshToken
-	 * 				The refreshToken to set
-	 */
-	public void setRefreshToken(String refreshToken) {
-		this.refreshToken = refreshToken;
-	}
+    /**
+     * @param accessTokenExpiresIn Set access token will expire in N second
+     */
+    public void setAccessTokenExpiresIn(Integer accessTokenExpiresIn) {
+        if (this.getAccessToken() == null) {
+            this.setAccessTokenExpiration(null);
+        } else {
+            this.setAccessTokenExpiration(System.currentTimeMillis() + (accessTokenExpiresIn == null || accessTokenExpiresIn <= 0 ? DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC : accessTokenExpiresIn) * 1000);
+        }
+    }
 
-	/**
-	 * @return
-	 * 				The extraParams
-	 */
-	@JsonAnyGetter
-	public Map<String, Object> getExtraParams() {
-		return this.extraParams;
-	}
+    /**
+     * @return The refresh token
+     */
+    @JsonProperty(OAuth20.OAUTH_REFRESH_TOKEN)
+    public String getRefreshToken() {
+        return this.refreshToken;
+    }
 
-	/**
-	 * @param extraParams
-	 * 				The extraParams to set
-	 */
-	public void setExtraParams(Map<String, Object> extraParams) {
-		this.extraParams = extraParams;
-	}
-	
-	/**
-	 * @param key
-	 * 				The key of extra parameter to add
-	 * @param value
-	 * 				The value of extra parameter to add
-	 */
-	@JsonAnySetter
-	public void addExtraParams(String key, Object value) {
-		if (this.extraParams == null) {
-			this.extraParams = new HashMap<>();
-		}
-		this.extraParams.put(key, value);
-	}
-	
-	public String toJSON() {
-		try {
-			return JsonUtil.getObjectMapper().writeValueAsString(this);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return "{}";
-	}
+    /**
+     * @param refreshToken The refresh token to set
+     */
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return this.toJSON();
-	}
+    /**
+     * @return The extra parameters
+     */
+    @JsonAnyGetter
+    public Map<String, Object> getExtraParams() {
+        return this.extraParams;
+    }
+
+    /**
+     * @param extraParams The extra parameters to set
+     */
+    public void setExtraParams(Map<String, Object> extraParams) {
+        this.extraParams = extraParams;
+    }
+
+    /**
+     * @param key   The key of extra parameter to add
+     * @param value The value of extra parameter to add
+     */
+    @JsonAnySetter
+    public void addExtraParams(String key, Object value) {
+        if (this.extraParams == null) {
+            this.extraParams = new HashMap<>();
+        }
+        this.extraParams.put(key, value);
+    }
+
+    /**
+     * @return The JSON string shows details of this oauth credential
+     */
+    public String toJSON() {
+        try {
+            return JsonUtil.getObjectMapper().writeValueAsString(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "{}";
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return this.toJSON();
+    }
 
 }
