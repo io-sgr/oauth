@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 SgrAlpha
+ * Copyright 2017-2019 SgrAlpha
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,7 +177,8 @@ public class AuthorizationServer {
 
 	/**
 	 * @param from   The source to parse and generate/refresh token from
-	 * @param parser THe parser to parse source to TokenRequest
+	 * @param parser The parser to parse source to TokenRequest
+	 * @param <T>    The type of source to parse from
 	 * @return The generated/refreshed OAuth access token
 	 * @throws InvalidRequestException       The request is missing a parameter so the server can’t proceed with the request.
 	 *                                       This may also be returned if the request includes an unsupported parameter
