@@ -38,35 +38,38 @@ import javax.servlet.http.HttpServletResponse;
 
 public abstract class GenericOAuthV2TokenServlet extends HttpServlet {
 
-	@Override
-	protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-		resp.setContentType("application/json;charset=UTF-8");
-		resp.setCharacterEncoding("UTF-8");
-		final OAuthCredential credential;
-		try {
-			credential = getAuthorizationServer().generateToken(req, ServletBasedTokenRequestParser.instance());
-			if (credential == null) {
-				throw new ServerErrorException("Unable to generate access token");
-			}
-		} catch (InvalidRequestException | InvalidGrantException | InvalidScopeException | UnsupportedGrantTypeException e) {
-			onBadTokenRequest(e.getError(), req, resp);
-			return;
-		} catch (InvalidClientException e) {
-			onInvalidClient(e.getError(), req, resp);
-			return;
-		} catch (ServerErrorException e) {
-			onServerError(e.getError(), req, resp);
-			return;
-		}
-		resp.getWriter().write(JsonUtil.getObjectMapper().writeValueAsString(credential));
-	}
+    @Override
+    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json;charset=UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+        final OAuthCredential credential;
+        try {
+            credential = getAuthorizationServer().generateToken(req, ServletBasedTokenRequestParser.instance());
+            if (credential == null) {
+                throw new ServerErrorException("Unable to generate access token");
+            }
+        } catch (InvalidRequestException | InvalidGrantException | InvalidScopeException | UnsupportedGrantTypeException e) {
+            onBadTokenRequest(e.getError(), req, resp);
+            return;
+        } catch (InvalidClientException e) {
+            onInvalidClient(e.getError(), req, resp);
+            return;
+        } catch (ServerErrorException e) {
+            onServerError(e.getError(), req, resp);
+            return;
+        }
+        resp.getWriter().write(JsonUtil.getObjectMapper().writeValueAsString(credential));
+    }
 
-	protected abstract void onBadTokenRequest(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
+    protected abstract void onBadTokenRequest(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException;
 
-	protected abstract void onInvalidClient(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
+    protected abstract void onInvalidClient(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException;
 
-	protected abstract void onServerError(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
+    protected abstract void onServerError(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException;
 
-	protected abstract AuthorizationServer getAuthorizationServer();
+    protected abstract AuthorizationServer getAuthorizationServer();
 
 }

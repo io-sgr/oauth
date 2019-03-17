@@ -25,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.sgr.oauth.core.v20.OAuth20;
 import io.sgr.oauth.core.v20.ResponseType;
 import io.sgr.oauth.server.core.models.OAuthClientInfo;
@@ -41,105 +42,113 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AuthorizationDetail implements Serializable {
 
-	private final ResponseType responseType;
-	private final OAuthClientInfo client;
-	private final String currentUser;
-	private final List<ScopeDefinition> scopes;
-	private final String redirectUri;
-	private final String state;
-	private final boolean alreadyAuthorized;
+    private final ResponseType responseType;
+    private final OAuthClientInfo client;
+    private final String currentUser;
+    private final List<ScopeDefinition> scopes;
+    private final String redirectUri;
+    private final String state;
+    private final boolean alreadyAuthorized;
 
-	/**
-	 * @param responseType      The response type
-	 * @param client            The client
-	 * @param currentUser       Current user
-	 * @param redirectUri       The redirect URI
-	 * @param scopes            The scopes
-	 * @param state             Optional. The state of request, default to null
-	 * @param alreadyAuthorized User already authorized or not
-	 */
-	@JsonCreator
-	public AuthorizationDetail(
-			@JsonProperty(OAuth20.OAUTH_RESPONSE_TYPE) final ResponseType responseType,
-			@JsonProperty("client") final OAuthClientInfo client,
-			@JsonProperty("current_user") final String currentUser,
-			@JsonProperty(OAuth20.OAUTH_REDIRECT_URI) final String redirectUri,
-			@JsonProperty("scopes") final List<ScopeDefinition> scopes,
-			@JsonProperty(OAuth20.OAUTH_STATE) final String state,
-			@JsonProperty("already_authorized") final boolean alreadyAuthorized) {
-		notNull(responseType, "Missing response type");
-		this.responseType = responseType;
-		notNull(client, "Missing client info");
-		this.client = client;
-		notEmptyString(currentUser, "Missing current user");
-		this.currentUser = currentUser;
-		notEmptyString(redirectUri, "Missing redirect URI");
-		try {
-			this.redirectUri = URLDecoder.decode(redirectUri, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
-		notNull(scopes, "Missing scopes");
-		if (scopes.isEmpty()) {
-			throw new IllegalArgumentException("Missing scopes");
-		}
-		this.scopes = scopes;
-		this.state = isEmptyString(state) ? null : state;
-		this.alreadyAuthorized = alreadyAuthorized;
-	}
+    /**
+     * @param responseType
+     *         The response type
+     * @param client
+     *         The client
+     * @param currentUser
+     *         Current user
+     * @param redirectUri
+     *         The redirect URI
+     * @param scopes
+     *         The scopes
+     * @param state
+     *         Optional. The state of request, default to null
+     * @param alreadyAuthorized
+     *         User already authorized or not
+     */
+    @JsonCreator
+    public AuthorizationDetail(
+            @JsonProperty(OAuth20.OAUTH_RESPONSE_TYPE) final ResponseType responseType,
+            @JsonProperty("client") final OAuthClientInfo client,
+            @JsonProperty("current_user") final String currentUser,
+            @JsonProperty(OAuth20.OAUTH_REDIRECT_URI) final String redirectUri,
+            @JsonProperty("scopes") final List<ScopeDefinition> scopes,
+            @JsonProperty(OAuth20.OAUTH_STATE) final String state,
+            @JsonProperty("already_authorized") final boolean alreadyAuthorized) {
+        notNull(responseType, "Missing response type");
+        this.responseType = responseType;
+        notNull(client, "Missing client info");
+        this.client = client;
+        notEmptyString(currentUser, "Missing current user");
+        this.currentUser = currentUser;
+        notEmptyString(redirectUri, "Missing redirect URI");
+        try {
+            this.redirectUri = URLDecoder.decode(redirectUri, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        notNull(scopes, "Missing scopes");
+        if (scopes.isEmpty()) {
+            throw new IllegalArgumentException("Missing scopes");
+        }
+        this.scopes = scopes;
+        this.state = isEmptyString(state) ? null : state;
+        this.alreadyAuthorized = alreadyAuthorized;
+    }
 
-	/**
-	 * @return The response type
-	 */
-	@JsonProperty(OAuth20.OAUTH_RESPONSE_TYPE)
-	public ResponseType getResponseType() {
-		return responseType;
-	}
+    /**
+     * @return The response type
+     */
+    @JsonProperty(OAuth20.OAUTH_RESPONSE_TYPE)
+    public ResponseType getResponseType() {
+        return responseType;
+    }
 
-	/**
-	 * @return The client ID
-	 */
-	@JsonProperty("client")
-	public OAuthClientInfo getClient() {
-		return client;
-	}
+    /**
+     * @return The client ID
+     */
+    @JsonProperty("client")
+    public OAuthClientInfo getClient() {
+        return client;
+    }
 
-	/**
-	 * @return The current user
-	 */
-	@JsonProperty("current_user")
-	public String getCurrentUser() {
-		return currentUser;
-	}
+    /**
+     * @return The current user
+     */
+    @JsonProperty("current_user")
+    public String getCurrentUser() {
+        return currentUser;
+    }
 
-	/**
-	 * @return The redirect URI
-	 */
-	@JsonProperty(OAuth20.OAUTH_REDIRECT_URI)
-	public String getRedirectUri() {
-		return redirectUri;
-	}
+    /**
+     * @return The redirect URI
+     */
+    @JsonProperty(OAuth20.OAUTH_REDIRECT_URI)
+    public String getRedirectUri() {
+        return redirectUri;
+    }
 
-	/**
-	 * @return The scopes
-	 */
-	@JsonProperty("scopes")
-	public List<ScopeDefinition> getScopes() {
-		return Collections.unmodifiableList(scopes);
-	}
+    /**
+     * @return The scopes
+     */
+    @JsonProperty("scopes")
+    public List<ScopeDefinition> getScopes() {
+        return Collections.unmodifiableList(scopes);
+    }
 
-	/**
-	 * @return The state
-	 */
-	@JsonProperty(OAuth20.OAUTH_STATE)
-	public Optional<String> getState() {
-		return Optional.ofNullable(state);
-	}
+    /**
+     * @return The state
+     */
+    @JsonProperty(OAuth20.OAUTH_STATE)
+    public Optional<String> getState() {
+        return Optional.ofNullable(state);
+    }
 
-	/**
-	 * @return User already authorized or not
-	 */
-	public boolean isAlreadyAuthorized() {
-		return alreadyAuthorized;
-	}
+    /**
+     * @return User already authorized or not
+     */
+    public boolean isAlreadyAuthorized() {
+        return alreadyAuthorized;
+    }
+
 }

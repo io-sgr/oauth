@@ -22,11 +22,12 @@ import io.sgr.oauth.core.v20.OAuthErrorType;
 
 public class InvalidClientException extends UnrecoverableOAuthException {
 
-	/**
-	 * @param errorDescription The error description
-	 */
-	public InvalidClientException(final String errorDescription) {
-		super(new OAuthError(OAuthErrorType.INVALID_CLIENT.name().toLowerCase(), errorDescription));
-	}
+    /**
+     * @param errorDescription
+     *         The error description
+     */
+    public InvalidClientException(final String errorDescription) {
+        super(new OAuthError(OAuthErrorType.INVALID_CLIENT.name().toLowerCase(), errorDescription));
+    }
 
 }

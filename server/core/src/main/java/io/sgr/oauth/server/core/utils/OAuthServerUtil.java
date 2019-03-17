@@ -31,39 +31,39 @@ import java.util.Set;
 
 public class OAuthServerUtil {
 
-	public static boolean isRedirectUriRegistered(final String redirectUri, final String... callbacks) {
-		notEmptyString(redirectUri, "Redirect URI needs to be specified");
-		return callbacks != null && callbacks.length > 0 && isRedirectUriRegistered(redirectUri, new HashSet<>(Arrays.asList(callbacks)));
-	}
+    public static boolean isRedirectUriRegistered(final String redirectUri, final String... callbacks) {
+        notEmptyString(redirectUri, "Redirect URI needs to be specified");
+        return callbacks != null && callbacks.length > 0 && isRedirectUriRegistered(redirectUri, new HashSet<>(Arrays.asList(callbacks)));
+    }
 
-	public static boolean isRedirectUriRegistered(final String redirectUri, final List<String> callbacks) {
-		notEmptyString(redirectUri, "Redirect URI needs to be specified");
-		return callbacks != null && !callbacks.isEmpty() && isRedirectUriRegistered(redirectUri, new HashSet<>(callbacks));
-	}
+    public static boolean isRedirectUriRegistered(final String redirectUri, final List<String> callbacks) {
+        notEmptyString(redirectUri, "Redirect URI needs to be specified");
+        return callbacks != null && !callbacks.isEmpty() && isRedirectUriRegistered(redirectUri, new HashSet<>(callbacks));
+    }
 
-	public static boolean isRedirectUriRegistered(final String redirectUri, final Set<String> callbacks) {
-		return callbacks != null && !callbacks.isEmpty() && callbacks.contains(toBaseEndpoint(redirectUri));
-	}
+    public static boolean isRedirectUriRegistered(final String redirectUri, final Set<String> callbacks) {
+        return callbacks != null && !callbacks.isEmpty() && callbacks.contains(toBaseEndpoint(redirectUri));
+    }
 
-	public static String toBaseEndpoint(final String redirectUri) {
-		notEmptyString(redirectUri, "Redirect URI needs to be specified");
-		try {
-			final URI uri = URI.create(redirectUri);
-			return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null).toString();
-		} catch (URISyntaxException e) {
-			throw new IllegalArgumentException(e);
-		}
-	}
+    public static String toBaseEndpoint(final String redirectUri) {
+        notEmptyString(redirectUri, "Redirect URI needs to be specified");
+        try {
+            final URI uri = URI.create(redirectUri);
+            return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null).toString();
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
 
-	public static OAuthCredential parseAccessTokenFromAuthorization(String authStr) {
-		if (isEmptyString(authStr)) {
-			return null;
-		}
-		String[] a = authStr.split(" ");
-		if (a.length != 2) {
-			return null;
-		}
-		return new OAuthCredential(a[1], a[0]);
-	}
+    public static OAuthCredential parseAccessTokenFromAuthorization(String authStr) {
+        if (isEmptyString(authStr)) {
+            return null;
+        }
+        String[] a = authStr.split(" ");
+        if (a.length != 2) {
+            return null;
+        }
+        return new OAuthCredential(a[1], a[0]);
+    }
 
 }

@@ -35,39 +35,40 @@ import javax.servlet.http.HttpServletRequest;
 
 public class ServletBasedAuthorizationRequestParser implements AuthRequestParser<HttpServletRequest> {
 
-	private static final ServletBasedAuthorizationRequestParser INSTANCE = new ServletBasedAuthorizationRequestParser();
+    private static final ServletBasedAuthorizationRequestParser INSTANCE = new ServletBasedAuthorizationRequestParser();
 
-	private ServletBasedAuthorizationRequestParser() {
+    private ServletBasedAuthorizationRequestParser() {
 
-	}
+    }
 
-	public static ServletBasedAuthorizationRequestParser instance() {
-		return INSTANCE;
-	}
+    public static ServletBasedAuthorizationRequestParser instance() {
+        return INSTANCE;
+    }
 
-	@Override public AuthorizationRequest parse(final HttpServletRequest req)
-			throws InvalidRequestException, UnsupportedResponseTypeException {
-		notNull(req, "Missing HttpServletRequest");
-		final String responseTypeS = getOnlyOneParameter(req, OAuth20.OAUTH_RESPONSE_TYPE).orElse(null);
-		final ResponseType responseType;
-		if (isEmptyString(responseTypeS)) {
-			responseType = ResponseType.CODE;
-		} else {
-			try {
-				responseType = ResponseType.valueOf(responseTypeS.toUpperCase());
-			} catch (Exception e) {
-				throw new UnsupportedResponseTypeException(MessageFormat.format("Unsupported response type '{0}'", responseTypeS));
-			}
-		}
-		final String clientId = getOnlyOneParameter(req, OAuth20.OAUTH_CLIENT_ID).orElse(null);
-		final String redirectUri = getOnlyOneParameter(req, OAuth20.OAUTH_REDIRECT_URI).orElse(null);
-		final List<String> scopes = OAuthWebServerUtil.parseScopes(req).orElse(null);
-		final String state = getOnlyOneParameter(req, OAuth20.OAUTH_STATE).orElse(null);
-		try {
-			return new AuthorizationRequest(responseType, clientId, redirectUri, scopes, state);
-		} catch (IllegalArgumentException e) {
-			throw new InvalidRequestException(e.getMessage());
-		}
-	}
+    @Override
+    public AuthorizationRequest parse(final HttpServletRequest req)
+            throws InvalidRequestException, UnsupportedResponseTypeException {
+        notNull(req, "Missing HttpServletRequest");
+        final String responseTypeS = getOnlyOneParameter(req, OAuth20.OAUTH_RESPONSE_TYPE).orElse(null);
+        final ResponseType responseType;
+        if (isEmptyString(responseTypeS)) {
+            responseType = ResponseType.CODE;
+        } else {
+            try {
+                responseType = ResponseType.valueOf(responseTypeS.toUpperCase());
+            } catch (Exception e) {
+                throw new UnsupportedResponseTypeException(MessageFormat.format("Unsupported response type '{0}'", responseTypeS));
+            }
+        }
+        final String clientId = getOnlyOneParameter(req, OAuth20.OAUTH_CLIENT_ID).orElse(null);
+        final String redirectUri = getOnlyOneParameter(req, OAuth20.OAUTH_REDIRECT_URI).orElse(null);
+        final List<String> scopes = OAuthWebServerUtil.parseScopes(req).orElse(null);
+        final String state = getOnlyOneParameter(req, OAuth20.OAUTH_STATE).orElse(null);
+        try {
+            return new AuthorizationRequest(responseType, clientId, redirectUri, scopes, state);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidRequestException(e.getMessage());
+        }
+    }
 
 }

@@ -22,11 +22,12 @@ import io.sgr.oauth.core.v20.OAuthErrorType;
 
 public class InvalidScopeException extends UnrecoverableOAuthException {
 
-	/**
-	 * @param errorDescription The error description
-	 */
-	public InvalidScopeException(final String errorDescription) {
-		super(new OAuthError(OAuthErrorType.INVALID_SCOPE.name().toLowerCase(), errorDescription));
-	}
+    /**
+     * @param errorDescription
+     *         The error description
+     */
+    public InvalidScopeException(final String errorDescription) {
+        super(new OAuthError(OAuthErrorType.INVALID_SCOPE.name().toLowerCase(), errorDescription));
+    }
 
 }

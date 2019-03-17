@@ -25,37 +25,38 @@ import org.junit.Test;
 
 public class OAuthErrorTest {
 
-	@Test
-	public void testConstructor() {
-		OAuthError err;
+    @Test
+    public void testConstructor() {
+        OAuthError err;
 
-		final String error = OAuthErrorType.INVALID_GRANT.name().toLowerCase();
-		final String errorDescription = "This is a description";
-		err = new OAuthError(error, errorDescription);
-		assertEquals(error, err.getName());
-		assertEquals(errorDescription, err.getErrorDescription());
-		assertNull(err.getErrorUri());
+        final String error = OAuthErrorType.INVALID_GRANT.name().toLowerCase();
+        final String errorDescription = "This is a description";
+        err = new OAuthError(error, errorDescription);
+        assertEquals(error, err.getName());
+        assertEquals(errorDescription, err.getErrorDescription());
+        assertNull(err.getErrorUri());
 
-		final String errorUri = "http://localhost/api/how-to.html";
-		err = new OAuthError(error, errorDescription, errorUri);
-		assertEquals(error, err.getName());
-		assertEquals(errorDescription, err.getErrorDescription());
-		assertEquals(errorUri, err.getErrorUri());
-	}
+        final String errorUri = "http://localhost/api/how-to.html";
+        err = new OAuthError(error, errorDescription, errorUri);
+        assertEquals(error, err.getName());
+        assertEquals(errorDescription, err.getErrorDescription());
+        assertEquals(errorUri, err.getErrorUri());
+    }
 
-	@Test
-	public void testConstructorWithInvalidArguments() {
-		try {
-			new OAuthError(null, null);
-			fail();
-		} catch (IllegalArgumentException e) {
-			// Ignored
-		}
-		try {
-			new OAuthError("\n", null, null);
-			fail();
-		} catch (IllegalArgumentException e) {
-			// Ignored
-		}
-	}
+    @Test
+    public void testConstructorWithInvalidArguments() {
+        try {
+            new OAuthError(null, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // Ignored
+        }
+        try {
+            new OAuthError("\n", null, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // Ignored
+        }
+    }
+
 }

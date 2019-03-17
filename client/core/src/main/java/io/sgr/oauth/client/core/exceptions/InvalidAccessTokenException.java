@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package io.sgr.oauth.client.core.exceptions;
 
 import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
@@ -21,17 +22,16 @@ import io.sgr.oauth.core.v20.OAuthError;
 
 /**
  * @author SgrAlpha
- *
  */
 public class InvalidAccessTokenException extends UnrecoverableOAuthException {
 
-	public InvalidAccessTokenException() {
-		super(new OAuthError("invalid_access_token", "The access token is invalid."));
-	}
+    public InvalidAccessTokenException() {
+        super(new OAuthError("invalid_access_token", "The access token is invalid."));
+    }
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -8853177548564965128L;
-	
+    /**
+     *
+     */
+    private static final long serialVersionUID = -8853177548564965128L;
+
 }

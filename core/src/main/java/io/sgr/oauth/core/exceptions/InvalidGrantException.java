@@ -22,11 +22,12 @@ import io.sgr.oauth.core.v20.OAuthErrorType;
 
 public class InvalidGrantException extends UnrecoverableOAuthException {
 
-	/**
-	 * @param errorDescription The error description
-	 */
-	public InvalidGrantException(final String errorDescription) {
-		super(new OAuthError(OAuthErrorType.INVALID_GRANT.name().toLowerCase(), errorDescription));
-	}
+    /**
+     * @param errorDescription
+     *         The error description
+     */
+    public InvalidGrantException(final String errorDescription) {
+        super(new OAuthError(OAuthErrorType.INVALID_GRANT.name().toLowerCase(), errorDescription));
+    }
 
 }

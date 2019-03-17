@@ -14,16 +14,16 @@
  * limitations under the License.
  *
  */
+
 package io.sgr.oauth.core.v20;
 
 /**
  * @author SgrAlpha
- *
  */
 public enum ParameterStyle {
-	
-	QUERY_STRING,
-	BODY,
-	;
+
+    QUERY_STRING,
+    BODY,
+    ;
 
 }

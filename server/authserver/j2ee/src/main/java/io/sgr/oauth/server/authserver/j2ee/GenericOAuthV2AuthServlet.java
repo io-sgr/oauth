@@ -42,110 +42,112 @@ import javax.servlet.http.HttpSession;
 
 public abstract class GenericOAuthV2AuthServlet extends HttpServlet {
 
-	@Override
-	protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-		final String curUserId = getCurrentUserId(req, resp);
-		if (isEmptyString(curUserId)) {
-			onUserNotSignedIn(req, resp);
-			return;
-		}
+    @Override
+    protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+        final String curUserId = getCurrentUserId(req, resp);
+        if (isEmptyString(curUserId)) {
+            onUserNotSignedIn(req, resp);
+            return;
+        }
 
-		final AuthorizationDetail authDetail;
-		try {
-			authDetail = getAuthorizationServer()
-					.preAuthorization(req, ServletBasedAuthorizationRequestParser.instance(), curUserId, getUserLocale(req, resp));
-			if (authDetail == null) {
-				throw new ServerErrorException("Unable to check authorization request");
-			}
-		} catch (InvalidClientException e) {
-			onInvalidClient(e.getError(), req, resp);
-			return;
-		} catch (InvalidRequestException | InvalidScopeException | UnsupportedResponseTypeException e) {
-			onBadOAuthRequest(e.getError(), req, resp);
-			return;
-		} catch (ServerErrorException e) {
-			onServerError(e.getError(), req, resp);
-			return;
-		}
+        final AuthorizationDetail authDetail;
+        try {
+            authDetail = getAuthorizationServer()
+                    .preAuthorization(req, ServletBasedAuthorizationRequestParser.instance(), curUserId, getUserLocale(req, resp));
+            if (authDetail == null) {
+                throw new ServerErrorException("Unable to check authorization request");
+            }
+        } catch (InvalidClientException e) {
+            onInvalidClient(e.getError(), req, resp);
+            return;
+        } catch (InvalidRequestException | InvalidScopeException | UnsupportedResponseTypeException e) {
+            onBadOAuthRequest(e.getError(), req, resp);
+            return;
+        } catch (ServerErrorException e) {
+            onServerError(e.getError(), req, resp);
+            return;
+        }
 
-		if (authDetail.isAlreadyAuthorized()) {
-			afterAuthorized(true, authDetail, req, resp);
-			return;
-		}
+        if (authDetail.isAlreadyAuthorized()) {
+            afterAuthorized(true, authDetail, req, resp);
+            return;
+        }
 
-		final HttpSession session = req.getSession(true);
-		session.setAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_AUTH_DETAIL, authDetail);
-		session.setAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN, UUID.randomUUID().toString().replaceAll("-", ""));
-		displayUserAuthorizePage(authDetail, req, resp);
-	}
+        final HttpSession session = req.getSession(true);
+        session.setAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_AUTH_DETAIL, authDetail);
+        session.setAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN, UUID.randomUUID().toString().replaceAll("-", ""));
+        displayUserAuthorizePage(authDetail, req, resp);
+    }
 
-	@Override
-	protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-		final String currentUserId = getCurrentUserId(req, resp);
-		if (isEmptyString(currentUserId)) {
-			onUserNotSignedIn(req, resp);
-			return;
-		}
+    @Override
+    protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+        final String currentUserId = getCurrentUserId(req, resp);
+        if (isEmptyString(currentUserId)) {
+            onUserNotSignedIn(req, resp);
+            return;
+        }
 
-		final HttpSession session = req.getSession(true);
+        final HttpSession session = req.getSession(true);
 
-		final String reqCsrfToken = req.getParameter(OAuthV2WebConstants.REQ_PARAMS_KEY_CSRF_TOKEN);
-		if (isEmptyString(reqCsrfToken) || !reqCsrfToken.equals(session.getAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN))) {
-			session.removeAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN);
-			onBadOAuthRequest(new OAuthError("csrf_token_mismatch", "CSRF token mismatch!"), req, resp);
-			return;
-		}
-		session.removeAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN);
+        final String reqCsrfToken = req.getParameter(OAuthV2WebConstants.REQ_PARAMS_KEY_CSRF_TOKEN);
+        if (isEmptyString(reqCsrfToken) || !reqCsrfToken.equals(session.getAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN))) {
+            session.removeAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN);
+            onBadOAuthRequest(new OAuthError("csrf_token_mismatch", "CSRF token mismatch!"), req, resp);
+            return;
+        }
+        session.removeAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_CSRF_TOKEN);
 
-		final Object detail = session.getAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_AUTH_DETAIL);
-		if (!(detail instanceof AuthorizationDetail)) {
-			session.removeAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_AUTH_DETAIL);
-			onBadOAuthRequest(new OAuthError("bad_oauth_request", "Bad OAuth request"), req, resp);
-			return;
-		}
-		session.removeAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_AUTH_DETAIL);
+        final Object detail = session.getAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_AUTH_DETAIL);
+        if (!(detail instanceof AuthorizationDetail)) {
+            session.removeAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_AUTH_DETAIL);
+            onBadOAuthRequest(new OAuthError("bad_oauth_request", "Bad OAuth request"), req, resp);
+            return;
+        }
+        session.removeAttribute(OAuthV2WebConstants.SESSION_ATTRS_KEY_AUTH_DETAIL);
 
-		final String approvedS = req.getParameter(OAuthV2WebConstants.REQ_PARAMS_KEY_APPROVED);
-		final boolean approved = !isEmptyString(approvedS) && Boolean.parseBoolean(approvedS);
+        final String approvedS = req.getParameter(OAuthV2WebConstants.REQ_PARAMS_KEY_APPROVED);
+        final boolean approved = !isEmptyString(approvedS) && Boolean.parseBoolean(approvedS);
 
-		final AuthorizationDetail authDetail = (AuthorizationDetail) detail;
+        final AuthorizationDetail authDetail = (AuthorizationDetail) detail;
 
-		afterAuthorized(approved, authDetail, req, resp);
-	}
+        afterAuthorized(approved, authDetail, req, resp);
+    }
 
-	private void afterAuthorized(final boolean approved, final AuthorizationDetail authDetail, final HttpServletRequest req, final HttpServletResponse resp)
-			throws ServletException, IOException {
-		final String location;
-		try {
-			location = getAuthorizationServer().postAuthorization(approved, authDetail);
-			if (isEmptyString(location)) {
-				throw new ServerErrorException("Unable to authorize");
-			}
-		} catch (UnsupportedResponseTypeException e) {
-			onBadOAuthRequest(e.getError(), req, resp);
-			return;
-		} catch (ServerErrorException e) {
-			onServerError(e.getError(), req, resp);
-			return;
-		}
+    private void afterAuthorized(final boolean approved, final AuthorizationDetail authDetail, final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException {
+        final String location;
+        try {
+            location = getAuthorizationServer().postAuthorization(approved, authDetail);
+            if (isEmptyString(location)) {
+                throw new ServerErrorException("Unable to authorize");
+            }
+        } catch (UnsupportedResponseTypeException e) {
+            onBadOAuthRequest(e.getError(), req, resp);
+            return;
+        } catch (ServerErrorException e) {
+            onServerError(e.getError(), req, resp);
+            return;
+        }
 
-		resp.setHeader("Location", location);
-		resp.sendError(HttpServletResponse.SC_MOVED_TEMPORARILY);
-	}
+        resp.setHeader("Location", location);
+        resp.sendError(HttpServletResponse.SC_MOVED_TEMPORARILY);
+    }
 
-	protected abstract void displayUserAuthorizePage(final AuthorizationDetail authDetail, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
+    protected abstract void displayUserAuthorizePage(AuthorizationDetail authDetail, HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException;
 
-	protected abstract String getCurrentUserId(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
+    protected abstract String getCurrentUserId(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
 
-	protected abstract Locale getUserLocale(final HttpServletRequest req, final HttpServletResponse resp);
+    protected abstract Locale getUserLocale(HttpServletRequest req, HttpServletResponse resp);
 
-	protected abstract void onUserNotSignedIn(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
+    protected abstract void onUserNotSignedIn(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
 
-	protected abstract void onBadOAuthRequest(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
+    protected abstract void onBadOAuthRequest(OAuthError error, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
 
-	protected abstract void onInvalidClient(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
+    protected abstract void onInvalidClient(OAuthError error, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
 
-	protected abstract void onServerError(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException;
+    protected abstract void onServerError(OAuthError error, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
 
-	protected abstract AuthorizationServer getAuthorizationServer();
+    protected abstract AuthorizationServer getAuthorizationServer();
+
 }

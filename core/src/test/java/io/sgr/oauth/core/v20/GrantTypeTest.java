@@ -23,8 +23,9 @@ import org.junit.Test;
 
 public class GrantTypeTest {
 
-	@Test
-	public void simple() {
-		assertEquals(5, GrantType.values().length);
-	}
+    @Test
+    public void simple() {
+        assertEquals(5, GrantType.values().length);
+    }
+
 }

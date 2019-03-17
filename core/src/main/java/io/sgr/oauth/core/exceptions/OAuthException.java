@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package io.sgr.oauth.core.exceptions;
 
 import io.sgr.oauth.core.v20.OAuthError;
@@ -22,43 +23,49 @@ import java.text.MessageFormat;
 
 /**
  * @author SgrAlpha
- *
  */
 public abstract class OAuthException extends Exception {
-	
-	private final OAuthError error;
 
-	/**
-	 * @param error
-	 * 				The OAuth error
-	 */
-	public OAuthException(OAuthError error) {
-		super();
-		this.error = error;
-	}
+    private final OAuthError error;
 
-	/* (non-Javadoc)
-	 * @see java.lang.Throwable#getMessage()
-	 */
-	@Override
-	public String getMessage() {
-		if (this.getError() == null) {
-			return "No more detail";
-		}
-		return this.getError().getErrorDescription() == null ? this.getError().getName() : MessageFormat.format("{0}: {1}", this.getError().getName(), this.getError().getErrorDescription());
-	}
+    /**
+     * @param error
+     *         The OAuth error
+     */
+    public OAuthException(OAuthError error) {
+        super();
+        this.error = error;
+    }
 
-	/**
-	 * @return the error
-	 * 				The OAuth error
-	 */
-	public OAuthError getError() {
-		return this.error;
-	}
+    public OAuthException(final OAuthError error, final Throwable cause) {
+        super(cause);
+        this.error = error;
+    }
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -4355086515711493909L;
+    /* (non-Javadoc)
+     * @see java.lang.Throwable#getMessage()
+     */
+    @Override
+    public String getMessage() {
+        if (this.getError() == null) {
+            return "No more detail";
+        }
+        return this.getError().getErrorDescription() == null ?
+                this.getError().getName() :
+                MessageFormat.format("{0}: {1}", this.getError().getName(), this.getError().getErrorDescription());
+    }
+
+    /**
+     * @return the error
+     * The OAuth error
+     */
+    public OAuthError getError() {
+        return this.error;
+    }
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = -4355086515711493909L;
 
 }

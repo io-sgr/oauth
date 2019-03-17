@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package io.sgr.oauth.client.core.exceptions;
 
 import static io.sgr.oauth.core.v20.OAuthErrorType.INVALID_GRANT;
@@ -23,17 +24,16 @@ import io.sgr.oauth.core.v20.OAuthError;
 
 /**
  * @author SgrAlpha
- *
  */
 public class RefreshTokenRevokedException extends UnrecoverableOAuthException {
 
-	public RefreshTokenRevokedException() {
-		super(new OAuthError(INVALID_GRANT.name().toLowerCase(), "The refresh token already been revoked."));
-	}
+    public RefreshTokenRevokedException() {
+        super(new OAuthError(INVALID_GRANT.name().toLowerCase(), "The refresh token already been revoked."));
+    }
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -7630620067962365131L;
-	
+    /**
+     *
+     */
+    private static final long serialVersionUID = -7630620067962365131L;
+
 }

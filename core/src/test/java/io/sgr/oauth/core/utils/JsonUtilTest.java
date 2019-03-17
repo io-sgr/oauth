@@ -23,10 +23,11 @@ import org.junit.Test;
 
 public class JsonUtilTest {
 
-	@Test
-	public void testGetter() {
-		assertNotNull(JsonUtil.getObjectMapper());
-		assertNotNull(JsonUtil.getJsonFactory());
-		assertNotNull(JsonUtil.getDefaultDateFormat());
-	}
+    @Test
+    public void testGetter() {
+        assertNotNull(JsonUtil.getObjectMapper());
+        assertNotNull(JsonUtil.getJsonFactory());
+        assertNotNull(JsonUtil.getDefaultDateFormat());
+    }
+
 }

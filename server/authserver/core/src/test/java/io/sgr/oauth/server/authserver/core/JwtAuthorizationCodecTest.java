@@ -21,9 +21,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import io.jsonwebtoken.ExpiredJwtException;
+
 import io.sgr.oauth.core.v20.ResponseType;
 import io.sgr.oauth.server.core.models.OAuthClientInfo;
 import io.sgr.oauth.server.core.models.ScopeDefinition;
+
 import org.junit.Test;
 
 import java.time.Clock;
@@ -35,51 +37,51 @@ import java.util.concurrent.TimeUnit;
 
 public class JwtAuthorizationCodecTest {
 
-	private static final OAuthClientInfo TEST_CLIENT = new OAuthClientInfo(
-			UUID.randomUUID().toString(), UUID.randomUUID().toString(),
-			"name", null, null, null, "user_1", Clock.systemUTC().millis());
-	private static final List<ScopeDefinition> TEST_SCOPES = Collections.singletonList(new ScopeDefinition("basic", "Basic", "Basic Scope"));
-	private static final AuthorizationDetail TEST_AUTH_DETAIL = new AuthorizationDetail(
-			ResponseType.CODE, TEST_CLIENT, "user_1",
-			"http://localhost/callback", TEST_SCOPES, null, false);
+    private static final OAuthClientInfo TEST_CLIENT = new OAuthClientInfo(
+            UUID.randomUUID().toString(), UUID.randomUUID().toString(),
+            "name", null, null, null, "user_1", Clock.systemUTC().millis());
+    private static final List<ScopeDefinition> TEST_SCOPES = Collections.singletonList(new ScopeDefinition("basic", "Basic", "Basic Scope"));
+    private static final AuthorizationDetail TEST_AUTH_DETAIL = new AuthorizationDetail(
+            ResponseType.CODE, TEST_CLIENT, "user_1",
+            "http://localhost/callback", TEST_SCOPES, null, false);
 
-	@Test(expected = ExpiredJwtException.class)
-	public void testEncodeDecode() throws InterruptedException {
-		final JwtAuthorizationCodec codec = new JwtAuthorizationCodec("test_issuer", "test_secret").setExpiresIn(3, ChronoUnit.SECONDS);
-		final String encoded = codec.encode(TEST_AUTH_DETAIL);
-		assertNotNull(encoded);
-		final AuthorizationDetail decoded = codec.decode(encoded);
-		assertNotNull(decoded);
-		TimeUnit.SECONDS.sleep(5);
-		codec.decode(encoded);
-	}
+    @Test(expected = ExpiredJwtException.class)
+    public void testEncodeDecode() throws InterruptedException {
+        final JwtAuthorizationCodec codec = new JwtAuthorizationCodec("test_issuer", "test_secret").setExpiresIn(3, ChronoUnit.SECONDS);
+        final String encoded = codec.encode(TEST_AUTH_DETAIL);
+        assertNotNull(encoded);
+        final AuthorizationDetail decoded = codec.decode(encoded);
+        assertNotNull(decoded);
+        TimeUnit.SECONDS.sleep(5);
+        codec.decode(encoded);
+    }
 
-	@Test
-	public void testConstructWithInvalidArguments() {
-		try {
-			new JwtAuthorizationCodec(null , null);
-			fail();
-		} catch (IllegalArgumentException e) {
-			// Expected
-		}
-		try {
-			new JwtAuthorizationCodec("test_issuer" , null);
-			fail();
-		} catch (IllegalArgumentException e) {
-			// Expected
-		}
-		try {
-			new JwtAuthorizationCodec("test_issuer" , "test_secret").setExpiresIn(-1, null);
-			fail();
-		} catch (IllegalArgumentException e) {
-			// Expected
-		}
-		try {
-			new JwtAuthorizationCodec("test_issuer" , "test_secret").setExpiresIn(1, null);
-			fail();
-		} catch (IllegalArgumentException e) {
-			// Expected
-		}
-	}
+    @Test
+    public void testConstructWithInvalidArguments() {
+        try {
+            new JwtAuthorizationCodec(null, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
+        try {
+            new JwtAuthorizationCodec("test_issuer", null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
+        try {
+            new JwtAuthorizationCodec("test_issuer", "test_secret").setExpiresIn(-1, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
+        try {
+            new JwtAuthorizationCodec("test_issuer", "test_secret").setExpiresIn(1, null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
+    }
 
 }

@@ -35,126 +35,127 @@ import java.util.UUID;
 
 public class OAuthClientInfoTest {
 
-	@Test
-	public void testEqual() {
-		final String clientId = UUID.randomUUID().toString();
-		final String name = "example";
-		final String desc = "This is a simple description";
-		final String iconUrl = "https://localhost/images/app.png";
-		final String privacyUrl = "https://localhost/privacy.html";
-		final List<String> callbacks = Collections.singletonList("https://localhost/callback");
-		final String ownerUid = "example_uid";
-		final long now = Clock.systemUTC().millis();
+    @Test
+    public void testEqual() {
+        final String clientId = UUID.randomUUID().toString();
+        final String name = "example";
+        final String desc = "This is a simple description";
+        final String iconUrl = "https://localhost/images/app.png";
+        final String privacyUrl = "https://localhost/privacy.html";
+        final List<String> callbacks = Collections.singletonList("https://localhost/callback");
+        final String ownerUid = "example_uid";
+        final long now = Clock.systemUTC().millis();
 
-		OAuthClientInfo client1 = new OAuthClientInfo(clientId, UUID.randomUUID().toString(), name, desc, iconUrl, privacyUrl, ownerUid, now, callbacks);
-		assertNotEquals(null, client1);
-		assertNotEquals(new Object(), client1);
-		assertEquals(client1, client1);
-		assertFalse(client1.equals(new Object()));
+        OAuthClientInfo client1 = new OAuthClientInfo(clientId, UUID.randomUUID().toString(), name, desc, iconUrl, privacyUrl, ownerUid, now, callbacks);
+        assertNotEquals(null, client1);
+        assertNotEquals(new Object(), client1);
+        assertEquals(client1, client1);
+        assertFalse(client1.equals(new Object()));
 
-		OAuthClientInfo client2 = new OAuthClientInfo(clientId, UUID.randomUUID().toString(), name, desc, iconUrl, privacyUrl, ownerUid, now, callbacks);
-		assertEquals(client1, client2);
+        OAuthClientInfo client2 = new OAuthClientInfo(clientId, UUID.randomUUID().toString(), name, desc, iconUrl, privacyUrl, ownerUid, now, callbacks);
+        assertEquals(client1, client2);
 
-		final Set<OAuthClientInfo> all = new HashSet<>();
-		all.add(client1);
-		all.add(client2);
-		assertEquals(1, all.size());
-	}
+        final Set<OAuthClientInfo> all = new HashSet<>();
+        all.add(client1);
+        all.add(client2);
+        assertEquals(1, all.size());
+    }
 
-	@Test
-	public void testCreateWithInvalidArguments() {
-		final String name = "example";
-		final long now = Clock.systemUTC().millis();
-//		try {
-//			new OAuthClientInfo(null, null, null, null, null, null);
-//			fail();
-//		} catch (IllegalArgumentException e) {
-//			// Ignore
-//		}
-//		try {
-//			new OAuthClientInfo(name, null, null, null, null, null);
-//			fail();
-//		} catch (IllegalArgumentException e) {
-//			// Ignore
-//		}
-		try {
-			new OAuthClientInfo(null, null, null, null, null, null, null, now);
-			fail();
-		} catch (IllegalArgumentException e) {
-			// Ignore
-		}
-		try {
-			new OAuthClientInfo(UUID.randomUUID().toString(), null, null, null, null, null, null, now);
-			fail();
-		} catch (IllegalArgumentException e) {
-			// Ignore
-		}
-		try {
-			new OAuthClientInfo(UUID.randomUUID().toString(), UUID.randomUUID().toString(), null, null, null, null, null, now);
-			fail();
-		} catch (IllegalArgumentException e) {
-			// Ignore
-		}
-		try {
-			new OAuthClientInfo(UUID.randomUUID().toString(), UUID.randomUUID().toString(), name, null, null, null, null, now);
-			fail();
-		} catch (IllegalArgumentException e) {
-			// Ignore
-		}
-	}
+    @Test
+    public void testCreateWithInvalidArguments() {
+        final String name = "example";
+        final long now = Clock.systemUTC().millis();
+        //		try {
+        //			new OAuthClientInfo(null, null, null, null, null, null);
+        //			fail();
+        //		} catch (IllegalArgumentException e) {
+        //			// Ignore
+        //		}
+        //		try {
+        //			new OAuthClientInfo(name, null, null, null, null, null);
+        //			fail();
+        //		} catch (IllegalArgumentException e) {
+        //			// Ignore
+        //		}
+        try {
+            new OAuthClientInfo(null, null, null, null, null, null, null, now);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // Ignore
+        }
+        try {
+            new OAuthClientInfo(UUID.randomUUID().toString(), null, null, null, null, null, null, now);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // Ignore
+        }
+        try {
+            new OAuthClientInfo(UUID.randomUUID().toString(), UUID.randomUUID().toString(), null, null, null, null, null, now);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // Ignore
+        }
+        try {
+            new OAuthClientInfo(UUID.randomUUID().toString(), UUID.randomUUID().toString(), name, null, null, null, null, now);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // Ignore
+        }
+    }
 
-	@Test
-	public void testCreateWithValidArguments() {
-		final String name = "example";
-		final String desc = "This is a simple description";
-		final String iconUrl = "https://localhost/images/app.png";
-		final String privacyUrl = "https://localhost/privacy.html";
-		final List<String> callbacks = Collections.singletonList("https://localhost/callback");
-		final String ownerUid = "example_uid";
-		final long now = Clock.systemUTC().millis();
-		try {
-			OAuthClientInfo info;
-//			info = new OAuthClientInfo(name, null, null, null, ownerUid, null);
-//			assertNotNull(info.getId());
-//			assertNotNull(info.getSecret());
-//			assertEquals(name, info.getName());
-//			assertFalse(info.getDescription().isPresent());
-//			assertFalse(info.getIconUrl().isPresent());
-//			assertFalse(info.getPrivacyUrl().isPresent());
-//			assertNotNull(info.getCallbacks());
-//			assertEquals(0, info.getCallbacks().size());
-//			assertEquals(ownerUid, info.getOwner());
-//			assertTrue(info.getCreatedTimeMs() > 0);
-//
-			info = new OAuthClientInfo(UUID.randomUUID().toString(), UUID.randomUUID().toString(), name, null, null, null, ownerUid, now, null);
-			assertNotNull(info.getId());
-			assertNotNull(info.getSecret());
-			assertEquals(name, info.getName());
-			assertFalse(info.getDescription().isPresent());
-			assertFalse(info.getIconUrl().isPresent());
-			assertFalse(info.getPrivacyUrl().isPresent());
-			assertNotNull(info.getCallbacks());
-			assertEquals(0, info.getCallbacks().size());
-			assertEquals(ownerUid, info.getOwner());
-			assertEquals(now, info.getCreatedTimeMs());
+    @Test
+    public void testCreateWithValidArguments() {
+        final String name = "example";
+        final String desc = "This is a simple description";
+        final String iconUrl = "https://localhost/images/app.png";
+        final String privacyUrl = "https://localhost/privacy.html";
+        final List<String> callbacks = Collections.singletonList("https://localhost/callback");
+        final String ownerUid = "example_uid";
+        final long now = Clock.systemUTC().millis();
+        try {
+            OAuthClientInfo info;
+            //			info = new OAuthClientInfo(name, null, null, null, ownerUid, null);
+            //			assertNotNull(info.getId());
+            //			assertNotNull(info.getSecret());
+            //			assertEquals(name, info.getName());
+            //			assertFalse(info.getDescription().isPresent());
+            //			assertFalse(info.getIconUrl().isPresent());
+            //			assertFalse(info.getPrivacyUrl().isPresent());
+            //			assertNotNull(info.getCallbacks());
+            //			assertEquals(0, info.getCallbacks().size());
+            //			assertEquals(ownerUid, info.getOwner());
+            //			assertTrue(info.getCreatedTimeMs() > 0);
+            //
+            info = new OAuthClientInfo(UUID.randomUUID().toString(), UUID.randomUUID().toString(), name, null, null, null, ownerUid, now, null);
+            assertNotNull(info.getId());
+            assertNotNull(info.getSecret());
+            assertEquals(name, info.getName());
+            assertFalse(info.getDescription().isPresent());
+            assertFalse(info.getIconUrl().isPresent());
+            assertFalse(info.getPrivacyUrl().isPresent());
+            assertNotNull(info.getCallbacks());
+            assertEquals(0, info.getCallbacks().size());
+            assertEquals(ownerUid, info.getOwner());
+            assertEquals(now, info.getCreatedTimeMs());
 
-			info = new OAuthClientInfo(UUID.randomUUID().toString(), UUID.randomUUID().toString(), name, desc, iconUrl, privacyUrl, ownerUid, now, callbacks);
-			assertNotNull(info.getId());
-			assertNotNull(info.getSecret());
-			assertEquals(name, info.getName());
-			assertTrue(info.getDescription().isPresent());
-			assertEquals(desc, info.getDescription().get());
-			assertTrue(info.getIconUrl().isPresent());
-			assertEquals(iconUrl, info.getIconUrl().get());
-			assertTrue(info.getPrivacyUrl().isPresent());
-			assertEquals(privacyUrl, info.getPrivacyUrl().get());
-			assertNotNull(info.getCallbacks());
-			assertEquals(callbacks.size(), info.getCallbacks().size());
-			assertEquals(callbacks.get(0), info.getCallbacks().get(0));
-			assertEquals(ownerUid, info.getOwner());
-			assertEquals(now, info.getCreatedTimeMs());
-		} catch (IllegalArgumentException e) {
-			fail(e.getMessage());
-		}
-	}
+            info = new OAuthClientInfo(UUID.randomUUID().toString(), UUID.randomUUID().toString(), name, desc, iconUrl, privacyUrl, ownerUid, now, callbacks);
+            assertNotNull(info.getId());
+            assertNotNull(info.getSecret());
+            assertEquals(name, info.getName());
+            assertTrue(info.getDescription().isPresent());
+            assertEquals(desc, info.getDescription().get());
+            assertTrue(info.getIconUrl().isPresent());
+            assertEquals(iconUrl, info.getIconUrl().get());
+            assertTrue(info.getPrivacyUrl().isPresent());
+            assertEquals(privacyUrl, info.getPrivacyUrl().get());
+            assertNotNull(info.getCallbacks());
+            assertEquals(callbacks.size(), info.getCallbacks().size());
+            assertEquals(callbacks.get(0), info.getCallbacks().get(0));
+            assertEquals(ownerUid, info.getOwner());
+            assertEquals(now, info.getCreatedTimeMs());
+        } catch (IllegalArgumentException e) {
+            fail(e.getMessage());
+        }
+    }
+
 }

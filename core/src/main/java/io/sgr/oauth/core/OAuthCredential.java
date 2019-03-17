@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package io.sgr.oauth.core;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -22,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.sgr.oauth.core.utils.JsonUtil;
 import io.sgr.oauth.core.v20.OAuth20;
 
@@ -49,25 +51,32 @@ public class OAuthCredential implements Serializable {
     private Map<String, Object> extraParams;
 
     /**
-     * @param accessToken The access token
+     * @param accessToken
+     *         The access token
      */
     public OAuthCredential(String accessToken) {
         this(accessToken, null, null, null);
     }
 
     /**
-     * @param accessToken The access token
-     * @param tokenType   The type of access token
+     * @param accessToken
+     *         The access token
+     * @param tokenType
+     *         The type of access token
      */
     public OAuthCredential(String accessToken, String tokenType) {
         this(accessToken, tokenType, null, null);
     }
 
     /**
-     * @param accessToken  The access token
-     * @param tokenType    The type of access token
-     * @param expiresIn    The seconds that access token will expire in
-     * @param refreshToken The refresh token
+     * @param accessToken
+     *         The access token
+     * @param tokenType
+     *         The type of access token
+     * @param expiresIn
+     *         The seconds that access token will expire in
+     * @param refreshToken
+     *         The refresh token
      */
     @JsonCreator
     public OAuthCredential(
@@ -111,7 +120,8 @@ public class OAuthCredential implements Serializable {
     }
 
     /**
-     * @param accessTokenExpiration The access token expiration time to set, in millisecond.
+     * @param accessTokenExpiration
+     *         The access token expiration time to set, in millisecond.
      */
     public void setAccessTokenExpiration(Long accessTokenExpiration) {
         this.accessTokenExpiration = accessTokenExpiration;
@@ -129,13 +139,15 @@ public class OAuthCredential implements Serializable {
     }
 
     /**
-     * @param accessTokenExpiresIn Set access token will expire in N second
+     * @param accessTokenExpiresIn
+     *         Set access token will expire in N second
      */
     public void setAccessTokenExpiresIn(Integer accessTokenExpiresIn) {
         if (this.getAccessToken() == null) {
             this.setAccessTokenExpiration(null);
         } else {
-            this.setAccessTokenExpiration(System.currentTimeMillis() + (accessTokenExpiresIn == null || accessTokenExpiresIn <= 0 ? DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC : accessTokenExpiresIn) * 1000);
+            this.setAccessTokenExpiration(System.currentTimeMillis()
+                    + (accessTokenExpiresIn == null || accessTokenExpiresIn <= 0 ? DEFAULT_ACCESS_TOKEN_EXPIRES_IN_SEC : accessTokenExpiresIn) * 1000);
         }
     }
 
@@ -148,7 +160,8 @@ public class OAuthCredential implements Serializable {
     }
 
     /**
-     * @param refreshToken The refresh token to set
+     * @param refreshToken
+     *         The refresh token to set
      */
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
@@ -163,15 +176,18 @@ public class OAuthCredential implements Serializable {
     }
 
     /**
-     * @param extraParams The extra parameters to set
+     * @param extraParams
+     *         The extra parameters to set
      */
     public void setExtraParams(Map<String, Object> extraParams) {
         this.extraParams = extraParams;
     }
 
     /**
-     * @param key   The key of extra parameter to add
-     * @param value The value of extra parameter to add
+     * @param key
+     *         The key of extra parameter to add
+     * @param value
+     *         The value of extra parameter to add
      */
     @JsonAnySetter
     public void addExtraParams(String key, Object value) {

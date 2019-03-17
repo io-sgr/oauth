@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package io.sgr.oauth.client.core.exceptions;
 
 import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
@@ -21,17 +22,16 @@ import io.sgr.oauth.core.v20.OAuthError;
 
 /**
  * @author SgrAlpha
- *
  */
 public class MissingAccessTokenException extends UnrecoverableOAuthException {
 
-	public MissingAccessTokenException() {
-		super(new OAuthError("missing_access_token", "The access token should be specified."));
-	}
+    public MissingAccessTokenException() {
+        super(new OAuthError("missing_access_token", "The access token should be specified."));
+    }
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 8000416928311828458L;
-	
+    /**
+     *
+     */
+    private static final long serialVersionUID = 8000416928311828458L;
+
 }

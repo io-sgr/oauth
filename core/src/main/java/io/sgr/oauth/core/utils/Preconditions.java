@@ -14,61 +14,60 @@
  * limitations under the License.
  *
  */
+
 package io.sgr.oauth.core.utils;
 
 /**
  * @author SgrAlpha
- *
  */
 public final class Preconditions {
 
-	public static final String DEFAULT_ERROR_MESSAGE = "Received an invalid parameter";
+    public static final String DEFAULT_ERROR_MESSAGE = "Received an invalid parameter";
 
-	/**
-	 * Make sure the given object is not null, otherwise an IllegalArgumentException will be thrown
-	 * 
-	 * @param object
-	 *			any object
-	 * @param errorMsg
-	 *			error message
-	 * @throws IllegalArgumentException
-	 *			if the object is null
-	 */
-	public static void notNull(Object object, String errorMsg) {
-		matchRequirement(object != null, errorMsg);
-	}
+    /**
+     * Make sure the given object is not null, otherwise an IllegalArgumentException will be thrown
+     *
+     * @param object
+     *         any object
+     * @param errorMsg
+     *         error message
+     * @throws IllegalArgumentException
+     *         if the object is null
+     */
+    public static void notNull(Object object, String errorMsg) {
+        matchRequirement(object != null, errorMsg);
+    }
 
-	/**
-	 * Make sure the given string is not null or a blank string, otherwise an IllegalArgumentException will be thrown
-	 * 
-	 * @param string
-	 *			any string
-	 * @param errorMsg
-	 *			error message
-	 * @throws IllegalArgumentException
-	 * 			if the string is null or a blank string
-	 */
-	public static void notEmptyString(String string, String errorMsg) {
-		matchRequirement(!isEmptyString(string), errorMsg);
-	}
-	
-	/**
-	 * Check if the specified string is null or blank string
-	 * 
-	 * @param string
-	 *			any string
-	 * @return
-	 * 			Whether or not the given string is an empty string
-	 */
-	public static boolean isEmptyString(String string) {
-		return string == null || string.trim().isEmpty();
-	}
+    /**
+     * Make sure the given string is not null or a blank string, otherwise an IllegalArgumentException will be thrown
+     *
+     * @param string
+     *         any string
+     * @param errorMsg
+     *         error message
+     * @throws IllegalArgumentException
+     *         if the string is null or a blank string
+     */
+    public static void notEmptyString(String string, String errorMsg) {
+        matchRequirement(!isEmptyString(string), errorMsg);
+    }
 
-	private static void matchRequirement(boolean requirements, String errorMsg) {
-		String message = (isEmptyString(errorMsg)) ? DEFAULT_ERROR_MESSAGE : errorMsg;
-		if (!requirements) {
-			throw new IllegalArgumentException(message);
-		}
-	}
+    /**
+     * Check if the specified string is null or blank string
+     *
+     * @param string
+     *         any string
+     * @return Whether or not the given string is an empty string
+     */
+    public static boolean isEmptyString(String string) {
+        return string == null || string.trim().isEmpty();
+    }
+
+    private static void matchRequirement(boolean requirements, String errorMsg) {
+        String message = (isEmptyString(errorMsg)) ? DEFAULT_ERROR_MESSAGE : errorMsg;
+        if (!requirements) {
+            throw new IllegalArgumentException(message);
+        }
+    }
 
 }

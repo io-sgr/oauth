@@ -14,19 +14,19 @@
  * limitations under the License.
  *
  */
+
 package io.sgr.oauth.core.v20;
 
 /**
  * @author SgrAlpha
- *
  */
 public enum GrantType {
-	
-	AUTHORIZATION_CODE,
-	PASSWORD,
-	ASSERTION,
-	REFRESH_TOKEN,
-	NONE,
-	;
+
+    AUTHORIZATION_CODE,
+    PASSWORD,
+    ASSERTION,
+    REFRESH_TOKEN,
+    NONE,
+    ;
 
 }

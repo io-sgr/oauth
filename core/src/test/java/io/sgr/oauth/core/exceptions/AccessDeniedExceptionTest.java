@@ -21,20 +21,22 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
 import io.sgr.oauth.core.v20.OAuthErrorType;
+
 import org.junit.Test;
 
 import java.text.MessageFormat;
 
 public class AccessDeniedExceptionTest {
 
-	@Test(expected = AccessDeniedException.class)
-	public void testBasicMethods() throws AccessDeniedException {
-		final String errorDescription = "Somehow access denied";
-		final AccessDeniedException e = new AccessDeniedException(errorDescription);
-		assertNotNull(e.getError());
-		assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.ACCESS_DENIED.name().toLowerCase(), errorDescription), e.getMessage());
-		assertEquals(OAuthErrorType.ACCESS_DENIED.name().toLowerCase(), e.getError().getName());
-		assertEquals(errorDescription, e.getError().getErrorDescription());
-		throw e;
-	}
+    @Test(expected = AccessDeniedException.class)
+    public void testBasicMethods() throws AccessDeniedException {
+        final String errorDescription = "Somehow access denied";
+        final AccessDeniedException e = new AccessDeniedException(errorDescription);
+        assertNotNull(e.getError());
+        assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.ACCESS_DENIED.name().toLowerCase(), errorDescription), e.getMessage());
+        assertEquals(OAuthErrorType.ACCESS_DENIED.name().toLowerCase(), e.getError().getName());
+        assertEquals(errorDescription, e.getError().getErrorDescription());
+        throw e;
+    }
+
 }

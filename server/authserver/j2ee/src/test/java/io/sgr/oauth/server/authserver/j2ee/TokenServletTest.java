@@ -33,6 +33,7 @@ import io.sgr.oauth.core.v20.OAuthError;
 import io.sgr.oauth.server.authserver.core.AuthorizationServer;
 import io.sgr.oauth.server.authserver.j2ee.dummy.DummyBackend;
 import io.sgr.oauth.server.authserver.j2ee.dummy.DummyTokenServlet;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,89 +50,97 @@ import javax.servlet.http.HttpServletResponse;
 @RunWith(MockitoJUnitRunner.class)
 public class TokenServletTest {
 
-	private DummyTokenServlet servlet;
+    private DummyTokenServlet servlet;
 
-	@Mock
-	private AuthorizationServer mockAuthServer;
-	@Mock
-	private DummyBackend mockBackend;
-	@Mock
-	private HttpServletRequest mockReq;
-	@Mock
-	private HttpServletResponse mockResp;
-	@Mock
-	private OAuthCredential mockCredential;
-	@Mock
-	private PrintWriter mockWriter;
+    @Mock
+    private AuthorizationServer mockAuthServer;
+    @Mock
+    private DummyBackend mockBackend;
+    @Mock
+    private HttpServletRequest mockReq;
+    @Mock
+    private HttpServletResponse mockResp;
+    @Mock
+    private OAuthCredential mockCredential;
+    @Mock
+    private PrintWriter mockWriter;
 
-	@Before
-	public void init() {
-		servlet = new DummyTokenServlet(mockAuthServer, mockBackend);
-	}
+    @Before
+    public void init() {
+        servlet = new DummyTokenServlet(mockAuthServer, mockBackend);
+    }
 
-	@Test
-	public void testGenerateToken()
-			throws ServletException, IOException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException, ServerErrorException, InvalidRequestException, InvalidClientException {
-		when(mockAuthServer.generateToken(any(), any())).thenReturn(mockCredential);
-		when(mockResp.getWriter()).thenReturn(mockWriter);
-		servlet.doPost(mockReq, mockResp);
-		verify(mockWriter, times(1)).write(any(String.class));
-	}
+    @Test
+    public void testGenerateToken()
+            throws ServletException, IOException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException, ServerErrorException,
+            InvalidRequestException, InvalidClientException {
+        when(mockAuthServer.generateToken(any(), any())).thenReturn(mockCredential);
+        when(mockResp.getWriter()).thenReturn(mockWriter);
+        servlet.doPost(mockReq, mockResp);
+        verify(mockWriter, times(1)).write(any(String.class));
+    }
 
-	@Test
-	public void testServerErrorException()
-			throws ServletException, IOException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException, ServerErrorException, InvalidRequestException, InvalidClientException {
-		when(mockAuthServer.generateToken(any(), any())).thenThrow(new ServerErrorException(""));
-		servlet.doPost(mockReq, mockResp);
-		verify(mockBackend, times(1)).onServerError(any(OAuthError.class));
-	}
+    @Test
+    public void testServerErrorException()
+            throws ServletException, IOException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException, ServerErrorException,
+            InvalidRequestException, InvalidClientException {
+        when(mockAuthServer.generateToken(any(), any())).thenThrow(new ServerErrorException(""));
+        servlet.doPost(mockReq, mockResp);
+        verify(mockBackend, times(1)).onServerError(any(OAuthError.class));
+    }
 
-	@Test
-	public void testInvalidClientException()
-			throws ServletException, IOException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException, ServerErrorException, InvalidRequestException, InvalidClientException {
-		when(mockAuthServer.generateToken(any(), any())).thenThrow(new InvalidClientException(""));
-		servlet.doPost(mockReq, mockResp);
-		verify(mockBackend, times(1)).onInvalidClient(any(OAuthError.class));
-	}
+    @Test
+    public void testInvalidClientException()
+            throws ServletException, IOException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException, ServerErrorException,
+            InvalidRequestException, InvalidClientException {
+        when(mockAuthServer.generateToken(any(), any())).thenThrow(new InvalidClientException(""));
+        servlet.doPost(mockReq, mockResp);
+        verify(mockBackend, times(1)).onInvalidClient(any(OAuthError.class));
+    }
 
-	@Test
-	public void testUnsupportedGrantTypeException()
-			throws ServletException, IOException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException, ServerErrorException, InvalidRequestException, InvalidClientException {
-		when(mockAuthServer.generateToken(any(), any())).thenThrow(new UnsupportedGrantTypeException(""));
-		servlet.doPost(mockReq, mockResp);
-		verify(mockBackend, times(1)).onBadTokenRequest(any(OAuthError.class));
-	}
+    @Test
+    public void testUnsupportedGrantTypeException()
+            throws ServletException, IOException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException, ServerErrorException,
+            InvalidRequestException, InvalidClientException {
+        when(mockAuthServer.generateToken(any(), any())).thenThrow(new UnsupportedGrantTypeException(""));
+        servlet.doPost(mockReq, mockResp);
+        verify(mockBackend, times(1)).onBadTokenRequest(any(OAuthError.class));
+    }
 
-	@Test
-	public void testInvalidScopeException()
-			throws ServletException, IOException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException, ServerErrorException, InvalidRequestException, InvalidClientException {
-		when(mockAuthServer.generateToken(any(), any())).thenThrow(new InvalidScopeException(""));
-		servlet.doPost(mockReq, mockResp);
-		verify(mockBackend, times(1)).onBadTokenRequest(any(OAuthError.class));
-	}
+    @Test
+    public void testInvalidScopeException()
+            throws ServletException, IOException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException, ServerErrorException,
+            InvalidRequestException, InvalidClientException {
+        when(mockAuthServer.generateToken(any(), any())).thenThrow(new InvalidScopeException(""));
+        servlet.doPost(mockReq, mockResp);
+        verify(mockBackend, times(1)).onBadTokenRequest(any(OAuthError.class));
+    }
 
-	@Test
-	public void testInvalidGrantException()
-			throws ServletException, IOException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException, ServerErrorException, InvalidRequestException, InvalidClientException {
-		when(mockAuthServer.generateToken(any(), any())).thenThrow(new InvalidGrantException(""));
-		servlet.doPost(mockReq, mockResp);
-		verify(mockBackend, times(1)).onBadTokenRequest(any(OAuthError.class));
-	}
+    @Test
+    public void testInvalidGrantException()
+            throws ServletException, IOException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException, ServerErrorException,
+            InvalidRequestException, InvalidClientException {
+        when(mockAuthServer.generateToken(any(), any())).thenThrow(new InvalidGrantException(""));
+        servlet.doPost(mockReq, mockResp);
+        verify(mockBackend, times(1)).onBadTokenRequest(any(OAuthError.class));
+    }
 
-	@Test
-	public void testInvalidRequestException()
-			throws ServletException, IOException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException, ServerErrorException, InvalidRequestException, InvalidClientException {
-		when(mockAuthServer.generateToken(any(), any())).thenThrow(new InvalidRequestException(""));
-		servlet.doPost(mockReq, mockResp);
-		verify(mockBackend, times(1)).onBadTokenRequest(any(OAuthError.class));
-	}
+    @Test
+    public void testInvalidRequestException()
+            throws ServletException, IOException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException, ServerErrorException,
+            InvalidRequestException, InvalidClientException {
+        when(mockAuthServer.generateToken(any(), any())).thenThrow(new InvalidRequestException(""));
+        servlet.doPost(mockReq, mockResp);
+        verify(mockBackend, times(1)).onBadTokenRequest(any(OAuthError.class));
+    }
 
-	@Test
-	public void testGeneratedNull()
-			throws ServletException, IOException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException, ServerErrorException, InvalidRequestException, InvalidClientException {
-		when(mockAuthServer.generateToken(any(), any())).thenReturn(null);
-		servlet.doPost(mockReq, mockResp);
-		verify(mockBackend, times(1)).onServerError(any(OAuthError.class));
-	}
+    @Test
+    public void testGeneratedNull()
+            throws ServletException, IOException, InvalidGrantException, InvalidScopeException, UnsupportedGrantTypeException, ServerErrorException,
+            InvalidRequestException, InvalidClientException {
+        when(mockAuthServer.generateToken(any(), any())).thenReturn(null);
+        servlet.doPost(mockReq, mockResp);
+        verify(mockBackend, times(1)).onServerError(any(OAuthError.class));
+    }
 
 }

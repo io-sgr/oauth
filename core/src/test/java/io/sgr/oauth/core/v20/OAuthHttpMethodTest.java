@@ -23,8 +23,9 @@ import org.junit.Test;
 
 public class OAuthHttpMethodTest {
 
-	@Test
-	public void simple() {
-		assertEquals(5, OAuthHttpMethod.values().length);
-	}
+    @Test
+    public void simple() {
+        assertEquals(5, OAuthHttpMethod.values().length);
+    }
+
 }

@@ -1,7 +1,7 @@
 {
-	"client_id": "",
-	"client_secret": "",
-	"auth_uri": "https://accounts.google.com/o/oauth2/v2/auth",
-	"token_uri": "https://www.googleapis.com/oauth2/v4/token",
-	"revoke_uri": "https://www.googleapis.com/oauth2/revoke"
+  "client_id": "",
+  "client_secret": "",
+  "auth_uri": "https://accounts.google.com/o/oauth2/v2/auth",
+  "token_uri": "https://www.googleapis.com/oauth2/v4/token",
+  "revoke_uri": "https://www.googleapis.com/oauth2/revoke"
 }

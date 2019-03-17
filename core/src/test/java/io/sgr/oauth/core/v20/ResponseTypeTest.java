@@ -23,8 +23,9 @@ import org.junit.Test;
 
 public class ResponseTypeTest {
 
-	@Test
-	public void simple() {
-		assertEquals(3, ResponseType.values().length);
-	}
+    @Test
+    public void simple() {
+        assertEquals(3, ResponseType.values().length);
+    }
+
 }

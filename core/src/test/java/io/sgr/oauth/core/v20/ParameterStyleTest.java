@@ -23,8 +23,9 @@ import org.junit.Test;
 
 public class ParameterStyleTest {
 
-	@Test
-	public void simple() {
-		assertEquals(2, ParameterStyle.values().length);
-	}
+    @Test
+    public void simple() {
+        assertEquals(2, ParameterStyle.values().length);
+    }
+
 }

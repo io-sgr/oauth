@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package io.sgr.oauth.core.utils;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -25,35 +26,34 @@ import java.util.Locale;
 
 /**
  * @author SgrAlpha
- *
  */
 public class JsonUtil {
 
-	private static final DateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy", Locale.US);
-	
-	private static final JsonFactory JSON_FACTORY = new JsonFactory();
-	
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(JSON_FACTORY);
+    private static final DateFormat DEFAULT_DATE_FORMAT = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy", Locale.US);
 
-	/**
-	 * @return the defaultDateFormat
-	 */
-	public static DateFormat getDefaultDateFormat() {
-		return DEFAULT_DATE_FORMAT;
-	}
+    private static final JsonFactory JSON_FACTORY = new JsonFactory();
 
-	/**
-	 * @return the jsonFactory
-	 */
-	public static JsonFactory getJsonFactory() {
-		return JSON_FACTORY;
-	}
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper(JSON_FACTORY);
 
-	/**
-	 * @return the objectMapper
-	 */
-	public static ObjectMapper getObjectMapper() {
-		return OBJECT_MAPPER;
-	}
+    /**
+     * @return the defaultDateFormat
+     */
+    public static DateFormat getDefaultDateFormat() {
+        return DEFAULT_DATE_FORMAT;
+    }
+
+    /**
+     * @return the jsonFactory
+     */
+    public static JsonFactory getJsonFactory() {
+        return JSON_FACTORY;
+    }
+
+    /**
+     * @return the objectMapper
+     */
+    public static ObjectMapper getObjectMapper() {
+        return OBJECT_MAPPER;
+    }
 
 }

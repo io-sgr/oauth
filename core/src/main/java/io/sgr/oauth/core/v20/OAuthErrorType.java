@@ -21,35 +21,35 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum OAuthErrorType {
 
-	@JsonProperty("invalid_request")
-	INVALID_REQUEST,
+    @JsonProperty("invalid_request")
+    INVALID_REQUEST,
 
-	@JsonProperty("invalid_scope")
-	INVALID_SCOPE,
+    @JsonProperty("invalid_scope")
+    INVALID_SCOPE,
 
-	@JsonProperty("unauthorized_client")
-	UNAUTHORIZED_CLIENT,
+    @JsonProperty("unauthorized_client")
+    UNAUTHORIZED_CLIENT,
 
-	@JsonProperty("invalid_client")
-	INVALID_CLIENT,
+    @JsonProperty("invalid_client")
+    INVALID_CLIENT,
 
-	@JsonProperty("unsupported_response_type")
-	UNSUPPORTED_RESPONSE_TYPE,
+    @JsonProperty("unsupported_response_type")
+    UNSUPPORTED_RESPONSE_TYPE,
 
-	@JsonProperty("invalid_grant")
-	INVALID_GRANT,
+    @JsonProperty("invalid_grant")
+    INVALID_GRANT,
 
-	@JsonProperty("unsupported_grant_type")
-	UNSUPPORTED_GRANT_TYPE,
+    @JsonProperty("unsupported_grant_type")
+    UNSUPPORTED_GRANT_TYPE,
 
-	@JsonProperty("access_denied")
-	ACCESS_DENIED,
+    @JsonProperty("access_denied")
+    ACCESS_DENIED,
 
-	@JsonProperty("server_error")
-	SERVER_ERROR,
+    @JsonProperty("server_error")
+    SERVER_ERROR,
 
-	@JsonProperty("temporarily_unavailable")
-	TEMPORARILY_UNAVAILABLE,
+    @JsonProperty("temporarily_unavailable")
+    TEMPORARILY_UNAVAILABLE,
 
-	;
+    ;
 }

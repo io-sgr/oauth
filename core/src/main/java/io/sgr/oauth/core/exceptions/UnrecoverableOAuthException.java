@@ -14,27 +14,37 @@
  * limitations under the License.
  *
  */
+
 package io.sgr.oauth.core.exceptions;
 
 import io.sgr.oauth.core.v20.OAuthError;
 
 /**
  * @author SgrAlpha
- *
  */
 public class UnrecoverableOAuthException extends OAuthException {
 
-	/**
-	 * @param error
-	 * 				The OAuth error
-	 */
-	public UnrecoverableOAuthException(OAuthError error) {
-		super(error);
-	}
+    /**
+     * @param error
+     *         The OAuth error
+     */
+    public UnrecoverableOAuthException(OAuthError error) {
+        super(error);
+    }
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1650389290357723834L;
+    /**
+     * @param error
+     *         The OAuth error
+     * @param cause
+     *         The root cause
+     */
+    public UnrecoverableOAuthException(final OAuthError error, final Throwable cause) {
+        super(error, cause);
+    }
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = -1650389290357723834L;
 
 }

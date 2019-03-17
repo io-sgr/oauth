@@ -33,50 +33,52 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet
 public class DummyAuthServlet extends GenericOAuthV2AuthServlet {
 
-	private AuthorizationServer authServer;
-	private DummyBackend backend;
+    private AuthorizationServer authServer;
+    private DummyBackend backend;
 
-	public DummyAuthServlet(final AuthorizationServer authServer, final DummyBackend backend) {
-		this.authServer = authServer;
-		this.backend = backend;
-	}
+    public DummyAuthServlet(final AuthorizationServer authServer, final DummyBackend backend) {
+        this.authServer = authServer;
+        this.backend = backend;
+    }
 
-	@Override
-	protected String getCurrentUserId(final HttpServletRequest req, final HttpServletResponse resp) {
-		return backend.getCurrentUserId();
-	}
+    @Override
+    protected String getCurrentUserId(final HttpServletRequest req, final HttpServletResponse resp) {
+        return backend.getCurrentUserId();
+    }
 
-	@Override protected Locale getUserLocale(final HttpServletRequest req, final HttpServletResponse resp) {
-		return backend.getUserLocale();
-	}
+    @Override
+    protected Locale getUserLocale(final HttpServletRequest req, final HttpServletResponse resp) {
+        return backend.getUserLocale();
+    }
 
-	@Override
-	protected void onUserNotSignedIn(final HttpServletRequest req, final HttpServletResponse resp) {
-		backend.onUserNotSignedIn();
-	}
+    @Override
+    protected void onUserNotSignedIn(final HttpServletRequest req, final HttpServletResponse resp) {
+        backend.onUserNotSignedIn();
+    }
 
-	@Override
-	protected void onBadOAuthRequest(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) {
-		backend.onBadOAuthRequest(error);
-	}
+    @Override
+    protected void onBadOAuthRequest(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) {
+        backend.onBadOAuthRequest(error);
+    }
 
-	@Override
-	protected void onInvalidClient(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-		backend.onInvalidClient(error);
-	}
+    @Override
+    protected void onInvalidClient(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+        backend.onInvalidClient(error);
+    }
 
-	@Override
-	protected void onServerError(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) {
-		backend.onServerError(error);
-	}
+    @Override
+    protected void onServerError(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) {
+        backend.onServerError(error);
+    }
 
-	@Override
-	protected void displayUserAuthorizePage(final AuthorizationDetail authDetail, final HttpServletRequest req, final HttpServletResponse resp) {
-		backend.displayUserAuthorizePage(authDetail);
-	}
+    @Override
+    protected void displayUserAuthorizePage(final AuthorizationDetail authDetail, final HttpServletRequest req, final HttpServletResponse resp) {
+        backend.displayUserAuthorizePage(authDetail);
+    }
 
-	@Override protected AuthorizationServer getAuthorizationServer() {
-		return authServer;
-	}
+    @Override
+    protected AuthorizationServer getAuthorizationServer() {
+        return authServer;
+    }
 
 }

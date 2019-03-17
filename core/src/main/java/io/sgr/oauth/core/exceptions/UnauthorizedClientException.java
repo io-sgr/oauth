@@ -22,11 +22,12 @@ import io.sgr.oauth.core.v20.OAuthErrorType;
 
 public class UnauthorizedClientException extends UnrecoverableOAuthException {
 
-	/**
-	 * @param errorDescription The error description
-	 */
-	public UnauthorizedClientException(final String errorDescription) {
-		super(new OAuthError(OAuthErrorType.UNAUTHORIZED_CLIENT.name().toLowerCase(), errorDescription));
-	}
+    /**
+     * @param errorDescription
+     *         The error description
+     */
+    public UnauthorizedClientException(final String errorDescription) {
+        super(new OAuthError(OAuthErrorType.UNAUTHORIZED_CLIENT.name().toLowerCase(), errorDescription));
+    }
 
 }

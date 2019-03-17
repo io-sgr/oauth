@@ -14,17 +14,17 @@
  * limitations under the License.
  *
  */
+
 package io.sgr.oauth.core.v20;
 
 /**
  * @author SgrAlpha
- *
  */
 public enum ResponseType {
-	
-	CODE,
-	TOKEN,
-	CODE_AND_TOKEN,
-	;
+
+    CODE,
+    TOKEN,
+    CODE_AND_TOKEN,
+    ;
 
 }

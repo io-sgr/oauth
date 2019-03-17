@@ -21,20 +21,22 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
 import io.sgr.oauth.core.v20.OAuthErrorType;
+
 import org.junit.Test;
 
 import java.text.MessageFormat;
 
 public class UnauthorizedClientExceptionTest {
 
-	@Test(expected = UnauthorizedClientException.class)
-	public void testBasicMethods() throws UnauthorizedClientException {
-		final String errorDescription = "Unauthorized client";
-		final UnauthorizedClientException e = new UnauthorizedClientException(errorDescription);
-		assertNotNull(e.getError());
-		assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.UNAUTHORIZED_CLIENT.name().toLowerCase(), errorDescription), e.getMessage());
-		assertEquals(OAuthErrorType.UNAUTHORIZED_CLIENT.name().toLowerCase(), e.getError().getName());
-		assertEquals(errorDescription, e.getError().getErrorDescription());
-		throw e;
-	}
+    @Test(expected = UnauthorizedClientException.class)
+    public void testBasicMethods() throws UnauthorizedClientException {
+        final String errorDescription = "Unauthorized client";
+        final UnauthorizedClientException e = new UnauthorizedClientException(errorDescription);
+        assertNotNull(e.getError());
+        assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.UNAUTHORIZED_CLIENT.name().toLowerCase(), errorDescription), e.getMessage());
+        assertEquals(OAuthErrorType.UNAUTHORIZED_CLIENT.name().toLowerCase(), e.getError().getName());
+        assertEquals(errorDescription, e.getError().getErrorDescription());
+        throw e;
+    }
+
 }

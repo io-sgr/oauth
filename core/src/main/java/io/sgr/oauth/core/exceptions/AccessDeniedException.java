@@ -22,11 +22,12 @@ import io.sgr.oauth.core.v20.OAuthErrorType;
 
 public class AccessDeniedException extends UnrecoverableOAuthException {
 
-	/**
-	 * @param errorDescription The error description
-	 */
-	public AccessDeniedException(final String errorDescription) {
-		super(new OAuthError(OAuthErrorType.ACCESS_DENIED.name().toLowerCase(), errorDescription));
-	}
+    /**
+     * @param errorDescription
+     *         The error description
+     */
+    public AccessDeniedException(final String errorDescription) {
+        super(new OAuthError(OAuthErrorType.ACCESS_DENIED.name().toLowerCase(), errorDescription));
+    }
 
 }

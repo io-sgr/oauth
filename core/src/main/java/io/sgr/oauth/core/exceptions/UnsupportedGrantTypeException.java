@@ -22,11 +22,12 @@ import io.sgr.oauth.core.v20.OAuthErrorType;
 
 public class UnsupportedGrantTypeException extends UnrecoverableOAuthException {
 
-	/**
-	 * @param errorDescription The error description
-	 */
-	public UnsupportedGrantTypeException(final String errorDescription) {
-		super(new OAuthError(OAuthErrorType.UNSUPPORTED_GRANT_TYPE.name().toLowerCase(), errorDescription));
-	}
+    /**
+     * @param errorDescription
+     *         The error description
+     */
+    public UnsupportedGrantTypeException(final String errorDescription) {
+        super(new OAuthError(OAuthErrorType.UNSUPPORTED_GRANT_TYPE.name().toLowerCase(), errorDescription));
+    }
 
 }

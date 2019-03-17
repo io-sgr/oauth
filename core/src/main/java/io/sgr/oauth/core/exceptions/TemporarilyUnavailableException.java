@@ -22,11 +22,12 @@ import io.sgr.oauth.core.v20.OAuthErrorType;
 
 public class TemporarilyUnavailableException extends RecoverableOAuthException {
 
-	/**
-	 * @param errorDescription The error description
-	 */
-	public TemporarilyUnavailableException(final String errorDescription) {
-		super(new OAuthError(OAuthErrorType.TEMPORARILY_UNAVAILABLE.name().toLowerCase(), errorDescription));
-	}
+    /**
+     * @param errorDescription
+     *         The error description
+     */
+    public TemporarilyUnavailableException(final String errorDescription) {
+        super(new OAuthError(OAuthErrorType.TEMPORARILY_UNAVAILABLE.name().toLowerCase(), errorDescription));
+    }
 
 }

@@ -22,11 +22,12 @@ import io.sgr.oauth.core.v20.OAuthErrorType;
 
 public class ServerErrorException extends RecoverableOAuthException {
 
-	/**
-	 * @param errorDescription The error description
-	 */
-	public ServerErrorException(final String errorDescription) {
-		super(new OAuthError(OAuthErrorType.SERVER_ERROR.name().toLowerCase(), errorDescription));
-	}
+    /**
+     * @param errorDescription
+     *         The error description
+     */
+    public ServerErrorException(final String errorDescription) {
+        super(new OAuthError(OAuthErrorType.SERVER_ERROR.name().toLowerCase(), errorDescription));
+    }
 
 }

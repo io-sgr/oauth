@@ -29,30 +29,33 @@ import javax.servlet.http.HttpServletResponse;
 
 public class DummyTokenServlet extends GenericOAuthV2TokenServlet {
 
-	private final AuthorizationServer authServer;
-	private final DummyBackend backend;
+    private final AuthorizationServer authServer;
+    private final DummyBackend backend;
 
-	public DummyTokenServlet(final AuthorizationServer authServer, final DummyBackend backend) {
-		this.authServer = authServer;
-		this.backend = backend;
-	}
+    public DummyTokenServlet(final AuthorizationServer authServer, final DummyBackend backend) {
+        this.authServer = authServer;
+        this.backend = backend;
+    }
 
-	@Override
-	protected void onBadTokenRequest(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-		backend.onBadTokenRequest(error);
-	}
+    @Override
+    protected void onBadTokenRequest(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException {
+        backend.onBadTokenRequest(error);
+    }
 
-	@Override
-	protected void onInvalidClient(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-		backend.onInvalidClient(error);
-	}
+    @Override
+    protected void onInvalidClient(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+        backend.onInvalidClient(error);
+    }
 
-	@Override
-	protected void onServerError(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-		backend.onServerError(error);
-	}
+    @Override
+    protected void onServerError(final OAuthError error, final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+        backend.onServerError(error);
+    }
 
-	@Override protected AuthorizationServer getAuthorizationServer() {
-		return authServer;
-	}
+    @Override
+    protected AuthorizationServer getAuthorizationServer() {
+        return authServer;
+    }
+
 }

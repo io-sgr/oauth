@@ -21,20 +21,22 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
 import io.sgr.oauth.core.v20.OAuthErrorType;
+
 import org.junit.Test;
 
 import java.text.MessageFormat;
 
 public class InvalidGrantExceptionTest {
 
-	@Test(expected = InvalidGrantException.class)
-	public void testBasicMethods() throws InvalidGrantException {
-		final String errorDescription = "Invalid grant";
-		final InvalidGrantException e = new InvalidGrantException(errorDescription);
-		assertNotNull(e.getError());
-		assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.INVALID_GRANT.name().toLowerCase(), errorDescription), e.getMessage());
-		assertEquals(OAuthErrorType.INVALID_GRANT.name().toLowerCase(), e.getError().getName());
-		assertEquals(errorDescription, e.getError().getErrorDescription());
-		throw e;
-	}
+    @Test(expected = InvalidGrantException.class)
+    public void testBasicMethods() throws InvalidGrantException {
+        final String errorDescription = "Invalid grant";
+        final InvalidGrantException e = new InvalidGrantException(errorDescription);
+        assertNotNull(e.getError());
+        assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.INVALID_GRANT.name().toLowerCase(), errorDescription), e.getMessage());
+        assertEquals(OAuthErrorType.INVALID_GRANT.name().toLowerCase(), e.getError().getName());
+        assertEquals(errorDescription, e.getError().getErrorDescription());
+        throw e;
+    }
+
 }

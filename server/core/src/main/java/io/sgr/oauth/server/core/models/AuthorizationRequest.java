@@ -32,72 +32,78 @@ import java.util.Optional;
 
 public class AuthorizationRequest implements Serializable {
 
-	private final ResponseType responseType;
-	private final String clientId;
-	private final String redirectUri;
-	private final List<String> scopes;
-	private final String state;
+    private final ResponseType responseType;
+    private final String clientId;
+    private final String redirectUri;
+    private final List<String> scopes;
+    private final String state;
 
-	/**
-	 * @param responseType The response type
-	 * @param clientId     The client ID
-	 * @param redirectUri  The redirect URI
-	 * @param scopes       The scopes
-	 * @param state        The state
-	 */
-	public AuthorizationRequest(
-			final ResponseType responseType, final String clientId, final String redirectUri, final List<String> scopes,
-			final String state) {
-		notNull(responseType, "Missing response type");
-		this.responseType = responseType;
-		notEmptyString(clientId, "Missing client ID");
-		this.clientId = clientId;
-		notEmptyString(redirectUri, "Missing redirect URI");
-		try {
-			this.redirectUri = URLDecoder.decode(redirectUri, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
-		notNull(scopes, "Missing scopes");
-		if (scopes.isEmpty()) {
-			throw new IllegalArgumentException("Missing scopes");
-		}
-		this.scopes = scopes;
-		this.state = isEmptyString(state) ? null : state;
-	}
+    /**
+     * @param responseType
+     *         The response type
+     * @param clientId
+     *         The client ID
+     * @param redirectUri
+     *         The redirect URI
+     * @param scopes
+     *         The scopes
+     * @param state
+     *         The state
+     */
+    public AuthorizationRequest(
+            final ResponseType responseType, final String clientId, final String redirectUri, final List<String> scopes,
+            final String state) {
+        notNull(responseType, "Missing response type");
+        this.responseType = responseType;
+        notEmptyString(clientId, "Missing client ID");
+        this.clientId = clientId;
+        notEmptyString(redirectUri, "Missing redirect URI");
+        try {
+            this.redirectUri = URLDecoder.decode(redirectUri, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+        notNull(scopes, "Missing scopes");
+        if (scopes.isEmpty()) {
+            throw new IllegalArgumentException("Missing scopes");
+        }
+        this.scopes = scopes;
+        this.state = isEmptyString(state) ? null : state;
+    }
 
-	/**
-	 * @return The response type
-	 */
-	public ResponseType getResponseType() {
-		return responseType;
-	}
+    /**
+     * @return The response type
+     */
+    public ResponseType getResponseType() {
+        return responseType;
+    }
 
-	/**
-	 * @return The client ID
-	 */
-	public String getClientId() {
-		return clientId;
-	}
+    /**
+     * @return The client ID
+     */
+    public String getClientId() {
+        return clientId;
+    }
 
-	/**
-	 * @return The redirect URI
-	 */
-	public String getRedirectUri() {
-		return redirectUri;
-	}
+    /**
+     * @return The redirect URI
+     */
+    public String getRedirectUri() {
+        return redirectUri;
+    }
 
-	/**
-	 * @return The scopes
-	 */
-	public List<String> getScopes() {
-		return Collections.unmodifiableList(scopes);
-	}
+    /**
+     * @return The scopes
+     */
+    public List<String> getScopes() {
+        return Collections.unmodifiableList(scopes);
+    }
 
-	/**
-	 * @return The state
-	 */
-	public Optional<String> getState() {
-		return Optional.ofNullable(state);
-	}
+    /**
+     * @return The state
+     */
+    public Optional<String> getState() {
+        return Optional.ofNullable(state);
+    }
+
 }

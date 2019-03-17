@@ -14,10 +14,12 @@
  * limitations under the License.
  *
  */
+
 package io.sgr.oauth.client.core;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.sgr.oauth.core.utils.JsonUtil;
 
 import java.io.IOException;
@@ -26,89 +28,86 @@ import java.io.Serializable;
 
 /**
  * @author SgrAlpha
- *
  */
 public class OAuthClientConfig implements Serializable {
-	
-	public final String clientId;
-	public final String clientSecret;
-	public final String authUri;
-	public final String tokenUri;
-	public final String revokeUri;
-	
-	/**
-	 * @param clientId
-	 * 				The client it
-	 * @param clientSecret
-	 * 				The client secret
-	 * @param authUri
-	 * 				The URI for OAuth authentication
-	 * @param tokenUri
-	 * 				The URI to get OAuth token
-	 * @param revokeUri
-	 * 				The URI to revoke a token
-	 */
-	@JsonCreator
-	public OAuthClientConfig(
-			@JsonProperty("client_id") String clientId,
-			@JsonProperty("client_secret") String clientSecret,
-			@JsonProperty("auth_uri") String authUri,
-			@JsonProperty("token_uri") String tokenUri,
-			@JsonProperty("revoke_uri") String revokeUri
-			) {
-		this.clientId = clientId;
-		this.clientSecret = clientSecret;
-		this.authUri = authUri;
-		this.tokenUri = tokenUri;
-		this.revokeUri = revokeUri;
-	}
-	
-	/**
-	 * @param file
-	 * 			The relative file name in class path to load GenericClientSecret from 
-	 * @return
-	 * 			The GenericClientSecret parsed from the specified file
-	 * @throws IOException
-	 * 			Failed to read from the specified file
-	 */
-	public static final OAuthClientConfig readFromClasspath(String file) throws IOException {
-		try (
-				InputStream in = OAuthClientConfig.class.getClassLoader().getResourceAsStream(file);
-				) {
-			return readFrom(in);
-		} finally {
-			
-		}
-	}
-	
-	/**
-	 * @param in
-	 * 			The input stream to read GenericClientSecret from
-	 * @return
-	 * 			The GenericClientSecret parsed from the specified file
-	 * @throws IOException
-	 * 			Failed to read from the specified file
-	 */
-	public static final OAuthClientConfig readFrom(InputStream in) throws IOException {
-		return JsonUtil.getObjectMapper().readValue(in, OAuthClientConfig.class);
-	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		try {
-			return JsonUtil.getObjectMapper().writeValueAsString(this);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return "";
-	}
+    public final String clientId;
+    public final String clientSecret;
+    public final String authUri;
+    public final String tokenUri;
+    public final String revokeUri;
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7860561832133384705L;
+    /**
+     * @param clientId
+     *         The client it
+     * @param clientSecret
+     *         The client secret
+     * @param authUri
+     *         The URI for OAuth authentication
+     * @param tokenUri
+     *         The URI to get OAuth token
+     * @param revokeUri
+     *         The URI to revoke a token
+     */
+    @JsonCreator
+    public OAuthClientConfig(
+            @JsonProperty("client_id") String clientId,
+            @JsonProperty("client_secret") String clientSecret,
+            @JsonProperty("auth_uri") String authUri,
+            @JsonProperty("token_uri") String tokenUri,
+            @JsonProperty("revoke_uri") String revokeUri
+    ) {
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
+        this.authUri = authUri;
+        this.tokenUri = tokenUri;
+        this.revokeUri = revokeUri;
+    }
+
+    /**
+     * @param file
+     *         The relative file name in class path to load GenericClientSecret from
+     * @return The GenericClientSecret parsed from the specified file
+     * @throws IOException
+     *         Failed to read from the specified file
+     */
+    public static final OAuthClientConfig readFromClasspath(String file) throws IOException {
+        try (
+                InputStream in = OAuthClientConfig.class.getClassLoader().getResourceAsStream(file);
+        ) {
+            return readFrom(in);
+        } finally {
+
+        }
+    }
+
+    /**
+     * @param in
+     *         The input stream to read GenericClientSecret from
+     * @return The GenericClientSecret parsed from the specified file
+     * @throws IOException
+     *         Failed to read from the specified file
+     */
+    public static final OAuthClientConfig readFrom(InputStream in) throws IOException {
+        return JsonUtil.getObjectMapper().readValue(in, OAuthClientConfig.class);
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        try {
+            return JsonUtil.getObjectMapper().writeValueAsString(this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 7860561832133384705L;
 
 }

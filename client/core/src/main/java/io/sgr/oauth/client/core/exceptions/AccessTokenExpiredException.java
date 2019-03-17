@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package io.sgr.oauth.client.core.exceptions;
 
 import io.sgr.oauth.core.exceptions.UnrecoverableOAuthException;
@@ -21,17 +22,16 @@ import io.sgr.oauth.core.v20.OAuthError;
 
 /**
  * @author SgrAlpha
- *
  */
 public class AccessTokenExpiredException extends UnrecoverableOAuthException {
 
-	public AccessTokenExpiredException() {
-		super(new OAuthError("access_token_expired", "The access token already expired."));
-	}
+    public AccessTokenExpiredException() {
+        super(new OAuthError("access_token_expired", "The access token already expired."));
+    }
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -6840095992772525895L;
-	
+    /**
+     *
+     */
+    private static final long serialVersionUID = -6840095992772525895L;
+
 }

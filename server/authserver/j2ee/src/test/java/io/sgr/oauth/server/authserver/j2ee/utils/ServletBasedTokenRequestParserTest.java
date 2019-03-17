@@ -26,6 +26,7 @@ import io.sgr.oauth.core.exceptions.UnsupportedGrantTypeException;
 import io.sgr.oauth.core.v20.GrantType;
 import io.sgr.oauth.core.v20.OAuth20;
 import io.sgr.oauth.server.core.models.TokenRequest;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -38,49 +39,49 @@ import javax.servlet.http.HttpServletRequest;
 @RunWith(MockitoJUnitRunner.class)
 public class ServletBasedTokenRequestParserTest {
 
-	private static final ServletBasedTokenRequestParser PARSER = ServletBasedTokenRequestParser.instance();
+    private static final ServletBasedTokenRequestParser PARSER = ServletBasedTokenRequestParser.instance();
 
-	@Mock
-	private HttpServletRequest mockReq;
+    @Mock
+    private HttpServletRequest mockReq;
 
-	@Test
-	public void testParse() throws InvalidRequestException, UnsupportedGrantTypeException {
-		final String grantType = GrantType.ASSERTION.name();
-		final String clientId = UUID.randomUUID().toString();
-		final String clientSecret = UUID.randomUUID().toString();
-		final String redirectUri = "http://localhost/callback";
-		when(mockReq.getParameterValues(OAuth20.OAUTH_GRANT_TYPE)).thenReturn(new String[] { grantType });
-		when(mockReq.getParameter(OAuth20.OAUTH_GRANT_TYPE)).thenReturn(grantType);
-		when(mockReq.getParameterValues(OAuth20.OAUTH_CLIENT_ID)).thenReturn(new String[] { clientId });
-		when(mockReq.getParameter(OAuth20.OAUTH_CLIENT_ID)).thenReturn(clientId);
-		when(mockReq.getParameterValues(OAuth20.OAUTH_CLIENT_SECRET)).thenReturn(new String[] { clientSecret });
-		when(mockReq.getParameter(OAuth20.OAUTH_CLIENT_SECRET)).thenReturn(clientSecret);
-		when(mockReq.getParameterValues(OAuth20.OAUTH_REDIRECT_URI)).thenReturn(new String[] { redirectUri });
-		when(mockReq.getParameter(OAuth20.OAUTH_REDIRECT_URI)).thenReturn(redirectUri);
-		final TokenRequest req = PARSER.parse(mockReq);
-		assertNotNull(req);
-		assertEquals(GrantType.ASSERTION, req.getGrantType());
-		assertEquals(clientId, req.getClientId());
-		assertEquals(clientSecret, req.getClientSecret());
-		assertEquals(redirectUri, req.getRedirectUri());
-	}
+    @Test
+    public void testParse() throws InvalidRequestException, UnsupportedGrantTypeException {
+        final String grantType = GrantType.ASSERTION.name();
+        final String clientId = UUID.randomUUID().toString();
+        final String clientSecret = UUID.randomUUID().toString();
+        final String redirectUri = "http://localhost/callback";
+        when(mockReq.getParameterValues(OAuth20.OAUTH_GRANT_TYPE)).thenReturn(new String[] {grantType});
+        when(mockReq.getParameter(OAuth20.OAUTH_GRANT_TYPE)).thenReturn(grantType);
+        when(mockReq.getParameterValues(OAuth20.OAUTH_CLIENT_ID)).thenReturn(new String[] {clientId});
+        when(mockReq.getParameter(OAuth20.OAUTH_CLIENT_ID)).thenReturn(clientId);
+        when(mockReq.getParameterValues(OAuth20.OAUTH_CLIENT_SECRET)).thenReturn(new String[] {clientSecret});
+        when(mockReq.getParameter(OAuth20.OAUTH_CLIENT_SECRET)).thenReturn(clientSecret);
+        when(mockReq.getParameterValues(OAuth20.OAUTH_REDIRECT_URI)).thenReturn(new String[] {redirectUri});
+        when(mockReq.getParameter(OAuth20.OAUTH_REDIRECT_URI)).thenReturn(redirectUri);
+        final TokenRequest req = PARSER.parse(mockReq);
+        assertNotNull(req);
+        assertEquals(GrantType.ASSERTION, req.getGrantType());
+        assertEquals(clientId, req.getClientId());
+        assertEquals(clientSecret, req.getClientSecret());
+        assertEquals(redirectUri, req.getRedirectUri());
+    }
 
-	@Test(expected = UnsupportedGrantTypeException.class)
-	public void testParseWithUnsupportedGrantType() throws InvalidRequestException, UnsupportedGrantTypeException {
-		final String respType = "abc";
-		when(mockReq.getParameterValues(OAuth20.OAUTH_GRANT_TYPE)).thenReturn(new String[] { respType });
-		when(mockReq.getParameter(OAuth20.OAUTH_GRANT_TYPE)).thenReturn(respType);
-		PARSER.parse(mockReq);
-	}
+    @Test(expected = UnsupportedGrantTypeException.class)
+    public void testParseWithUnsupportedGrantType() throws InvalidRequestException, UnsupportedGrantTypeException {
+        final String respType = "abc";
+        when(mockReq.getParameterValues(OAuth20.OAUTH_GRANT_TYPE)).thenReturn(new String[] {respType});
+        when(mockReq.getParameter(OAuth20.OAUTH_GRANT_TYPE)).thenReturn(respType);
+        PARSER.parse(mockReq);
+    }
 
-	@Test(expected = InvalidRequestException.class)
-	public void testParseFromBlank() throws InvalidRequestException, UnsupportedGrantTypeException {
-		PARSER.parse(mockReq);
-	}
+    @Test(expected = InvalidRequestException.class)
+    public void testParseFromBlank() throws InvalidRequestException, UnsupportedGrantTypeException {
+        PARSER.parse(mockReq);
+    }
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testParseFromNull() throws InvalidRequestException, UnsupportedGrantTypeException {
-		PARSER.parse(null);
-	}
+    @Test(expected = IllegalArgumentException.class)
+    public void testParseFromNull() throws InvalidRequestException, UnsupportedGrantTypeException {
+        PARSER.parse(null);
+    }
 
 }

@@ -24,5 +24,6 @@ import io.sgr.oauth.server.core.models.TokenRequest;
 
 public interface TokenRequestParser<T> {
 
-	TokenRequest parse(T from) throws InvalidRequestException, InvalidGrantException, UnsupportedGrantTypeException;
+    TokenRequest parse(T from) throws InvalidRequestException, InvalidGrantException, UnsupportedGrantTypeException;
+
 }

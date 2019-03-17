@@ -25,38 +25,39 @@ import java.util.Collection;
 
 public class AccessDefinition implements Serializable {
 
-	private final String clientId;
-	private final String userId;
-	private final Collection<ScopeDefinition> scopes;
-	private final String redirectUri;
+    private final String clientId;
+    private final String userId;
+    private final Collection<ScopeDefinition> scopes;
+    private final String redirectUri;
 
-	public AccessDefinition(final String clientId, final String userId, final Collection<ScopeDefinition> scopes, final String redirectUri) {
-		notEmptyString(clientId, "Client ID needs to be specified");
-		this.clientId = clientId;
-		notEmptyString(userId, "User ID needs to be specified");
-		this.userId = userId;
-		notNull(scopes, "Scopes needs to be specified");
-		if (scopes.isEmpty()) {
-			throw new IllegalArgumentException("Scopes needs to be specified");
-		}
-		this.scopes = scopes;
-		notEmptyString(redirectUri, "Redirect URI needs to be specified");
-		this.redirectUri = redirectUri;
-	}
+    public AccessDefinition(final String clientId, final String userId, final Collection<ScopeDefinition> scopes, final String redirectUri) {
+        notEmptyString(clientId, "Client ID needs to be specified");
+        this.clientId = clientId;
+        notEmptyString(userId, "User ID needs to be specified");
+        this.userId = userId;
+        notNull(scopes, "Scopes needs to be specified");
+        if (scopes.isEmpty()) {
+            throw new IllegalArgumentException("Scopes needs to be specified");
+        }
+        this.scopes = scopes;
+        notEmptyString(redirectUri, "Redirect URI needs to be specified");
+        this.redirectUri = redirectUri;
+    }
 
-	public String getClientId() {
-		return clientId;
-	}
+    public String getClientId() {
+        return clientId;
+    }
 
-	public String getUserId() {
-		return userId;
-	}
+    public String getUserId() {
+        return userId;
+    }
 
-	public Collection<ScopeDefinition> getScopes() {
-		return scopes;
-	}
+    public Collection<ScopeDefinition> getScopes() {
+        return scopes;
+    }
 
-	public String getRedirectUri() {
-		return redirectUri;
-	}
+    public String getRedirectUri() {
+        return redirectUri;
+    }
+
 }

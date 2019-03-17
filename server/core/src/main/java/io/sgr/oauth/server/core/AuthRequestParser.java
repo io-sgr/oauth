@@ -23,5 +23,6 @@ import io.sgr.oauth.server.core.models.AuthorizationRequest;
 
 public interface AuthRequestParser<T> {
 
-	AuthorizationRequest parse(T from) throws InvalidRequestException, UnsupportedResponseTypeException;
+    AuthorizationRequest parse(T from) throws InvalidRequestException, UnsupportedResponseTypeException;
+
 }

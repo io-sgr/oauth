@@ -31,51 +31,53 @@ import java.util.Objects;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ScopeDefinition implements Serializable {
 
-	private final String id;
-	private final String name;
-	private final String description;
+    private final String id;
+    private final String name;
+    private final String description;
 
-	@JsonCreator
-	public ScopeDefinition(
-			@JsonProperty("id") final String id,
-			@JsonProperty("name") final String name,
-			@JsonProperty("description") final String description) {
-		notEmptyString(id, "Scope ID needs to be specified");
-		this.id = id;
-		notEmptyString(name, "Scope name needs to be specified");
-		this.name = name;
-		notEmptyString(description, "Scope description needs to be specified");
-		this.description = description;
-	}
+    @JsonCreator
+    public ScopeDefinition(
+            @JsonProperty("id") final String id,
+            @JsonProperty("name") final String name,
+            @JsonProperty("description") final String description) {
+        notEmptyString(id, "Scope ID needs to be specified");
+        this.id = id;
+        notEmptyString(name, "Scope name needs to be specified");
+        this.name = name;
+        notEmptyString(description, "Scope description needs to be specified");
+        this.description = description;
+    }
 
-	@JsonProperty("id")
-	public String getId() {
-		return id;
-	}
+    @JsonProperty("id")
+    public String getId() {
+        return id;
+    }
 
-	@JsonProperty("name")
-	public String getName() {
-		return name;
-	}
+    @JsonProperty("name")
+    public String getName() {
+        return name;
+    }
 
-	@JsonProperty("description")
-	public String getDescription() {
-		return description;
-	}
+    @JsonProperty("description")
+    public String getDescription() {
+        return description;
+    }
 
-	@Override public boolean equals(final Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (!(o instanceof ScopeDefinition)) {
-			return false;
-		}
-		final ScopeDefinition that = (ScopeDefinition) o;
-		return Objects.equals(getId(), that.getId());
-	}
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ScopeDefinition)) {
+            return false;
+        }
+        final ScopeDefinition that = (ScopeDefinition) o;
+        return Objects.equals(getId(), that.getId());
+    }
 
-	@Override public int hashCode() {
-		return Objects.hash(getId());
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
 
 }

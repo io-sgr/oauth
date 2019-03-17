@@ -21,20 +21,22 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
 import io.sgr.oauth.core.v20.OAuthErrorType;
+
 import org.junit.Test;
 
 import java.text.MessageFormat;
 
 public class UnsupportedGrantTypeExceptionTest {
 
-	@Test(expected = UnsupportedGrantTypeException.class)
-	public void testBasicMethods() throws UnsupportedGrantTypeException {
-		final String errorDescription = "Does not support this grant type";
-		final UnsupportedGrantTypeException e = new UnsupportedGrantTypeException(errorDescription);
-		assertNotNull(e.getError());
-		assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.UNSUPPORTED_GRANT_TYPE.name().toLowerCase(), errorDescription), e.getMessage());
-		assertEquals(OAuthErrorType.UNSUPPORTED_GRANT_TYPE.name().toLowerCase(), e.getError().getName());
-		assertEquals(errorDescription, e.getError().getErrorDescription());
-		throw e;
-	}
+    @Test(expected = UnsupportedGrantTypeException.class)
+    public void testBasicMethods() throws UnsupportedGrantTypeException {
+        final String errorDescription = "Does not support this grant type";
+        final UnsupportedGrantTypeException e = new UnsupportedGrantTypeException(errorDescription);
+        assertNotNull(e.getError());
+        assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.UNSUPPORTED_GRANT_TYPE.name().toLowerCase(), errorDescription), e.getMessage());
+        assertEquals(OAuthErrorType.UNSUPPORTED_GRANT_TYPE.name().toLowerCase(), e.getError().getName());
+        assertEquals(errorDescription, e.getError().getErrorDescription());
+        throw e;
+    }
+
 }

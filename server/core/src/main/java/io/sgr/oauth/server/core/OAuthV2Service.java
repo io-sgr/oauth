@@ -28,38 +28,38 @@ import java.util.Optional;
 
 public interface OAuthV2Service {
 
-	void createScope(final ScopeDefinition scope);
+    void createScope(ScopeDefinition scope);
 
-	void updateScope(final ScopeDefinition scope);
+    void updateScope(ScopeDefinition scope);
 
-	void deleteScope(final String id);
+    void deleteScope(String id);
 
-	Optional<ScopeDefinition> getScopeById(final String id, final Locale locale);
+    Optional<ScopeDefinition> getScopeById(String id, Locale locale);
 
-	void createOAuthClient(final OAuthClientInfo client);
+    void createOAuthClient(OAuthClientInfo client);
 
-	void updateOAuthClient(final OAuthClientInfo client);
+    void updateOAuthClient(OAuthClientInfo client);
 
-	void deleteOAuthClient(final String clientId);
+    void deleteOAuthClient(String clientId);
 
-	Optional<OAuthClientInfo> getOAuthClientById(final String clientId);
+    Optional<OAuthClientInfo> getOAuthClientById(String clientId);
 
-	Optional<OAuthClientInfo> getOAuthClientByIdAndSecret(final String clientId, final String clientSecret);
+    Optional<OAuthClientInfo> getOAuthClientByIdAndSecret(String clientId, String clientSecret);
 
-	boolean checkIfUserAuthorized(final String currentUser, final String clientId, final List<String> requestedScopes);
+    boolean checkIfUserAuthorized(String currentUser, String clientId, List<String> requestedScopes);
 
-	boolean isAuthorizationCodeRevoked(final String authCode);
+    boolean isAuthorizationCodeRevoked(String authCode);
 
-	void revokeAuthorizationCode(final String authCode);
+    void revokeAuthorizationCode(String authCode);
 
-	Collection<String> getGrantedScopes(final String clientId, final String userId);
+    Collection<String> getGrantedScopes(String clientId, String userId);
 
-	OAuthCredential generateAccessToken(final String clientId, final String userId, final Collection<String> scopes);
+    OAuthCredential generateAccessToken(String clientId, String userId, Collection<String> scopes);
 
-	String getUserIdByUsernameAndPassword(final String username, final String password);
+    String getUserIdByUsernameAndPassword(String username, String password);
 
-	boolean isValidRefreshToken(final String clientId, final String refreshToken);
+    boolean isValidRefreshToken(String clientId, String refreshToken);
 
-	OAuthCredential refreshAccessToken(final String clientId, final String refreshToken);
+    OAuthCredential refreshAccessToken(String clientId, String refreshToken);
 
 }

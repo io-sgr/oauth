@@ -5,7 +5,7 @@
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
   ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~      http://www.apache.org/licenses/LICENSE-2.0
   ~
   ~ Unless required by applicable law or agreed to in writing, software
   ~ distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,7 +15,8 @@
   ~
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -58,7 +59,6 @@
         <jwt.version>0.9.0</jwt.version>
         <servlet.api.version>1.0</servlet.api.version>
         <google.client.version>1.23.0</google.client.version>
-        <apache.http.version>4.1.4</apache.http.version>
         <commons.codec.version>1.11</commons.codec.version>
         <commons.logging.version>1.2</commons.logging.version>
         <mockito.version>2.13.0</mockito.version>
@@ -69,8 +69,6 @@
         <module>server/core</module>
         <module>server/authserver/core</module>
         <module>server/authserver/j2ee</module>
-        <module>server/resourceserver/core</module>
-        <module>server/resourceserver/j2ee</module>
         <module>client/core</module>
         <module>client/googlehttp</module>
         <module>client/apachehttp</module>
@@ -141,8 +139,18 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>4.4.10</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>4.5.6</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpasyncclient</artifactId>
-                <version>${apache.http.version}</version>
+                <version>4.1.4</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>

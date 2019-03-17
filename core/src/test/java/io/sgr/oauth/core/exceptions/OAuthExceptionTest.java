@@ -22,31 +22,36 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import io.sgr.oauth.core.v20.OAuthError;
+
 import org.junit.Test;
 
 public class OAuthExceptionTest {
 
-	@Test(expected = OAuthException.class)
-	public void testGetMessageWithoutErrorDetail() throws OAuthException {
-		final OAuthException e = new OAuthException(new OAuthError("test_err", null)) {};
-		assertNotNull(e.getError());
-		assertEquals("test_err", e.getMessage());
-		throw e;
-	}
+    @Test(expected = OAuthException.class)
+    public void testGetMessageWithoutErrorDetail() throws OAuthException {
+        final OAuthException e = new OAuthException(new OAuthError("test_err", null)) {
+        };
+        assertNotNull(e.getError());
+        assertEquals("test_err", e.getMessage());
+        throw e;
+    }
 
-	@Test(expected = OAuthException.class)
-	public void testGetMessageWithErrorDetail() throws OAuthException {
-		final OAuthException e = new OAuthException(new OAuthError("test_err", "Sample description")) {};
-		assertNotNull(e.getError());
-		assertEquals("test_err: Sample description", e.getMessage());
-		throw e;
-	}
+    @Test(expected = OAuthException.class)
+    public void testGetMessageWithErrorDetail() throws OAuthException {
+        final OAuthException e = new OAuthException(new OAuthError("test_err", "Sample description")) {
+        };
+        assertNotNull(e.getError());
+        assertEquals("test_err: Sample description", e.getMessage());
+        throw e;
+    }
 
-	@Test(expected = OAuthException.class)
-	public void testGetMessage() throws OAuthException {
-		final OAuthException e = new OAuthException(null) {};
-		assertNull(e.getError());
-		assertEquals("No more detail", e.getMessage());
-		throw e;
-	}
+    @Test(expected = OAuthException.class)
+    public void testGetMessage() throws OAuthException {
+        final OAuthException e = new OAuthException(null) {
+        };
+        assertNull(e.getError());
+        assertEquals("No more detail", e.getMessage());
+        throw e;
+    }
+
 }

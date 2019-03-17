@@ -21,20 +21,22 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
 import io.sgr.oauth.core.v20.OAuthErrorType;
+
 import org.junit.Test;
 
 import java.text.MessageFormat;
 
 public class InvalidClientExceptionTest {
 
-	@Test(expected = InvalidClientException.class)
-	public void testBasicMethods() throws InvalidClientException {
-		final String errorDescription = "Invalid client";
-		final InvalidClientException e = new InvalidClientException(errorDescription);
-		assertNotNull(e.getError());
-		assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.INVALID_CLIENT.name().toLowerCase(), errorDescription), e.getMessage());
-		assertEquals(OAuthErrorType.INVALID_CLIENT.name().toLowerCase(), e.getError().getName());
-		assertEquals(errorDescription, e.getError().getErrorDescription());
-		throw e;
-	}
+    @Test(expected = InvalidClientException.class)
+    public void testBasicMethods() throws InvalidClientException {
+        final String errorDescription = "Invalid client";
+        final InvalidClientException e = new InvalidClientException(errorDescription);
+        assertNotNull(e.getError());
+        assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.INVALID_CLIENT.name().toLowerCase(), errorDescription), e.getMessage());
+        assertEquals(OAuthErrorType.INVALID_CLIENT.name().toLowerCase(), e.getError().getName());
+        assertEquals(errorDescription, e.getError().getErrorDescription());
+        throw e;
+    }
+
 }

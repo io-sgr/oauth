@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package io.sgr.oauth.core.v20;
 
 import static io.sgr.oauth.core.utils.Preconditions.notEmptyString;
@@ -28,58 +29,64 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OAuthError {
 
-	private final String name;
-	private final String errorDescription;
-	private final String errorUri;
+    private final String name;
+    private final String errorDescription;
+    private final String errorUri;
 
-	/**
-	 * @param error            The error
-	 * @param errorDescription Optional. The error description. Can only include ASCII characters, and should be a
-	 *                         sentence or two at most describing the circumstance of the error.
-	 */
-	public OAuthError(final String error, final String errorDescription) {
-		this(error, errorDescription, null);
-	}
+    /**
+     * @param error
+     *         The error
+     * @param errorDescription
+     *         Optional. The error description. Can only include ASCII characters, and should be a
+     *         sentence or two at most describing the circumstance of the error.
+     */
+    public OAuthError(final String error, final String errorDescription) {
+        this(error, errorDescription, null);
+    }
 
-	/**
-	 * @param error            The error
-	 * @param errorDescription Optional. The error description. Can only include ASCII characters, and should be a
-	 *                         sentence or two at most describing the circumstance of the error.
-	 * @param errorUri         Optional. The link to API documentation for information about how to correct the
-	 *                         specific error that was encountered.
-	 */
-	@JsonCreator
-	public OAuthError(
-			@JsonProperty("error") final String error,
-			@JsonProperty("error_description") final String errorDescription,
-			@JsonProperty("error_uri") final String errorUri) {
-		notEmptyString(error, "Error should be specified");
-		this.name = error;
-		this.errorDescription = errorDescription;
-		this.errorUri = errorUri;
-	}
+    /**
+     * @param error
+     *         The error
+     * @param errorDescription
+     *         Optional. The error description. Can only include ASCII characters, and should be a
+     *         sentence or two at most describing the circumstance of the error.
+     * @param errorUri
+     *         Optional. The link to API documentation for information about how to correct the
+     *         specific error that was encountered.
+     */
+    @JsonCreator
+    public OAuthError(
+            @JsonProperty("error") final String error,
+            @JsonProperty("error_description") final String errorDescription,
+            @JsonProperty("error_uri") final String errorUri) {
+        notEmptyString(error, "Error should be specified");
+        this.name = error;
+        this.errorDescription = errorDescription;
+        this.errorUri = errorUri;
+    }
 
-	/**
-	 * @return The error
-	 */
-	@JsonProperty("error")
-	public String getName() {
-		return this.name;
-	}
+    /**
+     * @return The error
+     */
+    @JsonProperty("error")
+    public String getName() {
+        return this.name;
+    }
 
-	/**
-	 * @return The error description
-	 */
-	@JsonProperty("error_description")
-	public String getErrorDescription() {
-		return this.errorDescription;
-	}
+    /**
+     * @return The error description
+     */
+    @JsonProperty("error_description")
+    public String getErrorDescription() {
+        return this.errorDescription;
+    }
 
-	/**
-	 * @return The link to API doc for info
-	 */
-	@JsonProperty("error_uri")
-	public String getErrorUri() {
-		return errorUri;
-	}
+    /**
+     * @return The link to API doc for info
+     */
+    @JsonProperty("error_uri")
+    public String getErrorUri() {
+        return errorUri;
+    }
+
 }

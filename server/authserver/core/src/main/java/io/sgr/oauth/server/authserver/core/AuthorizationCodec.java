@@ -19,8 +19,8 @@ package io.sgr.oauth.server.authserver.core;
 
 public interface AuthorizationCodec<T> {
 
-	String encode(final T content);
+    String encode(final T content);
 
-	T decode(String authCode);
+    T decode(String authCode);
 
 }

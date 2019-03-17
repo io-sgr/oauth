@@ -24,13 +24,20 @@ import java.util.Locale;
 
 public interface DummyBackend {
 
-	String getCurrentUserId();
-	Locale getUserLocale();
-	void onUserNotSignedIn();
-	void displayUserAuthorizePage(final AuthorizationDetail authDetail);
+    String getCurrentUserId();
 
-	void onBadOAuthRequest(final OAuthError error);
-	void onBadTokenRequest(final OAuthError error);
-	void onInvalidClient(final OAuthError error);
-	void onServerError(final OAuthError error);
+    Locale getUserLocale();
+
+    void onUserNotSignedIn();
+
+    void displayUserAuthorizePage(final AuthorizationDetail authDetail);
+
+    void onBadOAuthRequest(final OAuthError error);
+
+    void onBadTokenRequest(final OAuthError error);
+
+    void onInvalidClient(final OAuthError error);
+
+    void onServerError(final OAuthError error);
+
 }

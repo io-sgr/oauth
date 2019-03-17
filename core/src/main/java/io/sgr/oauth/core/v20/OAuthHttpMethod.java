@@ -14,12 +14,17 @@
  * limitations under the License.
  *
  */
+
 package io.sgr.oauth.core.v20;
 
 /**
  * @author SgrAlpha
- *
  */
 public enum OAuthHttpMethod {
-	GET, POST, PUT, DELETE, REDIRECT,
+    GET,
+    POST,
+    PUT,
+    DELETE,
+    REDIRECT,
+    ;
 }

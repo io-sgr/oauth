@@ -22,11 +22,12 @@ import io.sgr.oauth.core.v20.OAuthErrorType;
 
 public class InvalidRequestException extends UnrecoverableOAuthException {
 
-	/**
-	 * @param errorDescription The error description
-	 */
-	public InvalidRequestException(final String errorDescription) {
-		super(new OAuthError(OAuthErrorType.INVALID_REQUEST.name().toLowerCase(), errorDescription));
-	}
+    /**
+     * @param errorDescription
+     *         The error description
+     */
+    public InvalidRequestException(final String errorDescription) {
+        super(new OAuthError(OAuthErrorType.INVALID_REQUEST.name().toLowerCase(), errorDescription));
+    }
 
 }

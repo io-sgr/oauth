@@ -21,20 +21,22 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
 import io.sgr.oauth.core.v20.OAuthErrorType;
+
 import org.junit.Test;
 
 import java.text.MessageFormat;
 
 public class ServerErrorExceptionTest {
 
-	@Test(expected = ServerErrorException.class)
-	public void testBasicMethods() throws ServerErrorException {
-		final String errorDescription = "Server 500";
-		final ServerErrorException e = new ServerErrorException(errorDescription);
-		assertNotNull(e.getError());
-		assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.SERVER_ERROR.name().toLowerCase(), errorDescription), e.getMessage());
-		assertEquals(OAuthErrorType.SERVER_ERROR.name().toLowerCase(), e.getError().getName());
-		assertEquals(errorDescription, e.getError().getErrorDescription());
-		throw e;
-	}
+    @Test(expected = ServerErrorException.class)
+    public void testBasicMethods() throws ServerErrorException {
+        final String errorDescription = "Server 500";
+        final ServerErrorException e = new ServerErrorException(errorDescription);
+        assertNotNull(e.getError());
+        assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.SERVER_ERROR.name().toLowerCase(), errorDescription), e.getMessage());
+        assertEquals(OAuthErrorType.SERVER_ERROR.name().toLowerCase(), e.getError().getName());
+        assertEquals(errorDescription, e.getError().getErrorDescription());
+        throw e;
+    }
+
 }

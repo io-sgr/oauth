@@ -21,20 +21,22 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
 import io.sgr.oauth.core.v20.OAuthErrorType;
+
 import org.junit.Test;
 
 import java.text.MessageFormat;
 
 public class TemporarilyUnavailableExceptionTest {
 
-	@Test(expected = TemporarilyUnavailableException.class)
-	public void testBasicMethods() throws TemporarilyUnavailableException {
-		final String errorDescription = "Server 503";
-		final TemporarilyUnavailableException e = new TemporarilyUnavailableException(errorDescription);
-		assertNotNull(e.getError());
-		assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.TEMPORARILY_UNAVAILABLE.name().toLowerCase(), errorDescription), e.getMessage());
-		assertEquals(OAuthErrorType.TEMPORARILY_UNAVAILABLE.name().toLowerCase(), e.getError().getName());
-		assertEquals(errorDescription, e.getError().getErrorDescription());
-		throw e;
-	}
+    @Test(expected = TemporarilyUnavailableException.class)
+    public void testBasicMethods() throws TemporarilyUnavailableException {
+        final String errorDescription = "Server 503";
+        final TemporarilyUnavailableException e = new TemporarilyUnavailableException(errorDescription);
+        assertNotNull(e.getError());
+        assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.TEMPORARILY_UNAVAILABLE.name().toLowerCase(), errorDescription), e.getMessage());
+        assertEquals(OAuthErrorType.TEMPORARILY_UNAVAILABLE.name().toLowerCase(), e.getError().getName());
+        assertEquals(errorDescription, e.getError().getErrorDescription());
+        throw e;
+    }
+
 }

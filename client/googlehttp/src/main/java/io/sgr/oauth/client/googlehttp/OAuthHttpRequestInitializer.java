@@ -14,27 +14,25 @@
  * limitations under the License.
  *
  */
+
 package io.sgr.oauth.client.googlehttp;
 
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 
-import java.io.IOException;
-
 /**
  * @author SgrAlpha
- *
  */
 public class OAuthHttpRequestInitializer implements HttpRequestInitializer {
 
-	/* (non-Javadoc)
-	 * @see com.google.api.client.http.HttpRequestInitializer#initialize(com.google.api.client.http.HttpRequest)
-	 */
-	@Override
-	public void initialize(HttpRequest request) throws IOException {
-//		request.setNumberOfRetries(3);
-		request.setThrowExceptionOnExecuteError(false);
-//		request.setParser(new JacksonFactory().createJsonObjectParser());
-	}
+    /* (non-Javadoc)
+     * @see com.google.api.client.http.HttpRequestInitializer#initialize(com.google.api.client.http.HttpRequest)
+     */
+    @Override
+    public void initialize(HttpRequest request) {
+        // request.setNumberOfRetries(3);
+        request.setThrowExceptionOnExecuteError(false);
+        // request.setParser(new JacksonFactory().createJsonObjectParser());
+    }
 
 }

@@ -21,20 +21,22 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
 import io.sgr.oauth.core.v20.OAuthErrorType;
+
 import org.junit.Test;
 
 import java.text.MessageFormat;
 
 public class InvalidRequestExceptionTest {
 
-	@Test(expected = InvalidRequestException.class)
-	public void testBasicMethods() throws InvalidRequestException {
-		final String errorDescription = "Invalid request";
-		final InvalidRequestException e = new InvalidRequestException(errorDescription);
-		assertNotNull(e.getError());
-		assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.INVALID_REQUEST.name().toLowerCase(), errorDescription), e.getMessage());
-		assertEquals(OAuthErrorType.INVALID_REQUEST.name().toLowerCase(), e.getError().getName());
-		assertEquals(errorDescription, e.getError().getErrorDescription());
-		throw e;
-	}
+    @Test(expected = InvalidRequestException.class)
+    public void testBasicMethods() throws InvalidRequestException {
+        final String errorDescription = "Invalid request";
+        final InvalidRequestException e = new InvalidRequestException(errorDescription);
+        assertNotNull(e.getError());
+        assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.INVALID_REQUEST.name().toLowerCase(), errorDescription), e.getMessage());
+        assertEquals(OAuthErrorType.INVALID_REQUEST.name().toLowerCase(), e.getError().getName());
+        assertEquals(errorDescription, e.getError().getErrorDescription());
+        throw e;
+    }
+
 }

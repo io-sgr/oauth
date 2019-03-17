@@ -21,20 +21,22 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNotNull;
 
 import io.sgr.oauth.core.v20.OAuthErrorType;
+
 import org.junit.Test;
 
 import java.text.MessageFormat;
 
 public class UnsupportedResponseTypeExceptionTest {
 
-	@Test(expected = UnsupportedResponseTypeException.class)
-	public void testBasicMethods() throws UnsupportedResponseTypeException {
-		final String errorDescription = "Does not support this response type";
-		final UnsupportedResponseTypeException e = new UnsupportedResponseTypeException(errorDescription);
-		assertNotNull(e.getError());
-		assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.UNSUPPORTED_RESPONSE_TYPE.name().toLowerCase(), errorDescription), e.getMessage());
-		assertEquals(OAuthErrorType.UNSUPPORTED_RESPONSE_TYPE.name().toLowerCase(), e.getError().getName());
-		assertEquals(errorDescription, e.getError().getErrorDescription());
-		throw e;
-	}
+    @Test(expected = UnsupportedResponseTypeException.class)
+    public void testBasicMethods() throws UnsupportedResponseTypeException {
+        final String errorDescription = "Does not support this response type";
+        final UnsupportedResponseTypeException e = new UnsupportedResponseTypeException(errorDescription);
+        assertNotNull(e.getError());
+        assertEquals(MessageFormat.format("{0}: {1}", OAuthErrorType.UNSUPPORTED_RESPONSE_TYPE.name().toLowerCase(), errorDescription), e.getMessage());
+        assertEquals(OAuthErrorType.UNSUPPORTED_RESPONSE_TYPE.name().toLowerCase(), e.getError().getName());
+        assertEquals(errorDescription, e.getError().getErrorDescription());
+        throw e;
+    }
+
 }

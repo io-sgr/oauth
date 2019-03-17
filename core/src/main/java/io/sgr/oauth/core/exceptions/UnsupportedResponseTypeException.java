@@ -22,11 +22,12 @@ import io.sgr.oauth.core.v20.OAuthErrorType;
 
 public class UnsupportedResponseTypeException extends UnrecoverableOAuthException {
 
-	/**
-	 * @param errorDescription The error description
-	 */
-	public UnsupportedResponseTypeException(final String errorDescription) {
-		super(new OAuthError(OAuthErrorType.UNSUPPORTED_RESPONSE_TYPE.name().toLowerCase(), errorDescription));
-	}
+    /**
+     * @param errorDescription
+     *         The error description
+     */
+    public UnsupportedResponseTypeException(final String errorDescription) {
+        super(new OAuthError(OAuthErrorType.UNSUPPORTED_RESPONSE_TYPE.name().toLowerCase(), errorDescription));
+    }
 
 }
