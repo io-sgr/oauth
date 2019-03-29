@@ -32,7 +32,7 @@
 
     <name>OAuth Utilities</name>
     <description>An Android compatible OAuth java library</description>
-    <url>https://github.com/sgr-io/oauth</url>
+    <url>https://github.com/io-sgr/oauth</url>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
@@ -43,7 +43,7 @@
     <scm>
         <connection>scm:git:git@github.com:io-sgr/oauth.git</connection>
         <developerConnection>scm:git:git@github.com:io-sgr/oauth.git</developerConnection>
-        <url>https://github.com/sgr-io/oauth</url>
+        <url>https://github.com/io-sgr/oauth</url>
         <tag>HEAD</tag>
     </scm>
     <developers>
