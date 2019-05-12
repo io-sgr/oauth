@@ -29,8 +29,7 @@
     <artifactId>oauth-server-core</artifactId>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.targetJdk>1.8</project.build.targetJdk>
     </properties>
 
     <dependencies>
